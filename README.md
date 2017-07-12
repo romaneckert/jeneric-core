@@ -1,0 +1,1 @@
+simple helper and abstract classes / framework for js applications
