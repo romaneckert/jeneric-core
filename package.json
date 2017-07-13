@@ -8,8 +8,5 @@
   },
   "author": "Roman Eckert",
   "license": "MIT",
-  "repository": "https://github.com/romaneckert/jeneric-core",
-  "browserify": {
-    "transform": [["babelify", { "presets": ["es2015"] }]]
-  }
+  "repository": "https://github.com/romaneckert/jeneric-core"
 }
