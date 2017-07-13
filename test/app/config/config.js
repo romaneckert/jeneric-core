@@ -1,12 +1,23 @@
 module.exports = {
-    modules: {
+    services: {
         logger : {
             active : false,
-            module : require('@jeneric/logger')
+            //module : require('@jeneric/logger'),
+            options : {
+                directory : 'var/logs/',
+                consoleLevels: [
+                    'debug',
+                    'info',
+                    'error'
+                ]
+            }
         },
         custom : {
-            active : false,
-            module : require('../modules/custom')
+            active : true,
+            module : require('../service/custom'),
+            options : {
+                test : true
+            }
         }
     }
 };

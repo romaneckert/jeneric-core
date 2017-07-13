@@ -1,11 +1,16 @@
-const Application = require('../application');
+const AbstractApplication = require('../abstract-application');
 
-class Main extends Application {
+class Main extends AbstractApplication {
     constructor() {
 
         super();
 
-        console.log(this.modules.custom);
+        this.kernel.init(require('./app/config/config'));
+
+        console.log(this.services.custom);
+        console.log(this.services.custom);
+        console.log(this.services.custom);
+
 
     }
 }

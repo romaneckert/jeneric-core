@@ -1,10 +1,10 @@
 const Abstract = require('./abstract');
 
 /** the main application class have to extend the application class. */
-class Application extends Abstract {
+class AbstractApplication extends Abstract {
     constructor() {
         super();
     }
 }
 
-module.exports = Application;
+module.exports = AbstractApplication;

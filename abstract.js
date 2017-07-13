@@ -6,7 +6,7 @@ const Kernel = require('./kernel');
 class Abstract {
 
     constructor() {
-        this._kernel = null;
+
     }
 
     /**
@@ -14,14 +14,14 @@ class Abstract {
      * @returns {Kernel}
      */
     get kernel() {
-        return (null === this._kernel) ? this._kernel = new Kernel() : this._kernel;
+        return require('./kernel');
     }
 
     /**
      * all registered components
      */
-    get modules() {
-        return this.kernel.modules;
+    get services() {
+        return this.kernel.services;
     }
 
     get config() {
