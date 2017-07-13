@@ -1,6 +1,6 @@
 {
   "name": "@jeneric/core",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "jeneric core classes",
   "main": "index.js",
   "scripts": {
