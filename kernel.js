@@ -27,7 +27,6 @@ class Kernel {
 
         this._initialized = true;
 
-        //this.services.logger.debug('all services are initialized');
     }
 
     get config() {
