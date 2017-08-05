@@ -1,4 +1,5 @@
 const Services = require('./services');
+const Environment = require('./environment');
 
 class Kernel {
 
@@ -6,22 +7,25 @@ class Kernel {
 
         this._config = null;
         this._services = new Services();
+        this._env = new Environment();
         this._initialized = false;
+
+        Object.assign(global, require('./globals'));
     }
 
     init(config) {
 
         this._config = config;
 
-        if ('object' !== typeof this._config.services) throw new Error('config have no modules configuration');
+        if ('object' !== typeof this._config.services) throw new Error('config have no services configuration');
 
         for(let key in this._config.services) {
 
-            let configuration = this._config.services[key];
+            let service = this._config.services[key];
 
-            if(!configuration.active) continue;
+            if(!service.active) continue;
 
-            this._services[key] = new configuration.module(configuration.options);
+            this._services[key] = new service.module(service.config);
 
         }
 
@@ -38,6 +42,10 @@ class Kernel {
         if(!this._initialized) throw new Error('kernel not initialized, please call kernel.init');
 
         return this._services;
+    }
+
+    get env() {
+        return this._env;
     }
 
 }

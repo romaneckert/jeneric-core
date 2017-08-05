@@ -8,5 +8,6 @@
   },
   "author": "Roman Eckert",
   "license": "MIT",
-  "repository": "https://github.com/romaneckert/jeneric-core"
+  "repository": "https://github.com/romaneckert/jeneric-core",
+  "dependencies": {}
 }

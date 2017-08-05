@@ -4,8 +4,6 @@ jeneric is a framework for building javascript application with mvc pattern and 
 
 every jeneric application needs the jeneric core package. all other jeneric modules are optional.
 
-have a look at the test folder, to understand the structure of an jeneric application
-
 Jeneric needs sponsors!
 
 ## Future Plans
