@@ -1,4 +1,3 @@
-const Services = require('./services');
 const Environment = require('./environment');
 
 class Kernel {
@@ -6,11 +5,8 @@ class Kernel {
     constructor() {
 
         this._config = null;
-        this._services = new Services();
+        this._services = {};
         this._env = new Environment();
-        this._initialized = false;
-
-        Object.assign(global, require('./globals'));
     }
 
     init(config) {
@@ -29,8 +25,6 @@ class Kernel {
 
         }
 
-        this._initialized = true;
-
     }
 
     get config() {
@@ -38,9 +32,6 @@ class Kernel {
     }
 
     get services() {
-
-        if(!this._initialized) throw new Error('kernel not initialized, please call kernel.init');
-
         return this._services;
     }
 

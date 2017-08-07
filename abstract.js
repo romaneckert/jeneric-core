@@ -21,11 +21,6 @@ class Abstract {
     get services() {
         return this.kernel.services;
     }
-
-    get env() {
-        return this.kernel.env;
-    }
-
 }
 
 module.exports = Abstract;
