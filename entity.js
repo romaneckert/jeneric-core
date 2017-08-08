@@ -1,9 +1,10 @@
 const Abstract = require('./abstract');
 
 class Entity extends Abstract {
-    constructor() {
+    constructor(entityName) {
         super();
         this._id = null;
+        this._entityName = entityName;
     }
 
     get id() {
@@ -15,7 +16,7 @@ class Entity extends Abstract {
     }
 
     get entityName() {
-        return this.constructor.name.toLowerCase();
+        return this._entityName
     }
 }
 
