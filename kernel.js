@@ -3,7 +3,6 @@ const Environment = require('./environment');
 class Kernel {
 
     constructor() {
-
         this._config = null;
         this._services = {};
         this._env = new Environment();

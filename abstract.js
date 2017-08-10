@@ -4,7 +4,11 @@
 class Abstract {
 
     constructor() {
+        this._instanceId = '_' + Math.random().toString(36).substr(2, 9);
+    }
 
+    get instanceId() {
+        return this._instanceId;
     }
 
     /**
