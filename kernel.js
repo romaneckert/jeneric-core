@@ -1,8 +1,20 @@
 class Kernel {
 
     constructor() {
-        this._config = null;
+        /*
+        if('undefined' !== typeof global) {
+            if('undefined' !== typeof global.kernel) return global.kernel;
+            global.kernel = this;
+        }
+
+        if('undefined' !== typeof window) {
+            if('undefined' !== typeof window.kernel) return window.kernel;
+            window.kernel = this;
+        }*/
+
+        this._config = {};
         this._services = {};
+
     }
 
     init(config) {

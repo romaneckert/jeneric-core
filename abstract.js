@@ -1,3 +1,5 @@
+const Kernel = require('./kernel');
+
 /** all classes extends the abstract class.
  * @abstract
  */
