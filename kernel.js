@@ -1,11 +1,8 @@
-const Environment = require('./environment');
-
 class Kernel {
 
     constructor() {
         this._config = null;
         this._services = {};
-        this._env = new Environment();
     }
 
     init(config) {
@@ -32,10 +29,6 @@ class Kernel {
 
     get services() {
         return this._services;
-    }
-
-    get env() {
-        return this._env;
     }
 
 }
