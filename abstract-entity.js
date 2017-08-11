@@ -1,6 +1,6 @@
 const Abstract = require('./abstract');
 
-class Entity extends Abstract {
+class AbstractEntity extends Abstract {
     constructor(entityName) {
         super();
         this._id = null;
@@ -20,6 +20,6 @@ class Entity extends Abstract {
     }
 }
 
-module.exports = Entity;
+module.exports = AbstractEntity;
 
 
