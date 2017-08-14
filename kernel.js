@@ -1,16 +1,6 @@
 class Kernel {
 
     constructor() {
-        /*
-        if('undefined' !== typeof global) {
-            if('undefined' !== typeof global.kernel) return global.kernel;
-            global.kernel = this;
-        }
-
-        if('undefined' !== typeof window) {
-            if('undefined' !== typeof window.kernel) return window.kernel;
-            window.kernel = this;
-        }*/
 
         this._config = {};
         this._services = {};
@@ -27,7 +17,7 @@ class Kernel {
 
             let service = this._config.services[key];
 
-            if(!service.active) continue;
+            if(false === service.active || 0 === service.active) continue;
 
             this._services[key] = new service.module(service.config);
 
