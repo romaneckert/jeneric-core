@@ -27,6 +27,10 @@ class Abstract {
     get services() {
         return this.kernel.services;
     }
+
+    get logger() {
+        return this.services.logger;
+    }
 }
 
 module.exports = Abstract;

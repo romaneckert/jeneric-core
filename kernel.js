@@ -23,6 +23,20 @@ class Kernel {
 
         }
 
+        if('undefined' === typeof this._services.logger) {
+            this._services.logger = {
+                debug : function(message, meta) {
+                    console.log(message, meta)
+                },
+                info : function(message, meta) {
+                    console.log(message, meta)
+                },
+                error : function(message, meta) {
+                    console.error(message, meta)
+                }
+            }
+        }
+
     }
 
     get config() {
