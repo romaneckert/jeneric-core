@@ -1,8 +1,6 @@
-const Abstract = require('./abstract');
-
-class AbstractEntity extends Abstract {
+class AbstractEntity {
     constructor(entityName) {
-        super();
+
         this._id = null;
         this._entityName = entityName;
     }

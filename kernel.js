@@ -3,38 +3,35 @@ class Kernel {
     constructor() {
 
         this._config = {};
+
+        if(this.isNode()) {
+            this._config = require('./config/' + 'app');
+        } else {
+            this._config = require('./config/web');
+        }
+
+
         this._services = {};
 
     }
 
     init(config) {
 
-        this._config = config;
+        Object.assign(this._config, config);
 
-        if ('object' !== typeof this._config.services) throw new Error('config have no services configuration');
+        if ('object' !== typeof this._config.component) throw new Error('config have no component configuration');
 
-        for(let key in this._config.services) {
+        for(let component in this._config.component) {
 
-            let service = this._config.services[key];
+            let componentConfig = this._config.component[component];
 
-            if(false === service.active || 0 === service.active) continue;
-
-            this._services[key] = new service.module(service.config);
-
-        }
-
-        if('undefined' === typeof this._services.logger) {
-            this._services.logger = {
-                debug : function(message, meta) {
-                    console.log(message, meta)
-                },
-                info : function(message, meta) {
-                    console.log(message, meta)
-                },
-                error : function(message, meta) {
-                    console.error(message, meta)
+            if('object' === typeof componentConfig.service) {
+                for(let service in componentConfig.service) {
+                    let serviceClass = componentConfig.service[service].class;
+                    this._services[service] = new serviceClass(componentConfig.service[service].config);
                 }
             }
+
         }
 
     }
@@ -45,6 +42,10 @@ class Kernel {
 
     get services() {
         return this._services;
+    }
+
+    isNode() {
+        return 'undefined' === typeof window;
     }
 
 }

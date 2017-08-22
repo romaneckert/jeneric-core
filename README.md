@@ -1,4 +1,4 @@
-# Jeneric
+# Jeneric Core
 
 jeneric is a framework for building javascript application with mvc pattern and modern code pattern in es6. It can be used for frontend and backend applications. For frontend application it is fully compatible with browserify. For backend applications it is full compatible with nodejs.
 

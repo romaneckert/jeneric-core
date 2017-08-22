@@ -1,5 +1,3 @@
-const Kernel = require('./kernel');
-
 /** all classes extends the abstract class.
  * @abstract
  */
@@ -30,6 +28,10 @@ class Abstract {
 
     get logger() {
         return this.services.logger;
+    }
+
+    get data() {
+        return this.services.data;
     }
 }
 
