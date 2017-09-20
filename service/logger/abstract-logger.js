@@ -1,4 +1,4 @@
-const AbstractService = require('../../../abstract-service');
+const AbstractService = require('../../abstract-service');
 
 class AbstractLogger extends AbstractService {
     constructor() {

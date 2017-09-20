@@ -1,4 +1,4 @@
-const AbstractService = require('../../../abstract-service');
+const AbstractService = require('../../abstract-service');
 
 class AbstractEntities extends AbstractService {
 

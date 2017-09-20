@@ -1,4 +1,4 @@
-const AbstractEntity = require('../../../abstract-entity');
+const AbstractEntity = require('../abstract-model');
 
 class Log extends AbstractEntity {
 

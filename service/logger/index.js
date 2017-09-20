@@ -1,7 +1,7 @@
 const AbstractLogger = require('./abstract-logger');
 const fs = require('fs');
 const path = require('path');
-const Log = require('../model/log');
+const Log = require('../../model/log');
 const util = require('../../util');
 
 class Logger extends AbstractLogger {

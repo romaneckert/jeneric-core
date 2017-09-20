@@ -19,18 +19,12 @@ class Kernel {
 
         Object.assign(this._config, config);
 
-        if ('object' !== typeof this._config.component) throw new Error('config have no component configuration');
+        if ('object' !== typeof this._config.service) throw new Error('config have no service configuration');
 
-        for(let component in this._config.component) {
+        for(let service in this._config.service) {
 
-            let componentConfig = this._config.component[component];
-
-            if('object' === typeof componentConfig.service) {
-                for(let service in componentConfig.service) {
-                    let serviceClass = componentConfig.service[service].class;
-                    this._services[service] = new serviceClass(componentConfig.service[service].config);
-                }
-            }
+            let serviceClass = this._config.service[service].class;
+            this._services[service] = new serviceClass(this._config.service[service].config);
 
         }
 

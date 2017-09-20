@@ -1,5 +1,5 @@
 const AbstractLogger = require('./abstract-logger');
-const Log = require('../entity/log');
+const Log = require('../../model/log');
 
 class Logger extends AbstractLogger {
     constructor() {

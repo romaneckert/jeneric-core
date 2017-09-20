@@ -1,24 +1,20 @@
 module.exports = {
-    component : {
+    service : {
         logger : {
-            service : {
-                logger : {
-                    class : require('../component/logger/service/logger')
-                },
-                objectManager : {
-                    class : require('../component/object-manager/service/object-manager')
-                }
-            },
-            model : {
-                log : {
-                    class : require('../component/logger/model/log')
-                }
-            },
-            repository : {
-                log : {
-                    class : require('../component/logger/repository/log')
-                }
-            }
+            class : require('../service/logger')
+        },
+        objectManager : {
+            class : require('../service/object-manager')
+        }
+    },
+    model : {
+        log : {
+            class : require('../model/log')
+        }
+    },
+    repository : {
+        log : {
+            class : require('../repository/log')
         }
     }
 };
