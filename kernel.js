@@ -2,14 +2,11 @@ class Kernel {
 
     constructor() {
 
-        this._config = {};
-
         if(this.isNode()) {
             this._config = require('./config/' + 'app');
         } else {
             this._config = require('./config/web');
         }
-
 
         this._services = {};
 
@@ -19,12 +16,11 @@ class Kernel {
 
         Object.assign(this._config, config);
 
-        if ('object' !== typeof this._config.service) throw new Error('config have no service configuration');
+        for(let serviceName in this._config.service) {
 
-        for(let service in this._config.service) {
+            let service = this._config.service[serviceName];
 
-            let serviceClass = this._config.service[service].class;
-            this._services[service] = new serviceClass(this._config.service[service].config);
+            this._services[serviceName] = new service.class(service.config);
 
         }
 
