@@ -1,8 +1,6 @@
 const AbstractLogger = require('./abstract-logger');
-const fs = require('fs');
 const path = require('path');
 const Log = require('../../model/log');
-const util = require('../../util');
 
 class Logger extends AbstractLogger {
     constructor(config) {
@@ -31,7 +29,7 @@ class Logger extends AbstractLogger {
 
         for(let type in this._config.level) {
             this._config.level[type].file = path.join(path.dirname(require.main.filename), this._config.level[type].file);
-            util.ensureFileExists(this._config.level[type].file);
+            this.fileSystem.ensureFileExists(this._config.level[type].file);
         }
     }
 
@@ -47,7 +45,7 @@ class Logger extends AbstractLogger {
 
         switch (type) {
             case 'debug':
-                fs.appendFileSync(
+                this.fileSystem.appendFileSync(
                     this._config.level.debug.file,
                     output
                 );
@@ -55,12 +53,12 @@ class Logger extends AbstractLogger {
                 if(this._config.level.debug.console) console.log(output);
                 break;
             case 'info':
-                fs.appendFileSync(
+                this.fileSystem.appendFileSync(
                     this._config.level.debug.file,
                     output
                 );
 
-                fs.appendFileSync(
+                this.fileSystem.appendFileSync(
                     this._config.level.info.file,
                     output
                 );
@@ -69,17 +67,17 @@ class Logger extends AbstractLogger {
 
                 break;
             case 'error':
-                fs.appendFileSync(
+                this.fileSystem.appendFileSync(
                     this._config.level.debug.file,
                     output
                 );
 
-                fs.appendFileSync(
+                this.fileSystem.appendFileSync(
                     this._config.level.info.file,
                     output
                 );
 
-                fs.appendFileSync(
+                this.fileSystem.appendFileSync(
                     this._config.level.error.file,
                     output
                 );

@@ -1,6 +1,6 @@
-const AbstractEntity = require('../abstract-model');
+const AbstractModel = require('../abstract-model');
 
-class Log extends AbstractEntity {
+class Log extends AbstractModel {
 
     constructor(message, meta, type) {
 

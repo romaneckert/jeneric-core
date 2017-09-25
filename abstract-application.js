@@ -1,8 +1,10 @@
 const Abstract = require('./abstract');
 
 class AbstractApplication extends Abstract {
-    constructor() {
+    constructor(config) {
         super();
+
+        this.kernel.init(config);
     }
 }
 

@@ -1,5 +1,8 @@
 module.exports = {
     service : {
+        fileSystem : {
+            class : require('../service/file-system'),
+        },
         logger : {
             class : require('../service/logger')
         },

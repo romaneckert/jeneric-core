@@ -26,12 +26,20 @@ class Abstract {
         return this.kernel.services;
     }
 
+    get classes() {
+        return this.kernel.classes;
+    }
+
     get logger() {
         return this.services.logger;
     }
 
     get data() {
         return this.services.data;
+    }
+
+    get fileSystem() {
+        return this.services.fileSystem;
     }
 }
 
