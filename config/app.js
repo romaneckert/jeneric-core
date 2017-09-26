@@ -1,23 +1,31 @@
 module.exports = {
-    service : {
-        fileSystem : {
-            class : require('../service/file-system'),
-        },
-        logger : {
-            class : require('../service/logger')
-        },
-        objectManager : {
-            class : require('../service/object-manager')
-        }
-    },
-    model : {
+    models : {
         log : {
             class : require('../model/log')
         }
     },
-    repository : {
+    repositories : {
         log : {
             class : require('../repository/log')
+        }
+    },
+    services : {
+        logger : {
+            class : require('../service/logger')
+        },
+        data : {
+            class : require('../service/data')
+        }
+    },
+    utils : {
+        object : {
+            class : require('../util/object'),
+        },
+        string : {
+            class : require('../util/string'),
+        },
+        fileSystem : {
+            class : require('../util/file-system'),
         }
     }
 };

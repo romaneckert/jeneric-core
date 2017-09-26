@@ -16,6 +16,10 @@ class AbstractLogger extends AbstractService {
     error(message, meta) {
         this._log(message, meta, 'error');
     }
+
+    critical(message, meta) {
+        this._log(message, meta, 'critical');
+    }
 }
 
 module.exports = AbstractLogger;

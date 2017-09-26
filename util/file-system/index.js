@@ -1,35 +1,23 @@
-const AbstractService = require('../../abstract-service');
 const fs = require('fs');
 const path = require('path')
 
-class FileSystem extends AbstractService {
-
-    constructor() {
-        super();
-    }
-
-    appendFileSync(file, data, options) {
+module.exports = {
+    appendFileSync : function(file, data, options) {
         return fs.appendFileSync(file, data, options);
-    }
-
-    dirname(filepath) {
+    },
+    dirname : function(filepath) {
         return path.dirname(filepath);
-    }
-
-    existsSync(path) {
+    },
+    existsSync : function(path) {
         return fs.existsSync(path);
-    }
-
-    mkdirSync(filepath) {
+    },
+    mkdirSync : function(filepath) {
         return fs.mkdirSync(filepath);
-    }
-
-    writeFileSync(file, data, options) {
+    },
+    writeFileSync : function(file, data, options) {
         return fs.writeFileSync(file, data, options);
-    }
-
-    ensureFileExists(filepath) {
-
+    },
+    ensureFileExists : function(filepath) {
         if(this.existsSync(filepath)) return true;
 
         let dirname = this.dirname(filepath);
@@ -39,10 +27,8 @@ class FileSystem extends AbstractService {
         this.writeFileSync(filepath, '');
 
         return true;
-
-    }
-
-    ensureFolderExists(folderPath) {
+    },
+    ensureFolderExists : function(folderPath) {
         if(this.existsSync(folderPath)) return true;
 
         this.ensureFolderExists(this.dirname(folderPath));
@@ -50,7 +36,4 @@ class FileSystem extends AbstractService {
 
         return true;
     }
-
-}
-
-module.exports = FileSystem;
+};

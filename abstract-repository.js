@@ -1,18 +1,18 @@
 const Abstract = require('./abstract');
 
 class AbstractRepository extends Abstract {
-    constructor(entityName) {
+    constructor(modelName) {
         super();
 
-        this._entityName = entityName;
+        this._modelName = modelName;
     }
 
-    get entityClass() {
-        return this.data.getClassByEntityName(this._entityName);
+    get modelClass() {
+        return this.models[this._modelName];
     }
 
-    get data() {
-        return this.data.data[this._entityName];
+    get raw() {
+        return this.data.raw[this._modelName];
     }
 
     find(data) {
@@ -36,10 +36,10 @@ class AbstractRepository extends Abstract {
 
         let results = [];
 
-        for(let objectId in this.data) {
-            let entity = new this.entityClass();
-            for (let attr in this.data[objectId]) entity[attr] = this.data[objectId][attr];
-            results.push(entity)
+        for(let id in this.raw) {
+            let object = new this.modelClass();
+            for (let attr in this.raw[id]) object[attr] = this.raw[id][attr];
+            results.push(object);
         }
 
         return results;
@@ -50,14 +50,14 @@ class AbstractRepository extends Abstract {
     }
 
     _getInstance(data) {
-        let entity = new this.entityClass();
-        for (let attr in data) entity[attr] = data[attr];
-        return entity;
+        let object = new this.modelClass();
+        for (let attr in data) object[attr] = data[attr];
+        return object;
     }
 
     _findById(id) {
 
-        for(let objectId in this.data) if(parseInt(objectId) === id) return this._getInstance(this.data[id]);
+        for(let objectId in this.raw) if(parseInt(objectId) === id) return this._getInstance(this.raw[id]);
 
         return null;
     }

@@ -2,48 +2,16 @@ const AbstractModel = require('../abstract-model');
 
 class Log extends AbstractModel {
 
-    constructor(message, meta, type) {
+    constructor(message, meta, type, date, callstack) {
 
         super('log');
-
-        switch (typeof message) {
-            case 'string':
-                message = String(message.split("\n"));
-                break;
-            case 'object':
-                message = [JSON.stringify(message)];
-                break;
-            case 'undefined':
-                message = null;
-                break;
-            default:
-                message = [String(message)];
-                break;
-        }
-
-        switch (typeof meta) {
-            case 'string':
-                meta = String(meta.split("\n"));
-                break;
-            case 'object':
-                meta = JSON.stringify(meta);
-                break;
-            case 'undefined':
-                meta = null;
-                break;
-            default:
-                meta = String(meta);
-                break;
-        }
 
         this._message = message;
         this._meta = meta;
         this._type = type;
+        this._date = date;
+        this._callStack = callstack;
 
-        this._date = new Date();
-
-        let e = new Error();
-        this._callStack = 'undefined' === typeof e.stack ? null : e.stack;
     }
 
     get date() {
@@ -81,9 +49,10 @@ class Log extends AbstractModel {
 
         if(null === this._callStack) return null;
 
-        let module = this.callStack.split(" at ")[4].split('(')[0].trim();
+        let module = this.callStack.split(" at ")[3].split('(')[0].trim();
 
         return (0 === module.indexOf('new')) ? module.replace('new ', '') + '.constructor' : module;
+
     }
 }
 

@@ -19,15 +19,8 @@ class Abstract {
         return require('./kernel');
     }
 
-    /**
-     * all registered components
-     */
     get services() {
         return this.kernel.services;
-    }
-
-    get classes() {
-        return this.kernel.classes;
     }
 
     get logger() {
@@ -38,8 +31,20 @@ class Abstract {
         return this.services.data;
     }
 
+    get models() {
+        return this.kernel.models;
+    }
+
+    get repositories() {
+        return this.kernel.repositories;
+    }
+
     get fileSystem() {
-        return this.services.fileSystem;
+        return this.utils.fileSystem;
+    }
+
+    get utils() {
+        return this.kernel.utils;
     }
 }
 
