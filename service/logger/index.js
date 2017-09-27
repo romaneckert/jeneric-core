@@ -46,7 +46,7 @@ class Logger extends AbstractLogger {
 
         let log = new Log(message, meta, type, new Date(), callStack);
 
-        this.data.persist(log);
+        if('object' === typeof this.data) this.data.persist(log);
 
         let output = '[' + log.dateString + '] [' + log.type + ']'
             + ((null !== log.module) ? ' [' + log.module + ']' : '')

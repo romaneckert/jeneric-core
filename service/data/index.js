@@ -1,5 +1,5 @@
 const AbstractData = require('./abstract-data');
-const Sequelize = require('sequelize');
+const mongoose = require('mongoose');
 
 class Data extends AbstractData {
     constructor(config) {
@@ -13,41 +13,32 @@ class Data extends AbstractData {
 
         this.utils.object.merge(this._config, config);
 
-        this._db = new Sequelize(this._config.db.database, this._config.db.username, this._config.db.password, {
-            host: this._config.db.host,
-            dialect: 'postgres',
-            pool: {
-                max: 10,
-                min: 0,
-                idle: 10000
-            },
-            logging : function(message) {
-                this.logger.debug(message)
-            }.bind(this)
-        });
+        // get schemas
+        this._schemas = {};
 
-        // test postgres connection
-        this._db
-            .authenticate()
-            .then(() => {
-                this.logger.info('Connection to database has been established successfully.');
-            })
-            .catch(error => {
-                this.logger.critical('Unable to connect to the database', error);
-                process.exit(1);
-            });
+        for(let modelName in this.kernel.config.models) {
 
-        // create tables in database if not exists
-        for (let modelName in this.models) {
-            let object = new this.models[modelName]();
+            let schema = this.kernel.config.models[modelName].schema;
 
-            console.log(object);
-
-            var definition = this._db.define(modelName, )
-
-            console.log(definition);
+            if ('object' !== typeof schema) {
+                this.logger.critical('no schema defined for: ' + modelName);
+                this.closeApplication();
+            }
 
         }
+
+        // http://mongoosejs.com/docs/advanced_schemas.html
+
+        mongoose.connect(
+            'mongodb://' + this._config.db.host + '/' + this._config.db.database,
+            {
+                useMongoClient : true
+            }
+        );
+
+
+
+        console.log(this._schemas);
 
     }
 

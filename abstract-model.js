@@ -1,7 +1,8 @@
 class AbstractModel {
-    constructor(modelName) {
+    constructor(modelName, schema) {
         this._id = null;
         this._modelName = modelName;
+        this._schema = schema;
     }
 
     get id() {

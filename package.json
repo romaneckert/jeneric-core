@@ -10,8 +10,6 @@
   "license": "MIT",
   "repository": "https://github.com/romaneckert/jeneric-core",
   "dependencies": {
-    "pg": "^7.3.0",
-    "pg-hstore": "^2.3.2",
-    "sequelize": "^4.11.0"
+    "mongoose": "^4.11.13"
   }
 }

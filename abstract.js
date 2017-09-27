@@ -46,6 +46,11 @@ class Abstract {
     get utils() {
         return this.kernel.utils;
     }
+
+    closeApplication() {
+        this.logger.info('close application');
+        process.exit(1);
+    }
 }
 
 module.exports = Abstract;
