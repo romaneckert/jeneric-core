@@ -16,7 +16,11 @@ class Abstract {
      * @returns {Kernel}
      */
     get kernel() {
-        return require('./kernel');
+        if ('undefined' === typeof window) {
+            return require('./ker' + 'nel');
+        } else {
+            return require('./kernel/web');
+        }
     }
 
     get services() {
@@ -45,11 +49,6 @@ class Abstract {
 
     get utils() {
         return this.kernel.utils;
-    }
-
-    closeApplication() {
-        this.logger.info('close application');
-        process.exit(1);
     }
 }
 

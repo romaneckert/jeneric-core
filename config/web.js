@@ -18,6 +18,9 @@ module.exports = {
         }
     },
     utils : {
+        error : {
+            class : require('../util/error'),
+        },
         object : {
             class : require('../util/object'),
         },

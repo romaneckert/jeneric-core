@@ -25,14 +25,17 @@ module.exports = {
         }
     },
     utils : {
+        error : {
+            class : require('../util/error'),
+        },
+        fileSystem : {
+            class : require('../util/file-system'),
+        },
         object : {
             class : require('../util/object'),
         },
         string : {
             class : require('../util/string'),
-        },
-        fileSystem : {
-            class : require('../util/file-system'),
         }
     }
 };

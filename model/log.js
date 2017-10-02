@@ -18,6 +18,7 @@ class Log extends AbstractModel {
         return this._date;
     }
 
+    // TODO: refactor out of model
     get dateString() {
 
         return this.date.getFullYear()
@@ -45,6 +46,7 @@ class Log extends AbstractModel {
         return this._meta;
     }
 
+    // TODO: refactor out of model
     get module() {
 
         if(null === this._callStack) return null;

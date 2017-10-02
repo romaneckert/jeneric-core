@@ -21,8 +21,7 @@ class Data extends AbstractData {
             let schema = this.kernel.config.models[modelName].schema;
 
             if ('object' !== typeof schema) {
-                this.logger.critical('no schema defined for: ' + modelName);
-                this.closeApplication();
+                throw new Error('no schema defined for: ' + modelName);
             }
 
         }
@@ -35,8 +34,6 @@ class Data extends AbstractData {
                 useMongoClient : true
             }
         );
-
-
 
         console.log(this._schemas);
 
