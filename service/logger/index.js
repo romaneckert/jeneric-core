@@ -7,118 +7,96 @@ class Logger extends AbstractLogger {
 
         super();
 
-        // default config
+        // generate default config from log levels
         this._config = {
-            level: {
-                debug: {
-                    file: 'var/logs/debug.log',
-                    console: false
-                },
-                info: {
-                    file: 'var/logs/info.log',
-                    console: true
-                },
-                error: {
-                    file: 'var/logs/error.log',
-                    console: true
-                },
-                critical: {
-                    file: 'var/logs/critical.log',
-                    console: true
-                }
-            }
+            levels: {}
         };
+
+        for(let level of this._levels) {
+            this._config.levels[level.name] = {
+                file : 'var/logs/' + level.name + '.log',
+                console : true
+            };
+        }
 
         this.utils.object.merge(this._config, config);
 
-        for(let type in this._config.level) {
-            this._config.level[type].file = path.join(path.dirname(require.main.filename), this._config.level[type].file);
-            this.fileSystem.ensureFileExists(this._config.level[type].file);
+        for(let levelName in this._config.levels) {
+
+            let level = this._config.levels[levelName];
+
+            level.file = path.join(path.dirname(require.main.filename), level.file);
+            this.fileSystem.ensureFileExists(level.file);
         }
     }
 
-    _log(message, meta, type) {
+    /**
+     * @param message
+     * @param meta
+     * @param type
+     * @private
+     */
+    _log(message, meta, stack, code) {
+
+        let level = this._getLevelByCode(code);
+        let date = new Date();
 
         message = this.utils.string.cast(message);
         meta = this.utils.string.cast(meta);
-        let err = new Error();
-        let callStack = 'undefined' === typeof err.stack ? null : err.stack;
 
-        let log = new Log(message, meta, type, new Date(), callStack);
+        if('object' !== typeof stack) {
+            stack = this.utils.error.stack(new Error());
+            stack.shift();
+            stack.shift();
+        }
+        stack = this._stackToString(stack);
 
-        if('object' === typeof this.data) this.data.persist(log);
+        let output = '[' + this._dateStringFromDate(date) + '] ';
+        output += '[' + level.name + '] ';
+        output += message;
 
-        let output = '[' + log.dateString + '] [' + log.type + ']'
+        if(meta.length > 0) output += ' [' + meta + ']';
+        output += ' [' + stack + ']';
+
+        /*
+        let output = '[' + log.dateString + '] [' + log.code + ']'
             + ((null !== log.module) ? ' [' + log.module + ']' : '')
             + ' ' + log.message
             + ((null !== log.meta) ? ' [' + log.meta + ']' : '')
-            + ((null !== log.callStack) ? ' [' + (log.callStack.split(" at ")[3].match(/\w+\.js:\d+:\d+|\w+\.\w+\.js:\d+:\d+/g)[0]) + ']' : '');
+            + ((null !== log.callStack) ? ' [' + (log.callStack.split(" at ")[3].match(/\w+\.js:\d+:\d+|\w+\.\w+\.js:\d+:\d+/g)[0]) + ']' : '');*/
 
-        switch (type) {
-            case 'debug':
+        for(let levelInLevels of this._levels) {
+
+            if(levelInLevels.code >= code) {
                 this.fileSystem.appendFileSync(
-                    this._config.level.debug.file,
+                    this._config.levels[levelInLevels.name].file,
                     output + '\n'
                 );
+            }
 
-                if(this._config.level.debug.console) console.log(output);
-                break;
-            case 'info':
-                this.fileSystem.appendFileSync(
-                    this._config.level.debug.file,
-                    output + '\n'
-                );
-
-                this.fileSystem.appendFileSync(
-                    this._config.level.info.file,
-                    output + '\n'
-                );
-
-                if(this._config.level.info.console) console.log(output);
-
-                break;
-            case 'error':
-                this.fileSystem.appendFileSync(
-                    this._config.level.debug.file,
-                    output + '\n'
-                );
-
-                this.fileSystem.appendFileSync(
-                    this._config.level.info.file,
-                    output + '\n'
-                );
-
-                this.fileSystem.appendFileSync(
-                    this._config.level.error.file,
-                    output + '\n'
-                );
-
-                if(this._config.level.error.console) console.error(output);
-                break;
-            case 'critical':
-                this.fileSystem.appendFileSync(
-                    this._config.level.debug.file,
-                    output + '\n'
-                );
-
-                this.fileSystem.appendFileSync(
-                    this._config.level.info.file,
-                    output + '\n'
-                );
-
-                this.fileSystem.appendFileSync(
-                    this._config.level.error.file,
-                    output + '\n'
-                );
-
-                this.fileSystem.appendFileSync(
-                    this._config.level.critical.file,
-                    output + '\n'
-                );
-
-                if(this._config.level.critical.console) console.error(output);
-                break;
         }
+
+        if(this._config.levels[level.name].console) console.log(output);
+
+        /*
+        let log = new Log(message, meta, code, date, callStack);
+
+        if('object' === typeof this.data) this.data.persist(log);
+        */
+
+    }
+
+    _stackToString(stack) {
+        let outputs = [];
+
+        for(let entry of stack) {
+
+            if(entry.path !== 'module.js' && entry.path !== 'bootstrap_node.js') {
+                outputs.push(entry.method + ' ' + entry.file + ':' + entry.row);
+            }
+        }
+
+        return outputs.join(' <- ');
     }
 }
 

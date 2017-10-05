@@ -13,7 +13,7 @@ class Kernel extends AbstractKernel {
         process.on('uncaughtException', function (error) {
 
             if('object' === typeof this.services && 'object' === typeof this.services.logger) {
-                this.services.logger.critical(error.message, error.stack);
+                this.services.logger.critical(error.message, null, this.utils.error.stack(error));
             } else {
                 throw error;
             }

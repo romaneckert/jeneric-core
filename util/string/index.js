@@ -5,18 +5,20 @@ module.exports = {
     },
 
     cast : function(string) {
+
         switch (typeof string) {
-            case 'string':
-                string = String(string.split("\n"));
-                break;
             case 'object':
-                string = [JSON.stringify(string)];
+                if(string === null) {
+                    string = '';
+                } else {
+                    string = JSON.stringify(string);
+                }
                 break;
             case 'undefined':
                 string = null;
                 break;
             default:
-                string = [String(string)];
+                string = String(string);
                 break;
         }
 
