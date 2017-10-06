@@ -12,6 +12,7 @@ class Kernel {
         this._models = {};
         this._repositories = {};
         this._utils = {};
+        this._handler = {};
 
     }
 
@@ -56,6 +57,10 @@ class Kernel {
 
     get utils() {
         return this._utils;
+    }
+
+    get handler() {
+        return this._handler;
     }
 
     get services() {
