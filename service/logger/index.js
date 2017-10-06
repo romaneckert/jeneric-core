@@ -7,16 +7,10 @@ class Logger extends AbstractLogger {
 
         super();
 
-        // generate default config from log levels
-        this._config = {
-            levels: {}
-        };
-
-        for(let level of this._levels) {
-            this._config.levels[level.name] = {
-                file : 'var/logs/' + level.name + '.log',
-                console : true
-            };
+        // extend config
+        for(let levelName in this._config.levels) {
+            this._config.levels[levelName].file = 'var/logs/' + levelName + '.log';
+            this._config.levels[levelName].console = true;
         }
 
         this.utils.object.merge(this._config, config);
@@ -38,7 +32,7 @@ class Logger extends AbstractLogger {
      */
     _log(message, meta, stack, code) {
 
-        let level = this._getLevelByCode(code);
+        let levelName = this._getLevelNameByCode(code);
         let date = new Date();
 
         message = this.utils.string.cast(message);
@@ -52,31 +46,24 @@ class Logger extends AbstractLogger {
         stack = this._stackToString(stack);
 
         let output = '[' + this._dateStringFromDate(date) + '] ';
-        output += '[' + level.name + '] ';
+        output += '[' + levelName + '] ';
         output += message;
 
         if(meta.length > 0) output += ' [' + meta + ']';
         output += ' [' + stack + ']';
 
-        /*
-        let output = '[' + log.dateString + '] [' + log.code + ']'
-            + ((null !== log.module) ? ' [' + log.module + ']' : '')
-            + ' ' + log.message
-            + ((null !== log.meta) ? ' [' + log.meta + ']' : '')
-            + ((null !== log.callStack) ? ' [' + (log.callStack.split(" at ")[3].match(/\w+\.js:\d+:\d+|\w+\.\w+\.js:\d+:\d+/g)[0]) + ']' : '');*/
+        for(let levelNameInConfig in this._config.levels) {
 
-        for(let levelInLevels of this._levels) {
-
-            if(levelInLevels.code >= code) {
+            if(this._config.levels[levelNameInConfig].code >= code) {
                 this.fileSystem.appendFileSync(
-                    this._config.levels[levelInLevels.name].file,
+                    this._config.levels[levelNameInConfig].file,
                     output + '\n'
                 );
             }
 
         }
 
-        if(this._config.levels[level.name].console) console.log(output);
+        if(this._config.levels[levelName].console) console.log(output);
 
         /*
         let log = new Log(message, meta, code, date, callStack);

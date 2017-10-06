@@ -4,40 +4,35 @@ class AbstractLogger extends AbstractService {
     constructor() {
         super();
 
-        this._levels = [
-            {
-                code: 0,
-                name: 'emergency'
-            },
-            {
-                code: 1,
-                name: 'alert'
-            },
-            {
-                code: 2,
-                name: 'critical'
-            },
-            {
-                code: 3,
-                name: 'error'
-            },
-            {
-                code: 4,
-                name: 'warning'
-            },
-            {
-                code: 5,
-                name: 'notice'
-            },
-            {
-                code: 6,
-                name: 'info'
-            },
-            {
-                code: 7,
-                name: 'debug'
+        this._config = {
+            levels : {
+                emergency : {
+                    code : 0
+                },
+                alert : {
+                    code : 1
+                },
+                critical : {
+                    code : 2
+                },
+                error : {
+                    code : 3,
+                },
+                warning : {
+                    code : 4,
+                },
+                notice : {
+                    code : 5
+                },
+                info : {
+                    code : 6
+                },
+                debug : {
+                    code : 7
+                }
             }
-        ];
+        };
+
     }
 
     emergency(message, meta, stack) {
@@ -77,9 +72,9 @@ class AbstractLogger extends AbstractService {
      * @returns {*}
      * @private
      */
-    _getLevelByCode(code) {
-        for(let level of this._levels) {
-            if(level.code === code) return level;
+    _getLevelNameByCode(code) {
+        for(let levelName in this._config.levels) {
+            if(this._config.levels[levelName].code === code) return levelName;
         }
         return null;
     }

@@ -16,11 +16,7 @@ class Abstract {
      * @returns {Kernel}
      */
     get kernel() {
-        if ('undefined' === typeof window) {
-            return require('./ker' + 'nel');
-        } else {
-            return require('./kernel/web');
-        }
+        return require('./kernel');
     }
 
     get services() {

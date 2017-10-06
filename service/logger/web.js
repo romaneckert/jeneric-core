@@ -6,22 +6,19 @@ class Logger extends AbstractLogger {
         super();
     }
 
-    _log(message, meta, type) {
+    _log(message, meta, stack, code) {
+
+        let levelName = this._getLevelNameByCode(code);
+        let date = new Date();
 
         message = this.utils.string.cast(message);
         meta = this.utils.string.cast(meta);
-        let err = new Error();
-        let callStack = 'undefined' === typeof err.stack ? null : err.stack;
 
-        let log = new Log(message, meta, type, new Date(), callStack);
+        let output = '[' + this._dateStringFromDate(date) + '] ';
+        output += '[' + levelName + '] ';
+        output += message;
 
-        this.data.persist(log);
-
-        let output = '[' + log.dateString + '] [' + log.type + ']'
-            + ((null !== log.module) ? ' [' + log.module + ']' : '')
-            + ' ' + log.message;
-
-        if('error' === log.type || 'critical' === log.type) {
+        if(code < 3) {
             if('undefined' !== typeof meta) {
                 console.error(output, meta);
             } else {
