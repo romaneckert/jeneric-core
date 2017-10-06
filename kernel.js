@@ -1,11 +1,11 @@
-class AbstractKernel {
+class Kernel {
 
     constructor() {
 
         if ('undefined' === typeof window) {
-            this._config = require('../config/' + 'app');
+            this._config = require('./config/' + 'app');
         } else {
-            this._config = require('../config/web');
+            this._config = require('./config/web');
         }
 
         this._services = {};
@@ -17,7 +17,10 @@ class AbstractKernel {
 
     init(config) {
 
-        this._registerErrorHandling();
+        // get handler
+        for(let handler in this._config.handler) {
+            this._handler[handler] = new this._config.handler[handler].class();
+        }
 
         // get utils
         for(let util in this._config.utils) {
@@ -69,4 +72,4 @@ class AbstractKernel {
 
 }
 
-module.exports = AbstractKernel;
+module.exports = new Kernel();

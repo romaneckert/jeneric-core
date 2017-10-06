@@ -16,6 +16,11 @@ module.exports = {
             class : require('../repository/log')
         }
     },
+    handler : {
+        error : {
+            class : require('../handler/error')
+        }
+    },
     services : {
         logger : {
             class : require('../service/logger')
