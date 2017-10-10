@@ -4,7 +4,8 @@ module.exports = {
         let stack = [];
 
         if('string' === typeof error.stack) {
-            let lines = error.stack.split('at');
+            let lines = error.stack.split('at ');
+
             lines.shift();
 
             for(let line of lines) {

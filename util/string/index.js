@@ -15,7 +15,7 @@ module.exports = {
                 }
                 break;
             case 'undefined':
-                string = null;
+                string = '';
                 break;
             default:
                 string = String(string);
