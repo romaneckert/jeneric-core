@@ -78,8 +78,13 @@ class Logger extends AbstractLogger {
 
         for(let entry of stack) {
 
-            if(entry.path !== 'module.js' && entry.path !== 'bootstrap_node.js') {
-                outputs.push(entry.method + ' ' + entry.file + ':' + entry.row);
+            let processPartentDir = path.dirname(process.cwd());
+
+            if(entry.path.includes(processPartentDir)) {
+
+                let scriptPath = entry.path.replace(processPartentDir, '');
+
+                outputs.push(entry.method + ' ' + scriptPath + ':' + entry.row);
             }
         }
 
