@@ -1,9 +1,8 @@
 const AbstractRepository = require('../abstract-repository');
 
 class Log extends AbstractRepository {
-
     constructor() {
-        super('log');
+        super();
     }
 }
 

@@ -36,11 +36,6 @@ class Kernel {
             this._models[modelName] = this._config.models[modelName].class;
         }
 
-        // make repositories application wide available
-        for(let repositoryName in this._config.repositories) {
-            this._repositories[repositoryName] = new this._config.repositories[repositoryName].class();
-        }
-
         // instantiate services
         for(let serviceName in this._config.services) {
 
