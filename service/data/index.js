@@ -1,5 +1,5 @@
 const AbstractData = require('./abstract-data');
-const mongoose = require('mongoose');
+const mongodb = require('mongodb').MongoClient;
 
 class Data extends AbstractData {
     constructor(config) {
@@ -23,31 +23,37 @@ class Data extends AbstractData {
 
             if ('object' !== typeof schema) throw new Error('no schema defined for: ' + modelName);
 
-            this._repositories[modelName] = new this.kernel.config.repositories[modelName].class();
-            this._repositories[modelName].init(modelName, schema);
+            let repositoryClassInstance = new this.kernel.config.repositories[modelName].class();
+            repositoryClassInstance.init(modelName, schema);
+
+            this._repositories[modelName] = repositoryClassInstance;
 
         }
 
-        // http://mongoosejs.com/docs/advanced_schemas.html
-        this._db = mongoose.connect(
-            'mongodb://' + this._config.db.host + '/' + this._config.db.database,
+        //let url = 'mongodb://127.0.0.2/blub';
+        let url = 'mongodb://' + this._config.db.host + '/' + this._config.db.database;
+
+        mongodb.connect(
+            url,
             {
-                useMongoClient : true
-            }
+                connectTimeoutMS : 5000
+            },
+            this._handleDBConnection.bind(this)
         );
 
-        this._db.on('error', this._handleDBConnectionError.bind(this));
-        this._db.once('open', this._handleDBConnectionSuccess.bind(this));
-
     }
 
-    _handleDBConnectionError(error) {
-        this.logger.debug('Can not connect to database ' + this._config.db.database + '.');
-        throw error;
+    _handleDBConnection(err, db) {
+        if(null === err) {
+            this._db = db;
+            this.logger.debug('Connection to database ' + this._config.db.database + ' established.');
+        } else {
+            this.logger.error('Can not connect to database ' + this._config.db.database + '.');
+        }
     }
 
-    _handleDBConnectionSuccess() {
-        this.logger.debug('Connection to database ' + this._config.db.database + ' established.');
+    get repositories() {
+        return this._repositories;
     }
 
 
