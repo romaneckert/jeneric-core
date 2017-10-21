@@ -1,15 +1,38 @@
 const Abstract = require('./abstract');
+
 class AbstractRepository extends Abstract {
     constructor() {
         super();
 
         this._modelName = null;
-        this._schema = null;
+        this._collection = null;
     }
 
-    init(modelName, schema) {
+    init(modelName) {
         this._modelName = modelName;
-        this._schema = schema;
+    }
+
+    get collection() {
+        return this._collection;
+    }
+
+    set collection(collection) {
+        this._collection = collection;
+    }
+
+    find(obj, callback) {
+
+        if('object' === typeof this.collection && null !== this._collection) {
+            this.collection.find(obj).toArray(function(err, results) {
+                if(null === err) {
+                    callback(results);
+                } else {
+                    throw err;
+                }
+            });
+        } else {
+            this.logger.error('data service is not ready');
+        }
     }
 
     get modelClass() {

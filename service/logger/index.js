@@ -22,12 +22,16 @@ class Logger extends AbstractLogger {
             level.file = path.join(path.dirname(require.main.filename), level.file);
             this.fileSystem.ensureFileExists(level.file);
         }
+
+        this._logs = [];
     }
 
     /**
+     *
      * @param message
      * @param meta
-     * @param type
+     * @param stack
+     * @param code
      * @private
      */
     _log(message, meta, stack, code) {
@@ -65,11 +69,22 @@ class Logger extends AbstractLogger {
 
         if(this._config.levels[levelName].console) console.log(output);
 
-        /*
-        let log = new Log(message, meta, code, date, callStack);
+        let log = new Log(message, meta, code, date, stack);
 
-        if('object' === typeof this.data) this.data.persist(log);
-        */
+        this._logs.push(log);
+
+        this._saveLogs();
+    }
+
+    _saveLogs() {
+
+        if(this.data.ready) {
+            for(let log of this._logs) {
+                this.data.add(log);
+            }
+
+            this._logs = [];
+        }
 
     }
 

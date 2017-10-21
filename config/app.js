@@ -1,14 +1,7 @@
 module.exports = {
     models : {
         log : {
-            class : require('../model/log'),
-            schema : {
-                message : String,
-                meta : String,
-                type : String,
-                date : Date,
-                callStack : String
-            }
+            class : require('../model/log')
         }
     },
     repositories : {
