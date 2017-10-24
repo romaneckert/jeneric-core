@@ -31,6 +31,10 @@ class Abstract {
         return this.services.data;
     }
 
+    get server() {
+        return this.services.server;
+    }
+
     get models() {
         return this.kernel.models;
     }

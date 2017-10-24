@@ -52,13 +52,15 @@ class Kernel extends EventEmitter {
             return false;
         }
 
-        if('string' !== event.handler) {
+        if('string' !== typeof event.handler) {
             this.services.logger.error('event has no handler', event);
             return false;
         }
 
-        if('object' !== this.handler[event.handler]) {
-            this.services.logger.error('event handler ' + event.handler + ' does not exists', event);
+        console.log(this.handler);
+
+        if('object' !== typeof this.handler[event.handler]) {
+            this.services.logger.error('event handler ' + event.handler + ' does not exists');
             return false;
         }
 

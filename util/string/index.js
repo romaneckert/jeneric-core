@@ -4,28 +4,33 @@ module.exports = {
         return string + 's';
     },
 
-    cast : function(string) {
+    cast : function(val) {
 
-        switch (typeof string) {
+        switch (typeof val) {
             case 'object':
-                if(string === null) {
-                    string = '';
+                if(val === null) {
+                    val = '';
                 } else {
-                    try {
-                        string = JSON.stringify(string);
-                    } catch(err) {
-                        string = String(string);
-                    }
+
+                    let cache = [];
+
+                    val = JSON.stringify(val, function(key, val) {
+                        if (typeof val === 'object') {
+                            if (cache.indexOf(val) >= 0) return;
+                            cache.push(val)
+                        }
+                        return val
+                    });
                 }
                 break;
             case 'undefined':
-                string = '';
+                val = '';
                 break;
             default:
-                string = String(string);
+                val = String(val);
                 break;
         }
 
-        return string;
+        return val;
     }
 };
