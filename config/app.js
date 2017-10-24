@@ -20,6 +20,9 @@ module.exports = {
         },
         data : {
             class : require('../service/data')
+        },
+        server : {
+            class : require('../service/server')
         }
     },
     utils : {

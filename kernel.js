@@ -1,13 +1,12 @@
-class Kernel {
+const EventEmitter = require('events');
+
+class Kernel extends EventEmitter {
 
     constructor() {
 
-        if ('undefined' === typeof window) {
-            this._config = require('./config/' + 'app');
-        } else {
-            this._config = require('./config/web');
-        }
+        super();
 
+        this._config = require('./config/app');
         this._services = {};
         this._models = {};
         this._utils = {};
@@ -17,11 +16,6 @@ class Kernel {
 
     init(config) {
 
-        // get handler
-        for(let handler in this._config.handler) {
-            this._handler[handler] = new this._config.handler[handler].class();
-        }
-
         // get utils
         for(let util in this._config.utils) {
             this._utils[util] = this._config.utils[util].class
@@ -29,6 +23,11 @@ class Kernel {
 
         // merge application specific config with default config
         if('object' === typeof config) this._utils.object.merge(this._config, config);
+
+        // get handler
+        for(let handler in this._config.handler) {
+            this._handler[handler] = new this._config.handler[handler].class();
+        }
 
         // make models application wide available
         for(let modelName in this._config.models) {
@@ -43,6 +42,27 @@ class Kernel {
             this._services[serviceName] = new service.class(service.config);
 
         }
+
+        this.on('event', this._handleEvent.bind(this));
+    }
+
+    _handleEvent(event) {
+        if('object' !== typeof event) {
+            this.services.logger.error('event is no object', event);
+            return false;
+        }
+
+        if('string' !== event.handler) {
+            this.services.logger.error('event has no handler', event);
+            return false;
+        }
+
+        if('object' !== this.handler[event.handler]) {
+            this.services.logger.error('event handler ' + event.handler + ' does not exists', event);
+            return false;
+        }
+
+        this.handler[event.handler].handle(event);
     }
 
     get config() {

@@ -11,7 +11,11 @@ module.exports = {
                 if(string === null) {
                     string = '';
                 } else {
-                    string = JSON.stringify(string);
+                    try {
+                        string = JSON.stringify(string);
+                    } catch(err) {
+                        string = String(string);
+                    }
                 }
                 break;
             case 'undefined':
