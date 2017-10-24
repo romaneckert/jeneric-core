@@ -1,17 +1,11 @@
-const EventEmitter = require('events');
-
-class Kernel extends EventEmitter {
+class Kernel {
 
     constructor() {
-
-        super();
-
         this._config = require('./config/app');
         this._services = {};
         this._models = {};
         this._utils = {};
         this._handler = {};
-
     }
 
     init(config) {
@@ -42,11 +36,9 @@ class Kernel extends EventEmitter {
             this._services[serviceName] = new service.class(service.config);
 
         }
-
-        this.on('event', this._handleEvent.bind(this));
     }
 
-    _handleEvent(event) {
+    handle(event) {
         if('object' !== typeof event) {
             this.services.logger.error('event is no object', event);
             return false;
@@ -56,8 +48,6 @@ class Kernel extends EventEmitter {
             this.services.logger.error('event has no handler', event);
             return false;
         }
-
-        console.log(this.handler);
 
         if('object' !== typeof this.handler[event.handler]) {
             this.services.logger.error('event handler ' + event.handler + ' does not exists');

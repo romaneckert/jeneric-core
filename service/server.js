@@ -41,21 +41,40 @@ class Server extends AbstractService {
         this._io.on('connection', this._handleSocketIoConnection.bind(this));
     }
 
-    send(socket, event) {
+    send(event) {
+
+        if('string' !== typeof event.socketId) {
+            this.logger.error('event has no socket id', event);
+            return false;
+        }
+
+        if('object' !== typeof this._io.sockets.connected[event.socketId]) {
+            this.logger.error('socket with id ' + event.socketId + ' does not exists.');
+            return false;
+        }
+
+        let socket = this._io.sockets.connected[event.socketId];
+
         socket.emit('event', event);
     }
 
     _handleSocketIoConnection(socket) {
+
         socket.on('event', function(event) {
             if('object' !== typeof event) {
                 this.logger.debug('event is no object', event);
             }
 
-            event.socket = socket;
-
-            this.kernel.emit('event', event);
+            event.socketId = socket.id;
+            this.kernel.handle(event);
 
         }.bind(this));
+
+        socket.on('disconnect', this._handleSocketDisconnect.bind(this));
+    }
+
+    _handleSocketDisconnect() {
+        this.logger.debug('socket disconnect', event);
     }
 
     _handleRequest(request, response) {
