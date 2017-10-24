@@ -3,7 +3,8 @@ const url = require('url');
 const fs = require('fs');
 const path = require('path');
 const io = require('socket.io');
-const AbstractService = require('@jeneric/core/abstract-service');
+
+const AbstractService = require('../abstract-service');
 
 /** server module */
 class Server extends AbstractService {
@@ -30,9 +31,7 @@ class Server extends AbstractService {
         this.utils.object.merge(this._config, config);
 
         this._config.directory = path.join(path.dirname(require.main.filename), this._config.directory);
-
-        // check if binary exists
-        if(!fs.existsSync(this._config.directory)) throw new Error(this._config.directory + 'does not exists');
+        this.fileSystem.ensureFolderExists(this._config.directory);
 
         this._server = http.createServer(this._handleRequest.bind(this));
         this._server.listen(3000);
