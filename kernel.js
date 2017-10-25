@@ -1,7 +1,13 @@
 class Kernel {
 
     constructor() {
-        this._config = require('./config/app');
+
+        if ('undefined' === typeof window) {
+            this._config = require('./config/' + 'app');
+        } else {
+            this._config = require('./config/web');
+        }
+
         this._services = {};
         this._models = {};
         this._utils = {};

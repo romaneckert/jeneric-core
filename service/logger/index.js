@@ -9,7 +9,7 @@ class Logger extends AbstractLogger {
 
         // extend config
         for(let levelName in this._config.levels) {
-            this._config.levels[levelName].file = 'var/logs/' + levelName + '.log';
+            this._config.levels[levelName].file = '../var/logs/' + levelName + '.log';
             this._config.levels[levelName].console = true;
         }
 
