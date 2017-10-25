@@ -83,10 +83,6 @@ class Kernel {
         return this._models;
     }
 
-    get repositories() {
-        return this.services.data.repositories;
-    }
-
 }
 
 module.exports = new Kernel();

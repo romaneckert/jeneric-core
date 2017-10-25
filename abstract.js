@@ -40,7 +40,7 @@ class Abstract {
     }
 
     get repositories() {
-        return this.kernel.repositories;
+        return this.services.data.repositories;
     }
 
     get fileSystem() {
