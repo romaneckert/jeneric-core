@@ -14,7 +14,8 @@ class Server extends AbstractService {
         super();
 
         this._config = {
-            directory : 'web',
+            directory : '../public',
+            port : 3000,
             mimeTypes : {
                 css:    'text/css',
                 gif:    'image/gif',
@@ -34,7 +35,7 @@ class Server extends AbstractService {
         this.fileSystem.ensureFolderExists(this._config.directory);
 
         this._server = http.createServer(this._handleRequest.bind(this));
-        this._server.listen(3000);
+        this._server.listen(this._config.port);
 
         this._io = io(this._server);
         this._io.on('connection', this._handleSocketIoConnection.bind(this));
