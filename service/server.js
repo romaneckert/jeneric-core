@@ -40,19 +40,24 @@ class Server extends AbstractService {
         this._io.on('connection', this._handleSocketIoConnection.bind(this));
     }
 
-    send(event) {
+    send(socketId, event) {
 
-        if('string' !== typeof event.socketId) {
-            this.logger.error('event has no socket id', event);
+        if('string' !== typeof socketId) {
+            this.logger.error('no socket id set', socketId);
             return false;
         }
 
-        if('object' !== typeof this._io.sockets.connected[event.socketId]) {
-            this.logger.error('socket with id ' + event.socketId + ' does not exists.');
+        if('object' !== typeof event) {
+            this.logger.error('event is no object', event);
             return false;
         }
 
-        let socket = this._io.sockets.connected[event.socketId];
+        if('object' !== typeof this._io.sockets.connected[socketId]) {
+            this.logger.error('socket with id ' + socketId + ' does not exists.');
+            return false;
+        }
+
+        let socket = this._io.sockets.connected[socketId];
 
         socket.emit('event', event);
     }
@@ -73,7 +78,7 @@ class Server extends AbstractService {
     }
 
     _handleSocketDisconnect() {
-        this.logger.debug('socket disconnect', event);
+        this.logger.debug('socket disconnect');
     }
 
     _handleRequest(request, response) {
