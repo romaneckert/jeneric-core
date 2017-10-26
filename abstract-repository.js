@@ -29,7 +29,7 @@ class AbstractRepository extends Abstract {
                 } else {
                     throw err;
                 }
-            });
+            }.bind(this));
         } else {
             this.logger.error('data service is not ready');
         }
