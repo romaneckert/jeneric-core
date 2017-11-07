@@ -1,6 +1,6 @@
 {
   "name": "@jeneric/core",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "jeneric core",
   "main": "index.js",
   "scripts": {
@@ -8,9 +8,5 @@
   },
   "author": "Roman Eckert",
   "license": "MIT",
-  "repository": "https://github.com/romaneckert/jeneric-core",
-  "dependencies": {
-    "mongodb": "^2.2.33",
-    "socket.io": "^2.0.4"
-  }
+  "repository": "https://github.com/romaneckert/jeneric-core"
 }
