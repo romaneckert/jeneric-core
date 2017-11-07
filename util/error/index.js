@@ -28,7 +28,11 @@ module.exports = {
 
                 let fileWithLineAndColumn = line.match(/\w+\.js:\d+:\d+|\w+\.\w+\.js:\d+:\d+/g);
 
-                if('string' === typeof fileWithLineAndColumn[0]) {
+                if(
+                    null !== typeof fileWithLineAndColumn &&
+                    'object' === typeof fileWithLineAndColumn &&
+                    'string' === typeof fileWithLineAndColumn[0]
+                ) {
                     let parts = fileWithLineAndColumn[0].split(':');
 
                     if('string' === typeof parts[0]) file = parts[0];
