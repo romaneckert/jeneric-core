@@ -29,7 +29,7 @@ module.exports = {
                 let fileWithLineAndColumn = line.match(/\w+\.js:\d+:\d+|\w+\.\w+\.js:\d+:\d+/g);
 
                 if(
-                    null !== typeof fileWithLineAndColumn &&
+                    null !== fileWithLineAndColumn &&
                     'object' === typeof fileWithLineAndColumn &&
                     'string' === typeof fileWithLineAndColumn[0]
                 ) {
