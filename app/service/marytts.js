@@ -3,7 +3,7 @@ const querystring = require('querystring');
 const http = require('http');
 const slug = require('slug');
 const fs = require('fs');
-const AbstractService = require('@jeneric/app/abstract-service');
+const AbstractService = require('../abstract-service');
 const path = require('path');
 
 /** marytts module */
