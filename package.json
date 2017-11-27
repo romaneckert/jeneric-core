@@ -8,5 +8,9 @@
   },
   "author": "Roman Eckert",
   "license": "MIT",
-  "repository": "https://github.com/romaneckert/jeneric-core"
+  "repository": "https://github.com/romaneckert/jeneric-core",
+  "dependencies": {
+    "mongodb": "^2.2.33",
+    "socket.io": "^2.0.4"
+  }
 }
