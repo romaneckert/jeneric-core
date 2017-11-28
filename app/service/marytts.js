@@ -33,7 +33,7 @@ class MaryTTS extends AbstractService {
         if(!fs.existsSync(this._config.bin)) throw new Error(this._config.bin + 'does not exists');
 
         // check if directory exists
-        this.utils.fileSystem.ensureFolderExists(this._config.directory);
+        this.fs.ensureFolderExists(this._config.directory);
 
         this._ready = false;
 

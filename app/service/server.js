@@ -32,7 +32,7 @@ class Server extends AbstractService {
         this.utils.object.merge(this.config, config);
 
         this.config.directory = path.join(path.dirname(require.main.filename), this.config.directory);
-        this.fileSystem.ensureFolderExists(this.config.directory);
+        this.fs.ensureFolderExists(this.config.directory);
 
         this._server = http.createServer(this._handleRequest.bind(this));
         this._server.listen(this.config.port);

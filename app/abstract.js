@@ -76,8 +76,8 @@ class Abstract {
         return this.services.data.repositories;
     }
 
-    get fileSystem() {
-        return this.utils.fileSystem;
+    get fs() {
+        return this.utils.fs;
     }
 
     get utils() {

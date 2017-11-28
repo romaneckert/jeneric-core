@@ -29,8 +29,8 @@ module.exports = {
         error : {
             class : require('../../common/util/error'),
         },
-        fileSystem : {
-            class : require('../util/file-system'),
+        fs : {
+            class : require('../util/fs'),
         },
         object : {
             class : require('../../common/util/object'),

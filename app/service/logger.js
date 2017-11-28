@@ -58,7 +58,7 @@ class Logger extends AbstractService {
         // ensure log files exists
         for(let code in this._config.levels) {
 
-            this.fileSystem.ensureFileExists(
+            this.fs.ensureFileExists(
                 path.join(
                     path.dirname(require.main.filename),
                     '../',
@@ -114,7 +114,7 @@ class Logger extends AbstractService {
         for(let levelCode in this._config.levels) {
 
             if(levelCode >= code) {
-                this.fileSystem.appendFileSync(
+                this.fs.appendFileSync(
                     path.join(
                         path.dirname(require.main.filename),
                         '../',

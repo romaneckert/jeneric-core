@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = require('path')
+const path = require('path');
 
 module.exports = {
     appendFileSync : function(file, data, options) {
@@ -35,5 +35,31 @@ module.exports = {
         this.mkdirSync(folderPath);
 
         return true;
+    },
+    copySync : function(src, dest) {
+
+        let ret = true;
+
+        // check if source exists
+        if(!fs.existsSync(src)) return false;
+
+        // check if destination exists
+        if(fs.existsSync(dest)) return false;
+
+        let stats = fs.statSync(src);
+
+        if(stats.isDirectory()) {
+            fs.mkdirSync(dest);
+            let files = fs.readdirSync(src);
+
+            for(let file of files) {
+                if(!this.copySync(path.join(src, file), path.join(dest, file))) return false;
+            }
+
+        } else {
+            fs.copyFileSync(src, dest);
+        }
+
+        return ret;
     }
 };
