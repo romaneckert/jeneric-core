@@ -1,4 +1,4 @@
-const ModuleDefinition = require('./module-definition');
+const ModuleDefinition = require('../common/module-definition');
 
 class Kernel {
 
