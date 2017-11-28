@@ -1,7 +1,6 @@
 module.exports = {
     toMany : function(string) {
-        if(string.indexOf('y') === string.length - 1) return string.slice(0, -1) + 'ies';
-        return string + 's';
+        return (string.indexOf('y') === string.length - 1) ? string.slice(0, -1) + 'ies' : string + 's';
     },
 
     cast : function(val) {
@@ -9,12 +8,14 @@ module.exports = {
         switch (typeof val) {
             case 'object':
                 if(val === null) {
-                    val = '';
+                    return '';
                 } else {
 
                     let cache = [];
 
                     val = JSON.stringify(val, function(key, val) {
+
+                        // prevent cycles
                         if (typeof val === 'object') {
                             if (cache.indexOf(val) >= 0) return;
                             cache.push(val)
@@ -24,13 +25,11 @@ module.exports = {
                 }
                 break;
             case 'undefined':
-                val = '';
+                return '';
                 break;
             default:
-                val = String(val);
+                return String(val);
                 break;
         }
-
-        return val;
     }
 };
