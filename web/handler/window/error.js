@@ -17,7 +17,7 @@ class Error extends AbstractHandler {
             let stack = this.utils.error.stack(error);
 
             try {
-                this.logger.critical(message, undefined, stack);
+                this.logger.critical(message, error, stack);
                 event.preventDefault();
             } catch(error) {
                 console.log(error);
