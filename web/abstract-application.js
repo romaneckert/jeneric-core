@@ -50,7 +50,7 @@ class AbstractApplication extends Abstract {
                 case 'window':
                     for(let l2 in this.kernel.handler[l1]) {
                         $(window).on(l2, function(e) {
-                            this.logger.debug('handle event ' + l1 + '/' + l2 );
+                            this.logger.debug('handle event ' + l1 + '/' + l2,  {event:e});
                             this.kernel.handler[l1][l2].handle(e);
                         }.bind(this));
                     }
@@ -61,7 +61,7 @@ class AbstractApplication extends Abstract {
                         for(let l3 in this.kernel.handler[l1][l2]) {
                             for(let l4 in this.kernel.handler[l1][l2][l3]) {
                                 $(document).on(l4, '.' + l2 + ' .' + l3, function(e) {
-                                    this.logger.debug('handle event ' + l1 + '/' + l2 + '/' + l3 + '/' + l4);
+                                    this.logger.debug('handle event ' + l1 + '/' + l2 + '/' + l3 + '/' + l4, {event:e});
                                     this.kernel.handler[l1][l2][l3][l4].handle(e);
                                 }.bind(this));
                             }
