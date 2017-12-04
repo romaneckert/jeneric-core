@@ -13,7 +13,7 @@ module.exports = {
 
                     let cache = [];
 
-                    val = JSON.stringify(val, function(key, val) {
+                    return JSON.stringify(val, function(key, val) {
 
                         // prevent cycles
                         if (typeof val === 'object') {
@@ -23,13 +23,10 @@ module.exports = {
                         return val
                     });
                 }
-                break;
             case 'undefined':
                 return '';
-                break;
             default:
                 return String(val);
-                break;
         }
     }
 };
