@@ -13,8 +13,8 @@ class Data extends AbstractService {
 
         this.utils.object.merge(this._config, config);
 
-        for(let entityName in this.kernel.config.entities) {
-            this[entityName] = new this.kernel.config.repositories[entityName].class();
+        for(let entityName in this._kernel.config.entities) {
+            this[entityName] = new this._kernel.config.repositories[entityName].class();
         }
 
         //let url = 'mongodb://127.0.0.2/blub';
@@ -32,7 +32,7 @@ class Data extends AbstractService {
 
     get ready() {
 
-        for(let entityName in this.kernel.config.entities) {
+        for(let entityName in this._kernel.config.entities) {
             if( 'object' !== typeof this[entityName].collection ||
                 null === this[entityName].collection
             ) {
@@ -87,7 +87,7 @@ class Data extends AbstractService {
             return false;
         }
 
-        for(let entityName in this.kernel.config.entities) {
+        for(let entityName in this._kernel.config.entities) {
 
             let collectionExists = false;
 

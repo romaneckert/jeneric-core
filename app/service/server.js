@@ -79,7 +79,7 @@ class Server extends AbstractService {
             }
 
             event.socketId = socket.id;
-            this.kernel.handle(event);
+            this._kernel.handle(event);
 
         }.bind(this));
 

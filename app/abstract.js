@@ -6,20 +6,10 @@ const ModuleDefinition = require('../common/module-definition');
 class Abstract {
 
     constructor() {
+        this._kernel = require('./kernel');
+
         this._moduleDefinition = new ModuleDefinition();
-        this._moduleDefinition.name = this.kernel.getModuleNameByClass(this.constructor);
-    }
-
-    /**
-     * the application kernel
-     * @returns {Kernel}
-     */
-    get kernel() {
-        return require('./kernel');
-    }
-
-    get services() {
-        return this.kernel.services;
+        this._moduleDefinition.name = this._kernel.getModuleNameByClass(this.constructor);
     }
 
     get logger() {
@@ -27,49 +17,49 @@ class Abstract {
         // builing layer between real logger service to set the module definition to logger
         return {
             emergency : function(message, meta, stack) {
-                this.services.logger.log(message, meta, this.moduleDefinition, stack, 0);
+                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 0);
             }.bind(this),
 
             alert : function(message, meta, stack) {
-                this.services.logger.log(message, meta, this.moduleDefinition, stack, 1);
+                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 1);
             }.bind(this),
 
             critical : function(message, meta, stack) {
-                this.services.logger.log(message, meta, this.moduleDefinition, stack, 2);
+                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 2);
             }.bind(this),
 
             error : function(message, meta, stack) {
-                this.services.logger.log(message, meta, this.moduleDefinition, stack, 3);
+                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 3);
             }.bind(this),
 
             warning : function(message, meta, stack) {
-                this.services.logger.log(message, meta, this.moduleDefinition, stack, 4);
+                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 4);
             }.bind(this),
 
             notice : function(message, meta, stack) {
-                this.services.logger.log(message, meta, this.moduleDefinition, stack, 5);
+                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 5);
             }.bind(this),
 
             info : function(message, meta, stack) {
-                this.services.logger.log(message, meta, this.moduleDefinition, stack, 6);
+                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 6);
             }.bind(this),
 
             debug : function(message, meta, stack) {
-                this.services.logger.log(message, meta, this.moduleDefinition, stack, 7);
+                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 7);
             }.bind(this)
         };
     }
 
     get data() {
-        return this.services.data;
+        return this._kernel.services.data;
     }
 
     get server() {
-        return this.services.server;
+        return this._kernel.services.server;
     }
 
     get entities() {
-        return this.kernel.entities;
+        return this._kernel.entities;
     }
 
     get repositories() {
@@ -81,7 +71,7 @@ class Abstract {
     }
 
     get utils() {
-        return this.kernel.utils;
+        return this._kernel.utils;
     }
 
     get moduleDefinition() {

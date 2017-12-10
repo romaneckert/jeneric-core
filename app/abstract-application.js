@@ -6,8 +6,8 @@ class AbstractApplication extends Abstract {
 
         this._moduleDefinition.type = 'core';
         this._moduleDefinition.name = 'application';
-
-        this.kernel.init(config);
+        this._moduleDefinition.name = 'application';
+        this._kernel.init(config);
 
         this._initialCheck = false;
         this._loopInterval = setInterval(this.checkLoop.bind(this), 8);
@@ -39,7 +39,7 @@ class AbstractApplication extends Abstract {
     }
 
     get systemCheck() {
-        return this.kernel.ready;
+        return this._kernel.ready;
     }
 }
 
