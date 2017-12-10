@@ -6,7 +6,7 @@ class Observer extends AbstractService {
     }
 
     observe(caller, service, method) {
-        console.log(caller + ' calls ' + service + '.' + method + '()');
+        this._kernel.services.logger.log('service ' + caller + ' calls ' + service + '.' + method + '()', undefined, this.moduleDefinition, undefined, 8);
     }
 
     get ready() {

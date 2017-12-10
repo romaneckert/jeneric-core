@@ -48,6 +48,11 @@ class Logger extends AbstractService {
                     name : 'debug',
                     console : true,
                     color: "\x1b[37m"
+                },
+                8 : {
+                    name : 'observe',
+                    console : true,
+                    color: "\x1b[37m"
                 }
             }
         };
@@ -133,17 +138,18 @@ class Logger extends AbstractService {
 
         let log = new this.entities.log(message, meta, code, date, stack);
 
-        this._logs.push(log);
 
-        this._saveLogs();
+        this._save(log);
     }
 
-    _saveLogs() {
+    _save(log) {
 
-        if(this.data.ready) {
+        this._logs.push(log);
+
+        if(this._kernel.services.data.ready) {
 
             for(let log of this._logs) {
-                this.data.add(log);
+                this._kernel.services.data.add(log);
             }
 
             this._logs = [];
