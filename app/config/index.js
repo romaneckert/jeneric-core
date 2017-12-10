@@ -15,6 +15,9 @@ module.exports = {
         }
     },
     services : {
+        observer : {
+            class : require('../service/observer')
+        },
         logger : {
             class : require('../service/logger')
         },

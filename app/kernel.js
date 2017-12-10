@@ -5,7 +5,7 @@ class Kernel {
     constructor() {
 
         this._config = require('./config');
-        this.services = {};
+        this._services = {};
         this.entities = {};
         this.utils = {};
         this.handler = {};
@@ -50,24 +50,24 @@ class Kernel {
 
             let service = this._config.services[serviceName];
 
-            this.services[serviceName] = new service.class(service.config);
+            this._services[serviceName] = new service.class(service.config);
 
         }
     }
 
     handle(event) {
         if('object' !== typeof event) {
-            this.services.logger.error('event is no object', event);
+            this._services.logger.error('event is no object', event);
             return false;
         }
 
         if('string' !== typeof event.handler) {
-            this.services.logger.error('event has no handler', event);
+            this._services.logger.error('event has no handler', event);
             return false;
         }
 
         if('object' !== typeof this.handler[event.handler]) {
-            this.services.logger.error('event handler ' + event.handler + ' does not exists');
+            this._services.logger.error('event handler ' + event.handler + ' does not exists');
             return false;
         }
 
@@ -78,11 +78,15 @@ class Kernel {
         this.handler.error.handle(error);
     }
 
+    get services() {
+        return this._services;
+    }
+
     get ready() {
 
-        for(let serviceName in this.services) {
+        for(let serviceName in this._services) {
 
-            let service = this.services[serviceName];
+            let service = this._services[serviceName];
 
             if (!service.ready) return false;
 

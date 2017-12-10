@@ -12,50 +12,74 @@ class Abstract {
         this._moduleDefinition.name = this._kernel.getModuleNameByClass(this.constructor);
     }
 
+    get services() {
+
+        if(this.moduleDefinition.type === 'service') {
+
+            let observed = false;
+
+            return new Proxy({}, {
+                get: function(target, serviceName) {
+                    return new Proxy(this._kernel.services[serviceName], {
+                        get : function(target, method) {
+                            if('function' === typeof target[method] && observed === false) {
+                                this._kernel.services.observer.observe(this.moduleDefinition.name, serviceName, method);
+                                observed = true;
+                            }
+                            return target[method];
+                        }.bind(this)
+                    });
+                }.bind(this)
+            });
+        } else {
+            return this._kernel.services;
+        }
+    }
+
     get logger() {
 
         // builing layer between real logger service to set the module definition to logger
         return {
             emergency : function(message, meta, stack) {
-                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 0);
+                this.services.logger.log(message, meta, this.moduleDefinition, stack, 0);
             }.bind(this),
 
             alert : function(message, meta, stack) {
-                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 1);
+                this.services.logger.log(message, meta, this.moduleDefinition, stack, 1);
             }.bind(this),
 
             critical : function(message, meta, stack) {
-                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 2);
+                this.services.logger.log(message, meta, this.moduleDefinition, stack, 2);
             }.bind(this),
 
             error : function(message, meta, stack) {
-                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 3);
+                this.services.logger.log(message, meta, this.moduleDefinition, stack, 3);
             }.bind(this),
 
             warning : function(message, meta, stack) {
-                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 4);
+                this.services.logger.log(message, meta, this.moduleDefinition, stack, 4);
             }.bind(this),
 
             notice : function(message, meta, stack) {
-                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 5);
+                this.services.logger.log(message, meta, this.moduleDefinition, stack, 5);
             }.bind(this),
 
             info : function(message, meta, stack) {
-                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 6);
+                this.services.logger.log(message, meta, this.moduleDefinition, stack, 6);
             }.bind(this),
 
             debug : function(message, meta, stack) {
-                this._kernel.services.logger.log(message, meta, this.moduleDefinition, stack, 7);
+                this.services.logger.log(message, meta, this.moduleDefinition, stack, 7);
             }.bind(this)
         };
     }
 
     get data() {
-        return this._kernel.services.data;
+        return this.services.data;
     }
 
     get server() {
-        return this._kernel.services.server;
+        return this.services.server;
     }
 
     get entities() {
