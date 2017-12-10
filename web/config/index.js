@@ -1,5 +1,10 @@
 module.exports = {
     handler : {
+        socket : {
+            message : {
+                class : require('../handler/socket/message')
+            }
+        },
         window : {
             error : {
                 class : require('../handler/window/error')
