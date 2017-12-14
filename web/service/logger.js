@@ -68,7 +68,12 @@ class Logger extends AbstractService {
         output += message.trim() + ' ';
         output += '[' + moduleString + ']';
 
-        console.groupCollapsed('%c ' + output , 'color:' + this._config.levels[code].color + ';');
+        // support browsers with console.groupCollapsed not exists
+        if('function' === typeof console.groupCollapsed) {
+            console.groupCollapsed('%c ' + output , 'color:' + this._config.levels[code].color + ';');
+        } else {
+            console.log('%c ' + output , 'color:' + this._config.levels[code].color + ';');
+        }
 
         console.log('type:', this._config.levels[code].name);
 
@@ -79,7 +84,12 @@ class Logger extends AbstractService {
         console.log('stack:', stack);
         console.log('date:', this._dateStringFromDate(date));
 
-        console.groupEnd();
+        if('function' === typeof console.groupCollapsed) {
+            console.groupEnd();
+        } else {
+            console.log('------------------------');
+        }
+
     }
 
     _stackToString(stack) {
