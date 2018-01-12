@@ -88,8 +88,17 @@ class Server extends AbstractService {
         }.bind(this));
     }
 
+    /**
+     * handle http requests
+     *
+     * @param request
+     * @param response
+     * @returns {boolean}
+     * @private
+     */
     _handleRequest(request, response) {
 
+        // log request method and request url
         this.logger.debug(request.method + ': ' + request.url);
 
         let parsedUrl = url.parse(request.url);
@@ -132,10 +141,7 @@ class Server extends AbstractService {
 
         return true;
     }
-
-    get ready() {
-        return true;
-    }
+    
 }
 
 module.exports = Server;
