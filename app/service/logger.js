@@ -134,6 +134,7 @@ class Logger extends AbstractService {
 
         let log = new this.entities.log(message, meta, code, date, stack);
 
+        this.handler.logger.log.handle(log);
 
         this._save(log);
     }
