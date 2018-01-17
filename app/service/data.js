@@ -70,9 +70,9 @@ class Data extends AbstractService {
         });
     }
 
-    _handleDBConnection(err, db) {
+    _handleDBConnection(err, client) {
         if(null === err) {
-            this._db = db;
+            this._db = client.db(this._config.db.database);
             this.logger.info('Connection to database ' + this._config.db.database + ' established.');
             this._db.collections(this._handleGetCollectionNames.bind(this));
         } else {

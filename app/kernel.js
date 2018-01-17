@@ -34,8 +34,6 @@ class Kernel {
 
         this._instantiateHandler(this._handler, this._config.handler);
 
-        console.log(this._handler);
-
         // handle uncaught exceptions
         process.on('uncaughtException', this._handler.error.handle.bind(this));
 

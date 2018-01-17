@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": "https://github.com/romaneckert/jeneric-core",
   "dependencies": {
-    "mongodb": "^2.2.34",
+    "mongodb": "^3.0.1",
     "slug": "^0.9.1",
     "socket.io": "^2.0.4"
   }
