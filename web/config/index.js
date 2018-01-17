@@ -22,6 +22,9 @@ module.exports = {
         },
         socket : {
             class : require('../service/socket')
+        },
+        template : {
+            class : require('../service/template')
         }
     },
     utils : {
