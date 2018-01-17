@@ -14,6 +14,10 @@ class Abstract {
         return require('./kernel');
     }
 
+    get entities() {
+        return this.kernel.entities;
+    }
+
     get services() {
         return this.kernel.services;
     }

@@ -24,6 +24,21 @@ class Socket extends AbstractService {
             return false;
         }
 
+        // try to make data to entities
+        if('object' === typeof event.data) {
+            for(let entityNameMultiple in event.data) {
+
+                let entityName = this.utils.string.toSingle(entityNameMultiple);
+
+                if('undefined' === typeof this.entities[entityName]) continue;
+
+                for(let entryIndex in event.data[entityNameMultiple]) {
+                    event.data[entityNameMultiple][entryIndex] = this.utils.object.merge(new this.entities[entityName](), event.data[entityNameMultiple][entryIndex]);
+                }
+
+            }
+        }
+
         this.logger.debug('handle event socket/' + event.handler);
 
         this.handler['socket'][event.handler].handle(event);

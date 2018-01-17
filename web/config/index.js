@@ -1,4 +1,9 @@
 module.exports = {
+    entities : {
+        log : {
+            class : require('../../common/entity/log')
+        }
+    },
     handler : {
         socket : {
             message : {

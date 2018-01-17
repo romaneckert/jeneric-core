@@ -1,7 +1,7 @@
 module.exports = {
     entities : {
         log : {
-            class : require('../entity/log')
+            class : require('../../common/entity/log')
         }
     },
     repositories : {

@@ -5,7 +5,7 @@ class Kernel {
     constructor() {
         this._config = require('./config');
         this._services = {};
-        this._models = {};
+        this._entities = {};
         this._utils = {};
         this._handler = {};
         this._moduleDefinition = new ModuleDefinition();
@@ -32,9 +32,9 @@ class Kernel {
 
         this._instantiateHandler(this._handler, this._config.handler);
 
-        // make models application wide available
-        for(let modelName in this._config.models) {
-            this._models[modelName] = this._config.models[modelName].class;
+        // make entities application wide available
+        for(let entityName in this._config.entities) {
+            this._entities[entityName] = this._config.entities[entityName].class;
         }
 
         // instantiate services
@@ -85,6 +85,10 @@ class Kernel {
 
     get services() {
         return this._services;
+    }
+
+    get entities() {
+        return this._entities;
     }
 
     get ready() {
