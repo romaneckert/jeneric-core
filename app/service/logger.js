@@ -51,7 +51,7 @@ class Logger extends AbstractService {
                 },
                 8 : {
                     name : 'observe',
-                    console : true,
+                    console : false,
                     color: "\x1b[37m"
                 }
             }
@@ -111,28 +111,24 @@ class Logger extends AbstractService {
         if(meta.length > 0) output += ' [' + meta + ']';
         output += ' [' + stack + ']';
 
-        let consoleOutput = message + ' ';
-        consoleOutput += '[' + moduleString + '] ';
-        if(meta.length > 0) consoleOutput += '[' + meta + '] ';
-        consoleOutput += '[' + stack + ']';
+        // write log entry in specific log file
+        let pathToLogFile = path.join(
+            path.dirname(require.main.filename),
+            '../',
+            this._config.directory,
+            this._config.levels[code].name + '.log'
+        );
 
-        for(let levelCode in this._config.levels) {
+        this.fs.appendFileSync(pathToLogFile, output + '\n');
 
-            if(levelCode >= code) {
-
-                let pathToLogFile = path.join(
-                    path.dirname(require.main.filename),
-                    '../',
-                    this._config.directory,
-                    this._config.levels[levelCode].name + '.log'
-                );
-
-                this.fs.appendFileSync(pathToLogFile, output + '\n');
-            }
-
-        }
-
+        // write log entry to console
         if(this._config.levels[code].console) {
+
+            let consoleOutput = message + ' ';
+            consoleOutput += '[' + moduleString + '] ';
+            if(meta.length > 0) consoleOutput += '[' + meta + '] ';
+            consoleOutput += '[' + stack + ']';
+
             console.log(this._config.levels[code].color , consoleOutput, "\x1b[0m") ;
         }
 
