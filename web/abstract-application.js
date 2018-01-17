@@ -59,17 +59,72 @@ class AbstractApplication extends Abstract {
                 case 'document':
                     for(let l2 in this.kernel.handler[l1]) {
                         for(let l3 in this.kernel.handler[l1][l2]) {
-                            for(let l4 in this.kernel.handler[l1][l2][l3]) {
-                                $(document).on(l4, '.' + l2 + ' .' + l3, function(e) {
-                                    this.logger.debug('handle event ' + l1 + '/' + l2 + '/' + l3 + '/' + l4, {event:e});
-                                    this.kernel.handler[l1][l2][l3][l4].handle(e);
+
+                            if('function' === typeof this.kernel.handler[l1][l2][l3].handle) {
+
+                                this._registerDocumentHandlerByType(l3, l2);
+
+                                console.log(l3);
+                                console.log('.' + l2);
+
+                                $(document).on(l3, '.' + l2, function(e) {
+                                    this.logger.debug('handle event ' + l1 + '/' + l2 + '/' + l3, {event:e});
+                                    this.kernel.handler[l1][l2][l3].handle(e);
                                 }.bind(this));
+                            } else {
+
+
+                                for(let l4 in this.kernel.handler[l1][l2][l3]) {
+
+                                    this._registerDocumentHandlerByType(l4, l2, l3);
+                                }
                             }
                         }
                     }
                     break;
             }
         }
+    }
+
+    _registerDocumentHandlerByType(type, class1, class2) {
+
+        let selector = '.' + class1;
+        let logMessage = 'handle ' + type + ' event on document/' + class1;
+
+        if('string' === typeof class2) {
+            selector += ' .' + class2;
+            logMessage +=  + '/' + class2;
+        }
+
+        console.log(this.kernel.handler);
+
+        switch(type) {
+            case 'scroll':
+                $(selector).on(type, function(e) {
+                    this.logger.debug(logMessage, {event:e});
+
+                    if('string' === typeof class2) {
+                        this.kernel.handler.document[class1][class2][type].handle(e);
+                    } else {
+                        this.kernel.handler.document[class1][type].handle(e);
+                    }
+
+                }.bind(this));
+                break;
+            default:
+                $(document).on(type, selector, function(e) {
+                    this.logger.debug(logMessage, {event:e});
+
+                    if('string' === typeof class2) {
+                        this.kernel.handler.document[class1][class2][type].handle(e);
+                    } else {
+                        this.kernel.handler.document[class1][type].handle(e);
+                    }
+
+                }.bind(this));
+        }
+
+
     }
 
     start() {
