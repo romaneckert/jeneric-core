@@ -38,7 +38,7 @@ class Server extends AbstractService {
         this._server.listen(this.config.port);
 
         this._io = io(this._server);
-        this._io.on('connection', this._handleSocketIoConnection.bind(this));
+        this._io.on('connection', this.handler.server.io.connection.handle.bind(this));
 
         this.logger.info('server started with port ' + this.config.port);
     }
@@ -67,25 +67,6 @@ class Server extends AbstractService {
         let socket = this._io.sockets.connected[socketId];
 
         socket.emit('event', event);
-    }
-
-    _handleSocketIoConnection(socket) {
-
-        this.logger.debug('new socket connection');
-
-        socket.on('event', function(event) {
-            if('object' !== typeof event) {
-                this.logger.debug('event is no object', event);
-            }
-
-            event.socketId = socket.id;
-            this._kernel.handle(event);
-
-        }.bind(this));
-
-        socket.on('disconnect', function() {
-            this.logger.debug('socket disconnect: ' + socket.id);
-        }.bind(this));
     }
 
     /**

@@ -101,6 +101,11 @@ class Abstract {
     get moduleDefinition() {
         return this._moduleDefinition;
     }
+
+    get handler() {
+        return this._kernel.handler;
+    }
+
 }
 
 module.exports = Abstract;

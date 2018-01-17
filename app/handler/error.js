@@ -1,6 +1,6 @@
 const AbstractHandler = require('../abstract-handler');
 
-class Error extends AbstractHandler {
+class ErrorHandler extends AbstractHandler {
     constructor() {
         super();
     }
@@ -17,4 +17,4 @@ class Error extends AbstractHandler {
     }
 }
 
-module.exports = Error;
+module.exports = ErrorHandler;

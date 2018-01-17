@@ -8,7 +8,7 @@ class Kernel {
         this._services = {};
         this.entities = {};
         this.utils = {};
-        this.handler = {};
+        this._handler = {};
 
         this._moduleDefinition = new ModuleDefinition();
         this._moduleDefinition.type = 'core';
@@ -32,13 +32,12 @@ class Kernel {
             }
         }
 
-        // get handler
-        for(let handler in this._config.handler) {
-            this.handler[handler] = new this._config.handler[handler].class();
-        }
+        this._instantiateHandler(this._handler, this._config.handler);
+
+        console.log(this._handler);
 
         // handle uncaught exceptions
-        process.on('uncaughtException', this.handleUncaughtException.bind(this));
+        process.on('uncaughtException', this._handler.error.handle.bind(this));
 
         // make entities application wide available
         for(let entityName in this._config.entities) {
@@ -55,27 +54,31 @@ class Kernel {
         }
     }
 
-    handle(event) {
-        if('object' !== typeof event) {
-            this._services.logger.error('event is no object', event);
-            return false;
+    /**
+     *
+     * instantiate handler of config.handler object recursive
+     *
+     * @param handler
+     * @param handlerConfig
+     * @private
+     */
+    _instantiateHandler(handler, handlerConfig) {
+
+        for(let conf in handlerConfig) {
+
+            if('function' === typeof handlerConfig[conf].class) {
+                handler[conf] = new handlerConfig[conf].class();
+            } else {
+                handler[conf] = {};
+                this._instantiateHandler(handler[conf], handlerConfig[conf]);
+            }
         }
 
-        if('string' !== typeof event.handler) {
-            this._services.logger.error('event has no handler', event);
-            return false;
-        }
-
-        if('object' !== typeof this.handler[event.handler]) {
-            this._services.logger.error('event handler ' + event.handler + ' does not exists');
-            return false;
-        }
-
-        this.handler[event.handler].handle(event);
+        return true;
     }
 
-    handleUncaughtException(error) {
-        this.handler.error.handle(error);
+    get handler() {
+        return this._handler;
     }
 
     get services() {
@@ -85,11 +88,7 @@ class Kernel {
     get ready() {
 
         for(let serviceName in this._services) {
-
-            let service = this._services[serviceName];
-
-            if (!service.ready) return false;
-
+            if (!this._services[serviceName].ready) return false;
         }
 
         return true;

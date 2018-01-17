@@ -12,6 +12,13 @@ module.exports = {
     handler : {
         error : {
             class : require('../handler/error')
+        },
+        server : {
+            io : {
+                connection : {
+                    class : require('../handler/server/io/connection')
+                }
+            }
         }
     },
     services : {
