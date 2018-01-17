@@ -119,15 +119,15 @@ class Logger extends AbstractService {
         for(let levelCode in this._config.levels) {
 
             if(levelCode >= code) {
-                this.fs.appendFileSync(
-                    path.join(
-                        path.dirname(require.main.filename),
-                        '../',
-                        this._config.directory,
-                        this._config.levels[code].name + '.log',
-                    ),
-                    output + '\n'
+
+                let pathToLogFile = path.join(
+                    path.dirname(require.main.filename),
+                    '../',
+                    this._config.directory,
+                    this._config.levels[levelCode].name + '.log'
                 );
+
+                this.fs.appendFileSync(pathToLogFile, output + '\n');
             }
 
         }
