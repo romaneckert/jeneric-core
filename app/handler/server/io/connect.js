@@ -1,6 +1,6 @@
 const AbstractHandler = require('../../../abstract-handler');
 
-class ConnectionHandler extends AbstractHandler {
+class ConnectHandler extends AbstractHandler {
     constructor() {
         super();
     }
@@ -40,4 +40,4 @@ class ConnectionHandler extends AbstractHandler {
     }
 }
 
-module.exports = ConnectionHandler;
+module.exports = ConnectHandler;

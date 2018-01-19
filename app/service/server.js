@@ -38,7 +38,7 @@ class Server extends AbstractService {
         this._server.listen(this.config.port);
 
         this._io = io(this._server);
-        this._io.on('connection', this.handler.server.io.connection.handle.bind(this));
+        this._io.on('connection', this.handler.server.io.connect.handle.bind(this));
 
         this.logger.info('server started with port ' + this.config.port);
     }
