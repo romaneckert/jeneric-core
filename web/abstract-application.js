@@ -61,16 +61,9 @@ class AbstractApplication extends Abstract {
                         for(let l3 in this.kernel.handler[l1][l2]) {
 
                             if('function' === typeof this.kernel.handler[l1][l2][l3].handle) {
-
                                 this._registerDocumentHandlerByType(l3, l2);
-
-                                $(document).on(l3, '.' + l2, function(e) {
-                                    this.logger.debug('handle event ' + l1 + '/' + l2 + '/' + l3, {event:e});
-                                    this.kernel.handler[l1][l2][l3].handle(e);
-                                }.bind(this));
                             } else {
                                 for(let l4 in this.kernel.handler[l1][l2][l3]) {
-
                                     this._registerDocumentHandlerByType(l4, l2, l3);
                                 }
                             }
