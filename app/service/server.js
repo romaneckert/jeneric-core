@@ -89,42 +89,45 @@ class Server extends AbstractService {
         let parsedUrl = url.parse(request.url);
         let pathname = path.join(this.config.directory, parsedUrl.pathname);
 
-        if(!fs.existsSync(pathname)) {
-            this.logger.debug('Not found: ' + pathname);
-            response.statusCode = 404;
-            response.end('Not found.');
-            return false;
-        }
+        if(!fs.existsSync(pathname)) return this.throw404(response, pathname);
 
         if(fs.statSync(pathname).isDirectory()) pathname += '/index.html';
 
-        if(!fs.existsSync(pathname)) {
-            this.logger.debug('Not found: ' + pathname);
-            response.statusCode = 404;
-            response.end('Not found.');
-            return false;
-        }
+        if(!fs.existsSync(pathname)) return this.throw404(response, pathname);
 
         fs.readFile(pathname, (error, data) => {
-            if (error) {
-                this.logger.debug('Not found: ' + pathname);
-                response.statusCode = 404;
-                response.end('Not found.');
-                return false;
-            } else {
-                let ext = path.extname(pathname).replace('.', '');
+            if (error) return this.throw404(response, pathname);
 
-                if ('string' === typeof this.config.mimeTypes[ext]) {
-                    response.setHeader('Content-type', this.config.mimeTypes[ext] || 'text/plain');
-                    response.end(data);
-                } else {
-                    response.statusCode = 500;
-                    response.end('Error getting the file. mime type not supported.');
-                }
-            }
+            let ext = path.extname(pathname).replace('.', '');
+
+            if ('string' !== typeof this.config.mimeTypes[ext])
+                return this.throw500(response, 'Error getting the file. mime type not supported.');
+
+            response.setHeader('Content-type', this.config.mimeTypes[ext] || 'text/plain');
+            response.end(data);
+
         });
 
         return true;
+    }
+
+    throw500(response, message) {
+
+        this.logger.debug('500 / ' + message);
+
+        response.statusCode = 500;
+        response.end(message);
+
+        return false;
+    }
+
+    throw404(response, pathname) {
+
+        this.logger.debug('404 / Not found: ' + pathname);
+        response.statusCode = 404;
+        response.end('Not found.');
+
+        return false;
     }
     
 }
