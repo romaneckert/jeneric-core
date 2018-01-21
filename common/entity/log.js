@@ -1,4 +1,4 @@
-const AbstractEntity = require('../../app/abstract-entity');
+const AbstractEntity = require('../abstract-entity');
 
 /**
  * @classDesc log entity
