@@ -22,6 +22,9 @@ module.exports = {
             io: {
                 connect: {
                     class: require('../handler/server/io/connect')
+                },
+                disconnect: {
+                    class: require('../handler/server/io/disconnect')
                 }
             }
         }

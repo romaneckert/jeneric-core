@@ -33,9 +33,7 @@ class ConnectHandler extends AbstractHandler {
 
         }.bind(this));
 
-        socket.on('disconnect', function() {
-            this.logger.debug('socket disconnect: ' + socket.id);
-        }.bind(this));
+        socket.on('disconnect', this.handler.server.io.disconnect.handle.bind(this, socket));
 
     }
 }
