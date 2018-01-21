@@ -93,7 +93,12 @@ class Logger extends AbstractService {
 
         let date = new Date();
 
+        // remove line breaks
+        message = message.replace(/(\r?\n|\r)/gm, ' ');
+
+        // remove whitespaces and the beginning and the end
         message = this.utils.string.cast(message).trim();
+
         meta = this.utils.string.cast(meta);
 
         if('object' !== typeof stack) {
