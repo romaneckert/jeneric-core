@@ -16,13 +16,9 @@ class TemplateService extends AbstractService {
         }.bind(this));
     }
 
-    get templates() {
-        return this._templates;
-    }
-
     getTemplate(id, entity) {
 
-        let $template = $(this.templates[id].html());
+        let $template = $(this._templates[id].html());
 
         $template.find('[data-attribute]').each(function(a, attribute) {
             let $attributeElement = $(attribute);
