@@ -1,7 +1,14 @@
 const ModuleDefinition = require('../common/module-definition');
 
+/**
+ * @exports web/kernel
+ * @class
+ */
 class Kernel {
 
+    /**
+     * @constructor
+     */
     constructor() {
         this._config = require('./config');
         this._services = {};

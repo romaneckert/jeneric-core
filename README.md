@@ -10,3 +10,7 @@ Jeneric needs sponsors!
 
 - jeneric is alpha not ready for production. i plan to realize different modules based on jeneric core.
 - create documentation
+
+## Links
+
+[API](./doc/index.html)

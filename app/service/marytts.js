@@ -6,7 +6,11 @@ const fs = require('fs');
 const AbstractService = require('../abstract-service');
 const path = require('path');
 
-/** marytts module */
+/**
+ * @classDesc marytts service
+ * @exports app/service/marytts
+ * @class
+ */
 class MaryTTS extends AbstractService {
 
     constructor(config) {

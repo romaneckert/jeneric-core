@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>app/service/data.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_abstract.html">app/abstract</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_handler_logger_log.html">app/handler/logger/log</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="app_handler_logger_log.html#handle">handle</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_kernel.html">app/kernel</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_data.html">app/service/data</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_logger.html">app/service/logger</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="app_service_logger.html#log">log</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_marytts.html">app/service/marytts</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_observer.html">app/service/observer</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_server.html">app/service/server</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_util.html">app/util</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="common_entity_log.html">common/entity/log</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="web_abstract.html">web/abstract</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="web_kernel.html">web/kernel</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">app/service/data.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const mongodb = require('mongodb').MongoClient;
+const AbstractService = require('../abstract-service');
+
+/**
+ * @classDesc data service to communicate with mongodb
+ * @exports app/service/data
+ * @class
+ */
+class Data extends AbstractService {
+
+
+    /**
+     * @constructor
+     * @param {object} config
+     */
+    constructor(config) {
+
+        super();
+
+        this._db = null;
+
+        // default config
+        this._config = {};
+
+        this.utils.object.merge(this._config, config);
+
+        for(let entityName in this._kernel.config.entities) {
+            this[entityName] = new this._kernel.config.repositories[entityName].class();
+        }
+
+        //let url = 'mongodb://127.0.0.2/blub';
+        let url = 'mongodb://' + this._config.db.host + '/' + this._config.db.database;
+
+        mongodb.connect(
+            url,
+            {
+                connectTimeoutMS : 5000
+            },
+            this._handleDBConnection.bind(this)
+        );
+
+    }
+
+    get ready() {
+
+        for(let entityName in this._kernel.config.entities) {
+            if( 'object' !== typeof this[entityName].collection ||
+                null === this[entityName].collection
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    add(rawObj) {
+
+        if( 'object' !== typeof rawObj ||
+            'function' !== typeof rawObj.constructor ||
+            'string' !== typeof rawObj.constructor.name
+        ) {
+            this.logger.error('can not add object', rawObj);
+            return false;
+        }
+
+        let entityName = rawObj.constructor.name.toLowerCase();
+
+        let obj = {};
+
+        for (let attribute in rawObj) {
+
+            // prevent insert _id with null
+            if('_id' === attribute) continue;
+
+            if (-1 === ['_entityName'].indexOf(attribute)) obj[attribute] = rawObj[attribute];
+        }
+
+        this[entityName].collection.insertOne(obj, function(err) {
+            if(null !== err) throw err;
+        });
+    }
+
+    _handleDBConnection(err, client) {
+        if(null === err) {
+            this._db = client.db(this._config.db.database);
+            this.logger.info('Connection to database ' + this._config.db.database + ' established.');
+            this._db.collections(this._handleGetCollectionNames.bind(this));
+        } else {
+            this.logger.error('Can not connect to database ' + this._config.db.database + '.');
+        }
+    }
+
+    _handleGetCollectionNames(err, collections) {
+
+        if(null !== err) {
+            this.logger.error('can not get existing collection names');
+            return false;
+        }
+
+        for(let entityName in this._kernel.config.entities) {
+
+            let collectionExists = false;
+
+            for(let collectionKey in collections) {
+                let collection = collections[collectionKey];
+                if(
+                    'object' === typeof collection &amp;&amp;
+                    'object' === typeof collection.s &amp;&amp;
+                    'string' === typeof collection.s.name &amp;&amp;
+                    collection.s.name === entityName
+                ) {
+                    collectionExists = true;
+                    this[entityName].collection = this._db.collection(entityName);
+                }
+            }
+
+            if(!collectionExists) {
+                this._db.createCollection(
+                    entityName,
+                    {
+                        'capped': false
+                    },
+                    this._handleCreateCollection.bind(this)
+                );
+            }
+        }
+    }
+
+    _handleCreateCollection(err, result) {
+
+        if(
+            null === err &amp;&amp;
+            'object' === typeof result &amp;&amp;
+            'object' === typeof result.s &amp;&amp;
+            'string' === typeof result.s.name
+        ) {
+            let entityName = result.s.name;
+
+            this[entityName].collection = this._db.collection(entityName);
+
+            this.logger.debug('Collection "' + entityName + '" created.');
+        } else {
+            this.logger.error('Can not create collection.');
+        }
+    }
+
+}
+
+module.exports = Data;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 22 2018 14:15:43 GMT+0100 (CET) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

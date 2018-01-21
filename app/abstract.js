@@ -2,9 +2,14 @@ const ModuleDefinition = require('../common/module-definition');
 
 /** all classes extends the abstract class.
  * @abstract
+ * @exports app/abstract
+ * @class
  */
 class Abstract {
 
+    /**
+     * @constructor
+     */
     constructor() {
         this._kernel = require('./kernel');
 

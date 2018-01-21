@@ -1,5 +1,9 @@
 const ModuleDefinition = require('../common/module-definition');
 
+/**
+ * @exports app/kernel
+ * @class
+ */
 class Kernel {
 
     constructor() {
@@ -75,14 +79,23 @@ class Kernel {
         return true;
     }
 
+    /**
+     * @returns {object} handler
+     */
     get handler() {
         return this._handler;
     }
 
+    /**
+     * @returns {object} services
+     */
     get services() {
         return this._services;
     }
 
+    /**
+     * @returns {boolean} ready
+     */
     get ready() {
 
         for(let serviceName in this._services) {

@@ -1,5 +1,10 @@
 const AbstractService = require('../abstract-service');
 
+/**
+ * @classDesc observer service
+ * @exports app/service/observer
+ * @class
+ */
 class Observer extends AbstractService {
     constructor() {
         super();

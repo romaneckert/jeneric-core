@@ -1,7 +1,21 @@
 const AbstractEntity = require('../../app/abstract-entity');
 
+/**
+ * @classDesc log entity
+ * @exports common/entity/log
+ * @class
+ */
 class Log extends AbstractEntity {
 
+    /**
+     * @constructor
+     *
+     * @param {String} message
+     * @param meta
+     * @param {Integer} code
+     * @param {Date} date
+     * @param stack
+     */
     constructor(message, meta, code, date, stack) {
 
         super();

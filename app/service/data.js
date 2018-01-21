@@ -1,7 +1,18 @@
 const mongodb = require('mongodb').MongoClient;
 const AbstractService = require('../abstract-service');
 
+/**
+ * @classDesc data service to communicate with mongodb
+ * @exports app/service/data
+ * @class
+ */
 class Data extends AbstractService {
+
+
+    /**
+     * @constructor
+     * @param {object} config
+     */
     constructor(config) {
 
         super();

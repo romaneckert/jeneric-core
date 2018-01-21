@@ -6,7 +6,11 @@ const io = require('socket.io');
 
 const AbstractService = require('../abstract-service');
 
-/** server module */
+/**
+ * @classDesc server
+ * @exports app/service/server
+ * @class
+ */
 class Server extends AbstractService {
 
     constructor(config) {

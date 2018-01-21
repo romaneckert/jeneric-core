@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>app/service/server.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_abstract.html">app/abstract</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_handler_logger_log.html">app/handler/logger/log</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="app_handler_logger_log.html#handle">handle</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_kernel.html">app/kernel</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_data.html">app/service/data</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_logger.html">app/service/logger</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="app_service_logger.html#log">log</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_marytts.html">app/service/marytts</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_observer.html">app/service/observer</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_service_server.html">app/service/server</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="app_util.html">app/util</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="common_entity_log.html">common/entity/log</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="web_abstract.html">web/abstract</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="web_kernel.html">web/kernel</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">app/service/server.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const http = require('http');
+const url = require('url');
+const fs = require('fs');
+const path = require('path');
+const io = require('socket.io');
+
+const AbstractService = require('../abstract-service');
+
+/**
+ * @classDesc server
+ * @exports app/service/server
+ * @class
+ */
+class Server extends AbstractService {
+
+    constructor(config) {
+
+        super();
+
+        this.config = {
+            directory : '../public',
+            port : 3000,
+            mimeTypes : {
+                css:    'text/css',
+                gif:    'image/gif',
+                html:   'text/html',
+                jpg:    'image/jpeg',
+                js:     'application/x-javascript',
+                mp3:    'audio/mpeg',
+                pdf:    'application/pdf',
+                png:    'image/png',
+                svg:    'image/svg+xml'
+            }
+        };
+
+        this.utils.object.merge(this.config, config);
+
+        this.config.directory = path.join(path.dirname(require.main.filename), this.config.directory);
+        this.fs.ensureFolderExists(this.config.directory);
+
+        this._server = http.createServer(this._handleRequest.bind(this));
+        this._server.listen(this.config.port);
+
+        this._io = io(this._server);
+        this._io.on('connection', this.handler.server.io.connect.handle.bind(this));
+
+        this.logger.info('server started with port ' + this.config.port);
+    }
+
+    broadcast(event) {
+        this._io.emit('event', event, { for: 'everyone' });
+    }
+
+    send(socketId, event) {
+
+        if('string' !== typeof socketId) {
+            this.logger.error('no socket id set', socketId);
+            return false;
+        }
+
+        if('object' !== typeof event) {
+            this.logger.error('event is no object', event);
+            return false;
+        }
+
+        if('object' !== typeof this._io.sockets.connected[socketId]) {
+            this.logger.error('socket with id ' + socketId + ' does not exists.');
+            return false;
+        }
+
+        let socket = this._io.sockets.connected[socketId];
+
+        socket.emit('event', event);
+    }
+
+    /**
+     * handle http requests
+     *
+     * @param request
+     * @param response
+     * @returns {boolean}
+     * @private
+     */
+    _handleRequest(request, response) {
+
+        // log request method and request url
+        this.logger.debug(request.method + ': ' + request.url);
+
+        let parsedUrl = url.parse(request.url);
+        let pathname = path.join(this.config.directory, parsedUrl.pathname);
+
+        if(!fs.existsSync(pathname)) {
+            this.logger.debug('Not found: ' + pathname);
+            response.statusCode = 404;
+            response.end('Not found.');
+            return false;
+        }
+
+        if(fs.statSync(pathname).isDirectory()) pathname += '/index.html';
+
+        if(!fs.existsSync(pathname)) {
+            this.logger.debug('Not found: ' + pathname);
+            response.statusCode = 404;
+            response.end('Not found.');
+            return false;
+        }
+
+        fs.readFile(pathname, (error, data) => {
+            if (error) {
+                this.logger.debug('Not found: ' + pathname);
+                response.statusCode = 404;
+                response.end('Not found.');
+                return false;
+            } else {
+                let ext = path.extname(pathname).replace('.', '');
+
+                if ('string' === typeof this.config.mimeTypes[ext]) {
+                    response.setHeader('Content-type', this.config.mimeTypes[ext] || 'text/plain');
+                    response.end(data);
+                } else {
+                    response.statusCode = 500;
+                    response.end('Error getting the file. mime type not supported.');
+                }
+            }
+        });
+
+        return true;
+    }
+    
+}
+
+module.exports = Server;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 22 2018 14:15:43 GMT+0100 (CET) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -1,6 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * @classDesc filesystem util
+ * @exports app/util
+ * @class
+ */
 module.exports = {
     appendFileSync : function(file, data, options) {
         return fs.appendFileSync(file, data, options);
