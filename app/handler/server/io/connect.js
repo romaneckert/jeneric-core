@@ -7,7 +7,7 @@ class ConnectHandler extends AbstractHandler {
 
     handle(socket) {
 
-        this.logger.debug('new socket connection');
+        this.logger.debug('new socket connection: ' + socket.id);
 
         socket.on('event', function(event) {
 

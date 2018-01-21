@@ -6,11 +6,7 @@ class DisconnectHandler extends AbstractHandler {
     }
 
     handle(socket) {
-
-        console.log(socket);
-
         this.logger.debug('socket disconnect: ' + socket.id);
-
     }
 }
 
