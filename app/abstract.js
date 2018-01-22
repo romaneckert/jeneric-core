@@ -75,7 +75,9 @@ class Abstract {
 
             debug : function(message, meta, stack) {
                 this.services.logger.log(message, meta, this.moduleDefinition, stack, 7);
-            }.bind(this)
+            }.bind(this),
+
+            history : this.services.logger.history
         };
     }
 
