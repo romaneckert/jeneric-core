@@ -8,24 +8,36 @@ const AbstractEntity = require('../abstract-entity');
 class Log extends AbstractEntity {
 
     /**
+     *
      * @constructor
      *
-     * @param {String} message
-     * @param meta
-     * @param {Integer} code
+     * @param {int} code
      * @param {Date} date
-     * @param stack
+     * @param {string} message
+     * @param meta
+     * @param {string} module
+     * @param {string} stack
      */
-    constructor(message, meta, code, date, stack) {
+
+    constructor(code, date, message, meta, module, stack) {
 
         super();
 
-        this._message = message;
-        this._meta = meta;
         this._code = code;
         this._date = date;
+        this._message = message;
+        this._meta = meta;
+        this._module = module;
         this._stack = stack;
 
+    }
+
+    get code() {
+        return this._code;
+    }
+
+    get date() {
+        return this._date;
     }
 
     get message() {
@@ -36,12 +48,8 @@ class Log extends AbstractEntity {
         return this._meta;
     }
 
-    get code() {
-        return this._code;
-    }
-
-    get date() {
-        return this._date;
+    get module() {
+        return this._module;
     }
 
     get stack() {

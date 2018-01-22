@@ -90,10 +90,10 @@ class Logger extends AbstractService {
      */
     log(message, meta, moduleDefinition, stack, code) {
 
-        let moduleString = '';
+        let module = '';
 
         if('object' === typeof moduleDefinition) {
-            moduleString = moduleDefinition.toString();
+            module = moduleDefinition.toString();
         }
 
         let date = new Date();
@@ -115,7 +115,7 @@ class Logger extends AbstractService {
 
         let output = '[' + this._dateStringFromDate(date) + '] ';
         output += '[' + this._config.levels[code].name + '] ';
-        output += '[' + moduleString + '] ';
+        output += '[' + module + '] ';
         output += '[' + message + ']';
 
         if(meta.length > 0) output += ' [' + meta + ']';
@@ -135,14 +135,14 @@ class Logger extends AbstractService {
         if(this._config.levels[code].console) {
 
             let consoleOutput = message + ' ';
-            consoleOutput += '[' + moduleString + '] ';
+            consoleOutput += '[' + module + '] ';
             if(meta.length > 0) consoleOutput += '[' + meta + '] ';
             consoleOutput += '[' + stack + ']';
 
             console.log(this._config.levels[code].color , consoleOutput, "\x1b[0m") ;
         }
 
-        let log = new this.entities.log(message, meta, code, date, stack);
+        let log = new this.entities.log(code, date, message, meta, module, stack);
 
         this.handler.logger.log.handle(log);
 
