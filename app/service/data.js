@@ -44,11 +44,7 @@ class Data extends AbstractService {
     get ready() {
 
         for(let entityName in this._kernel.config.entities) {
-            if( 'object' !== typeof this[entityName].collection ||
-                null === this[entityName].collection
-            ) {
-                return false;
-            }
+            if( 'object' !== typeof this[entityName].collection || null === this[entityName].collection) return false;
         }
 
         return true;
@@ -82,13 +78,14 @@ class Data extends AbstractService {
     }
 
     _handleDBConnection(err, client) {
-        if(null === err) {
-            this._db = client.db(this._config.db.database);
-            this.logger.info('Connection to database ' + this._config.db.database + ' established.');
-            this._db.collections(this._handleGetCollectionNames.bind(this));
-        } else {
+        if(null !== err) {
             this.logger.error('Can not connect to database ' + this._config.db.database + '.');
+            return false;
         }
+
+        this._db = client.db(this._config.db.database);
+        this.logger.info('Connection to database ' + this._config.db.database + ' established.');
+        this._db.collections(this._handleGetCollectionNames.bind(this));
     }
 
     _handleGetCollectionNames(err, collections) {

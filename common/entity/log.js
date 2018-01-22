@@ -12,7 +12,7 @@ class Log extends AbstractEntity {
      * @constructor
      *
      * @param {int} code
-     * @param {Date} date
+     * @param {date} date
      * @param {string} message
      * @param meta
      * @param {string} module

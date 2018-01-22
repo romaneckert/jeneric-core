@@ -78,7 +78,8 @@ class Logger extends AbstractService {
             );
         }
 
-        this._logs = [];
+        this._logsToSaveQueue = [];
+        this._history = [];
     }
 
     /**
@@ -144,22 +145,33 @@ class Logger extends AbstractService {
 
         let log = new this.entities.log(code, date, message, meta, module, stack);
 
+        // remove older entries if log history greater then 200
+        if(this._history.length > 200) this._history.shift();
+
+        // add current log to history
+        this._history.push(log);
+
+        // call log handler
         this.handler.logger.log.handle(log);
 
+        // save log to db
         this._save(log);
     }
 
     _save(log) {
 
-        this._logs.push(log);
+        // remove older entries if log to save queue greater then 200
+        if(this._logsToSaveQueue.length > 200) this._logsToSaveQueue.shift();
+
+        this._logsToSaveQueue.push(log);
 
         if(this._kernel.services.data.ready) {
 
-            for(let log of this._logs) {
-                this._kernel.services.data.add(log);
+            for(let logToSave of this._logsToSaveQueue) {
+                this._kernel.services.data.add(logToSave);
             }
 
-            this._logs = [];
+            this._logsToSaveQueue = [];
         }
 
     }
@@ -183,8 +195,8 @@ class Logger extends AbstractService {
     }
 
     /**
-     * @param date
-     * @returns {string}
+     * @param {date} date
+     * @returns {string} date
      * @private
      */
     _dateStringFromDate(date) {
@@ -200,6 +212,10 @@ class Logger extends AbstractService {
 
     get ready() {
         return true;
+    }
+
+    get history() {
+        return this._history;
     }
 }
 
