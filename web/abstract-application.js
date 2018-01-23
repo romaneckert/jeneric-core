@@ -81,7 +81,7 @@ class AbstractApplication extends Abstract {
 
         if('string' === typeof class2) {
             selector += ' .' + class2;
-            logMessage +=  + '/' + class2;
+            logMessage += logMessage + '/' + class2;
         }
 
         switch(type) {
