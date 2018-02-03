@@ -22,25 +22,29 @@ class TemplateService extends AbstractService {
 
         let $template = $(this._templates[id].html());
 
-        let dataAttributes = $template.data();
+        $template.find('[data-attribute]').each(function(i, elem) {
 
-        for(let attributeName in dataAttributes) {
-
-            let value = null;
-
-            if(entity[attributeName]) {
-                value = entity[attributeName];
-            }
-
-            $template.attr('data-' + attributeName, value);
-        }
-
-        $template.find('[data-attribute]').each(function(a, attribute) {
-            let $attributeElement = $(attribute);
-            let attributeName = $attributeElement.attr('data-attribute');
+            let $elem = $(elem);
+            let attributeName = $elem.attr('data-attribute');
+            let attributeMapping = $elem.attr('data-attribute-mapping');
 
             if(entity[attributeName]) {
-                $attributeElement.html(entity[attributeName]);
+
+                let value = entity[attributeName];
+
+                if('string' === typeof attributeMapping && attributeMapping.length > 0) {
+
+                    let defaultAttribute = $elem.attr(attributeMapping);
+
+                    if('href' === attributeMapping && 'string' === typeof defaultAttribute && -1 !== defaultAttribute.indexOf('#')) {
+                        $elem.attr('href', value + defaultAttribute);
+                    } else {
+                        $elem.attr(attributeMapping, value);
+                    }
+
+                } else {
+                    $elem.html(value);
+                }
             }
 
         });
