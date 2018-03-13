@@ -73,6 +73,7 @@ class Logger extends AbstractService {
                     path.dirname(require.main.filename),
                     '../',
                     this._config.directory,
+                    'type',
                     this._config.levels[code].name + '.log',
                 )
             );
@@ -102,7 +103,7 @@ class Logger extends AbstractService {
         // remove line breaks
         message = message.replace(/(\r?\n|\r)/gm, ' ');
 
-        // remove whitespaces and the beginning and the end
+        // remove whitespaces at the beginning and the end
         message = this.utils.string.cast(message).trim();
 
         meta = this.utils.string.cast(meta);
@@ -114,51 +115,65 @@ class Logger extends AbstractService {
         }
         stack = this._stackToString(stack);
 
-        let output = '[' + this._dateStringFromDate(date) + '] ';
-        output += '[' + this._config.levels[code].name + '] ';
-        output += '[' + module + '] ';
-        output += '[' + message + ']';
+        let log = new this.entities.log(code, date, message, meta, module, stack);
 
-        if(meta.length > 0) output += ' [' + meta + ']';
-        output += ' [' + stack + ']';
+        this._writeToLogFiles(log);
+        this._writeToConsole(log);
+        this._addToHistory(log);
+
+        // call log handler
+        this.handler.logger.log.handle(log);
+
+        // save log to db
+        this._saveInDB(log);
+    }
+
+    // TODO: add log rotation
+    _writeToLogFiles(log) {
 
         // write log entry in specific log file
         let pathToLogFile = path.join(
             path.dirname(require.main.filename),
             '../',
             this._config.directory,
-            this._config.levels[code].name + '.log'
+            'type',
+            this._config.levels[log.code].name + '.log'
         );
 
+        let output = '[' + this._dateStringFromDate(log.date) + '] ';
+        output += '[' + this._config.levels[log.code].name + '] ';
+        output += '[' + log.module + '] ';
+        output += '[' + log.message + ']';
+        if(log.meta.length > 0) output += ' [' + log.meta + ']';
+        output += ' [' + log.stack + ']';
+
         this.fs.appendFileSync(pathToLogFile, output + '\n');
+    }
+
+    _writeToConsole(log) {
 
         // write log entry to console
-        if(this._config.levels[code].console) {
+        if(this._config.levels[log.code].console) {
 
-            let consoleOutput = message + ' ';
-            consoleOutput += '[' + module + '] ';
-            if(meta.length > 0) consoleOutput += '[' + meta + '] ';
-            consoleOutput += '[' + stack + ']';
+            let consoleOutput = log.message + ' ';
+            consoleOutput += '[' + log.module + '] ';
+            if(log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
+            consoleOutput += '[' + log.stack + ']';
 
-            console.log(this._config.levels[code].color , consoleOutput, "\x1b[0m") ;
+            console.log(this._config.levels[log.code].color , consoleOutput, "\x1b[0m") ;
         }
 
-        let log = new this.entities.log(code, date, message, meta, module, stack);
+    }
 
+    _addToHistory(log) {
         // remove older entries if log history greater then 200
         if(this._history.length > 200) this._history.shift();
 
         // add current log to history
         this._history.push(log);
-
-        // call log handler
-        this.handler.logger.log.handle(log);
-
-        // save log to db
-        this._save(log);
     }
 
-    _save(log) {
+    _saveInDB(log) {
 
         // remove older entries if log to save queue greater then 200
         if(this._logsToSaveQueue.length > 200) this._logsToSaveQueue.shift();
