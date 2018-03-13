@@ -131,6 +131,8 @@ class Logger extends AbstractService {
     // TODO: add log rotation
     _writeToLogFiles(log) {
 
+        // TODO: add file checks with file check cache
+
         // write log entry in specific log file
         let pathToLogFile = path.join(
             path.dirname(require.main.filename),
