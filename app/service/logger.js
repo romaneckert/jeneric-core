@@ -67,15 +67,8 @@ class Logger extends AbstractService {
         
         // ensure log files exists
         for(let code in this._config.levels) {
-
             this.fs.ensureFileExists(
-                path.join(
-                    path.dirname(require.main.filename),
-                    '../',
-                    this._config.directory,
-                    'type',
-                    this._config.levels[code].name + '.log',
-                )
+                this._getPathToLogFile(code, 'type')
             );
         }
 
@@ -134,13 +127,7 @@ class Logger extends AbstractService {
         // TODO: add file checks with file check cache
 
         // write log entry in specific log file
-        let pathToLogFile = path.join(
-            path.dirname(require.main.filename),
-            '../',
-            this._config.directory,
-            'type',
-            this._config.levels[log.code].name + '.log'
-        );
+        let pathToLogFile = this._getPathToLogFile(log.code, 'type');
 
         let output = '[' + this._dateStringFromDate(log.date) + '] ';
         output += '[' + this._config.levels[log.code].name + '] ';
@@ -150,6 +137,18 @@ class Logger extends AbstractService {
         output += ' [' + log.stack + ']';
 
         this.fs.appendFileSync(pathToLogFile, output + '\n');
+    }
+
+    _getPathToLogFile(code, namespace) {
+
+        return path.join(
+            path.dirname(require.main.filename),
+            '../',
+            this._config.directory,
+            namespace,
+            this._config.levels[code].name + '.log'
+        );
+
     }
 
     _writeToConsole(log) {
