@@ -85,22 +85,22 @@ class Logger extends AbstractService {
      */
     log(message, meta, moduleDefinition, stack, code) {
 
-        let module = '';
-
-        if('object' === typeof moduleDefinition) {
-            module = moduleDefinition.toString();
-        }
-
+        // create date for current log entry
         let date = new Date();
 
-        // remove line breaks
+        // detect module definition
+        let module = ('object' === typeof moduleDefinition) ? module = moduleDefinition.toString() : '';
+
+        // remove line breaks from message
         message = message.replace(/(\r?\n|\r)/gm, ' ');
 
-        // remove whitespaces at the beginning and the end
+        // remove whitespaces at the beginning and the end of the message
         message = this.utils.string.cast(message).trim();
 
+        // cast meta data like objects to string
         meta = this.utils.string.cast(meta);
 
+        // create call stack if not defined
         if('object' !== typeof stack) {
             stack = this.utils.error.stack(new Error());
             stack.shift();
@@ -108,13 +108,19 @@ class Logger extends AbstractService {
         }
         stack = this._stackToString(stack);
 
+        // create log entity
         let log = new this.entities.log(code, date, message, meta, module, stack);
 
+        // write log to log files
         this._writeToLogFiles(log);
+
+        // write log to console
         this._writeToConsole(log);
+
+        // add log entry to history
         this._addToHistory(log);
 
-        // call log handler
+        // call log handler (can be used by application)
         this.handler.logger.log.handle(log);
 
         // save log to db
