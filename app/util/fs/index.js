@@ -25,9 +25,7 @@ module.exports = {
     ensureFileExists : function(filepath) {
         if(this.existsSync(filepath)) return true;
 
-        let dirname = this.dirname(filepath);
-
-        this.ensureFolderExists(dirname);
+        this.ensureFolderExists(this.dirname(filepath));
 
         this.writeFileSync(filepath, '');
 

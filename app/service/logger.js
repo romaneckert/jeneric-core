@@ -13,6 +13,8 @@ class Logger extends AbstractService {
 
         this._config = {
             directory : 'var/logs',
+            maxLinesPerLogFile: 10000,
+            maxLogRotationsPerType: 10,
             levels : {
                 0 : {
                     name : 'emergency',
@@ -64,13 +66,6 @@ class Logger extends AbstractService {
         
         // merge config
         this.utils.object.merge(this._config, config);
-        
-        // ensure log files exists
-        for(let code in this._config.levels) {
-            this.fs.ensureFileExists(
-                this._getPathToLogFile(code, 'type')
-            );
-        }
 
         this._logsToSaveQueue = [];
         this._history = [];
@@ -89,7 +84,7 @@ class Logger extends AbstractService {
         let date = new Date();
 
         // detect module definition
-        let module = ('object' === typeof moduleDefinition) ? module = moduleDefinition.toString() : '';
+        let module = ('object' === typeof moduleDefinition) ? moduleDefinition.toString() : '';
 
         // remove line breaks from message
         message = message.replace(/(\r?\n|\r)/gm, ' ');
@@ -130,10 +125,11 @@ class Logger extends AbstractService {
     // TODO: add log rotation
     _writeToLogFiles(log) {
 
-        // TODO: add file checks with file check cache
-
         // write log entry in specific log file
         let pathToLogFile = this._getPathToLogFile(log.code, 'type');
+
+        // check if log file exists and create if not
+        this.fs.ensureFileExists(pathToLogFile);
 
         let output = '[' + this._dateStringFromDate(log.date) + '] ';
         output += '[' + this._config.levels[log.code].name + '] ';
@@ -146,7 +142,6 @@ class Logger extends AbstractService {
     }
 
     _getPathToLogFile(code, namespace) {
-
         return path.join(
             path.dirname(require.main.filename),
             '../',
@@ -154,7 +149,6 @@ class Logger extends AbstractService {
             namespace,
             this._config.levels[code].name + '.log'
         );
-
     }
 
     _writeToConsole(log) {
