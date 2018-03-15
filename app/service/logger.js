@@ -86,11 +86,11 @@ class Logger extends AbstractService {
         // detect module definition
         let module = ('object' === typeof moduleDefinition) ? moduleDefinition.toString() : '';
 
+        // cast to string
+        message = this.utils.string.cast(message).trim();
+
         // remove line breaks from message
         message = message.replace(/(\r?\n|\r)/gm, ' ');
-
-        // remove whitespaces at the beginning and the end of the message
-        message = this.utils.string.cast(message).trim();
 
         // cast meta data like objects to string
         meta = this.utils.string.cast(meta);
