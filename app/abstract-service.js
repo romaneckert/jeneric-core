@@ -3,10 +3,7 @@ const Abstract = require('./abstract');
 class AbstractService extends Abstract {
 
     constructor() {
-
-        super();
-
-        this._moduleDefinition.type = 'service';
+        super('service');
     }
 
     get ready() {

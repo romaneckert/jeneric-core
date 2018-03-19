@@ -10,13 +10,15 @@ class Abstract {
     /**
      * @constructor
      */
-    constructor() {
+    constructor(moduleType) {
+
+        if('string' !== typeof moduleType) throw new Error('module type is not a string');
+
         this._kernel = require('./kernel');
 
         this._moduleDefinition = new ModuleDefinition();
-
-        // TODO: fix bug with maximum callstack
-        //this._moduleDefinition.name = this._kernel.getModuleNameByClass(this.constructor);
+        this._moduleDefinition.type = moduleType;
+        this._moduleDefinition.name = this.constructor.name;
     }
 
     get services() {

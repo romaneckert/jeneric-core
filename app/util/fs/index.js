@@ -47,6 +47,4 @@ fs.ensureFolderExists = function(directoryPath) {
     return true;
 };
 
-
-
 module.exports = fs;

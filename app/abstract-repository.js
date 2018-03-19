@@ -2,11 +2,7 @@ const Abstract = require('./abstract');
 
 class AbstractRepository extends Abstract {
     constructor() {
-
-        super();
-
-        this._moduleDefinition.type = 'repository';
-
+        super('repository');
         this._collection = null;
     }
 

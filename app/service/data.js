@@ -8,7 +8,6 @@ const AbstractService = require('../abstract-service');
  */
 class Data extends AbstractService {
 
-
     /**
      * @constructor
      * @param {object} config

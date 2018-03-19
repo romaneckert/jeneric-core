@@ -84,7 +84,7 @@ class Logger extends AbstractService {
         let date = new Date();
 
         // detect module definition
-        let module = ('object' === typeof moduleDefinition) ? moduleDefinition.toString() : '';
+        let module = ('object' === typeof moduleDefinition) ? moduleDefinition.toString().toLowerCase() : '';
 
         // cast to string
         message = this.utils.string.cast(message).trim();
