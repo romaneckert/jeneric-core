@@ -14,7 +14,9 @@ class Abstract {
         this._kernel = require('./kernel');
 
         this._moduleDefinition = new ModuleDefinition();
-        this._moduleDefinition.name = this._kernel.getModuleNameByClass(this.constructor);
+
+        // TODO: fix bug with maximum callstack
+        //this._moduleDefinition.name = this._kernel.getModuleNameByClass(this.constructor);
     }
 
     get services() {
@@ -43,7 +45,7 @@ class Abstract {
 
     get logger() {
 
-        // builing layer between real logger service to set the module definition to logger
+        // building layer between real logger service to set the module definition to logger
         return {
             emergency : function(message, meta, stack) {
                 this.services.logger.log(message, meta, this.moduleDefinition, stack, 0);

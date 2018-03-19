@@ -106,11 +106,12 @@ class Kernel {
     }
 
     getModuleNameByClass(clazz) {
+
         let path = [];
         this._getConfigPathByAttribute(this._config, 'class', clazz, path);
 
         if(path.length > 1) {
-            // removes first path segement like service or handler
+            // removes first path segment like service or handler
             path.shift();
             return path.join('/');
         }

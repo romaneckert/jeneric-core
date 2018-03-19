@@ -1,68 +1,52 @@
-const fs = require('fs');
-const path = require('path');
+let fs = require('fs');
 
-/**
- * @classDesc filesystem util
- * @exports app/util
- * @class
- */
-module.exports = {
-    appendFileSync : function(file, data, options) {
-        return fs.appendFileSync(file, data, options);
-    },
-    dirname : function(filepath) {
-        return path.dirname(filepath);
-    },
-    existsSync : function(path) {
-        return fs.existsSync(path);
-    },
-    mkdirSync : function(filepath) {
-        return fs.mkdirSync(filepath);
-    },
-    writeFileSync : function(file, data, options) {
-        return fs.writeFileSync(file, data, options);
-    },
-    ensureFileExists : function(filepath) {
-        if(this.existsSync(filepath)) return true;
+fs.path = require('path');
 
-        this.ensureFolderExists(this.dirname(filepath));
+fs.copySync = function(src, dest) {
 
-        this.writeFileSync(filepath, '');
+    // check if source exists
+    if(!fs.existsSync(src)) return false;
 
-        return true;
-    },
-    ensureFolderExists : function(folderPath) {
-        if(this.existsSync(folderPath)) return true;
+    // check if destination exists
+    if(fs.existsSync(dest)) return false;
 
-        this.ensureFolderExists(this.dirname(folderPath));
-        this.mkdirSync(folderPath);
+    let stats = fs.statSync(src);
 
-        return true;
-    },
-    copySync : function(src, dest) {
+    if(stats.isDirectory()) {
+        fs.mkdirSync(dest);
+        let files = fs.readdirSync(src);
 
-        let ret = true;
-
-        // check if source exists
-        if(!fs.existsSync(src)) return false;
-
-        // check if destination exists
-        if(fs.existsSync(dest)) return false;
-
-        let stats = fs.statSync(src);
-
-        if(stats.isDirectory()) {
-            fs.mkdirSync(dest);
-            let files = fs.readdirSync(src);
-
-            for(let file of files) {
-                if(!this.copySync(path.join(src, file), path.join(dest, file))) return false;
-            }
-
-        } else {
-            fs.copyFileSync(src, dest);
+        for(let file of files) {
+            if(!this.copySync(this.path.join(src, file), this.path.join(dest, file))) return false;
         }
 
-        return ret;
+    } else {
+        fs.copyFileSync(src, dest);
     }
+
+    return true;
+
 };
+
+fs.ensureFileExists = function(filePath) {
+    if(this.existsSync(filePath)) return true;
+
+    this.ensureFolderExists(this.path.dirname(filePath));
+
+    this.writeFileSync(filePath, '');
+
+    return true;
+};
+
+fs.ensureFolderExists = function(directoryPath) {
+    if(this.existsSync(directoryPath)) return true;
+
+    this.ensureFolderExists(this.path.dirname(directoryPath));
+    this.mkdirSync(directoryPath);
+
+    return true;
+};
+
+
+
+module.exports = fs;

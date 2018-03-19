@@ -13,7 +13,7 @@ class Logger extends AbstractService {
 
         this._config = {
             directory : 'var/logs',
-            maxLinesPerLogFile: 10000,
+            maxSizePerLogFile: 1 * 1024 * 1024, // in byte - default 32 mb
             maxLogRotationsPerType: 10,
             levels : {
                 0 : {
@@ -122,7 +122,7 @@ class Logger extends AbstractService {
         this._saveInDB(log);
     }
 
-    // TODO: add log rotation
+    // TODO: add write log by module
     _writeToLogFiles(log) {
 
         // write log entry in specific log file
@@ -131,6 +131,9 @@ class Logger extends AbstractService {
         // check if log file exists and create if not
         this.fs.ensureFileExists(pathToLogFile);
 
+        // check if log rotation is necessary
+        this._rotateLogFile(pathToLogFile);
+
         let output = '[' + this._dateStringFromDate(log.date) + '] ';
         output += '[' + this._config.levels[log.code].name + '] ';
         output += '[' + log.module + '] ';
@@ -138,12 +141,39 @@ class Logger extends AbstractService {
         if(log.meta.length > 0) output += ' [' + log.meta + ']';
         output += ' [' + log.stack + ']';
 
+        // write line to log file
         this.fs.appendFileSync(pathToLogFile, output + '\n');
     }
 
+    _rotateLogFile(pathToLogFile) {
+
+        let fileSize = this.fs.statSync(pathToLogFile).size;
+
+        if(fileSize < this._config.maxSizePerLogFile) return false;
+
+        for (let i = this._config.maxLogRotationsPerType - 1; i >= 0; i--) {
+
+            let pathToArchivedLogFile = pathToLogFile + '.' + i;
+
+            // check if archived file exists
+            if(!this.fs.existsSync(pathToArchivedLogFile)) continue;
+
+            // unlink last log file
+            if(this._config.maxLogRotationsPerType - 1 === i) {
+                this.fs.unlinkSync(pathToArchivedLogFile);
+                continue;
+            }
+
+            this.fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
+        }
+
+        this.fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
+        this.fs.ensureFileExists(pathToLogFile);
+    }
+
     _getPathToLogFile(code, namespace) {
-        return path.join(
-            path.dirname(require.main.filename),
+        return this.fs.path.join(
+            this.fs.path.dirname(require.main.filename),
             '../',
             this._config.directory,
             namespace,

@@ -22,22 +22,23 @@ class Data extends AbstractService {
         // default config
         this._config = {};
 
-        this.utils.object.merge(this._config, config);
+        if('object' === typeof config) {
+            this.utils.object.merge(this._config, config);
+        }
 
         for(let entityName in this._kernel.config.entities) {
             this[entityName] = new this._kernel.config.repositories[entityName].class();
         }
 
-        //let url = 'mongodb://127.0.0.2/blub';
-        let url = 'mongodb://' + this._config.db.host + '/' + this._config.db.database;
-
-        mongodb.connect(
-            url,
-            {
-                connectTimeoutMS : 5000
-            },
-            this._handleDBConnection.bind(this)
-        );
+        if('object' === typeof this._config && 'object' === typeof this._config.db) {
+            mongodb.connect(
+                'mongodb://' + this._config.db.host + '/' + this._config.db.database,
+                {
+                    connectTimeoutMS : 5000
+                },
+                this._handleDBConnection.bind(this)
+            );
+        }
 
     }
 

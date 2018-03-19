@@ -17,7 +17,7 @@ class Server extends AbstractService {
 
         super();
 
-        this.config = {
+        this._config = {
             directory : '../public',
             port : 3000,
             mimeTypes : {
@@ -33,18 +33,17 @@ class Server extends AbstractService {
             }
         };
 
-        this.utils.object.merge(this.config, config);
+        this.utils.object.merge(this._config, config);
 
-        this.config.directory = path.join(path.dirname(require.main.filename), this.config.directory);
-        this.fs.ensureFolderExists(this.config.directory);
+        this._config.directory = path.join(path.dirname(require.main.filename), this._config.directory);
 
         this._server = http.createServer(this._handleRequest.bind(this));
-        this._server.listen(this.config.port);
+        this._server.listen(this._config.port);
 
         this._io = io(this._server);
         this._io.on('connection', this.handler.server.io.connect.handle.bind(this));
 
-        this.logger.info('server started with port ' + this.config.port);
+        this.logger.info('server started with port ' + this._config.port);
     }
 
     broadcast(event) {
@@ -87,7 +86,7 @@ class Server extends AbstractService {
         this.logger.debug(request.method + ': ' + request.url);
 
         let parsedUrl = url.parse(request.url);
-        let pathname = path.join(this.config.directory, parsedUrl.pathname);
+        let pathname = path.join(this._config.directory, parsedUrl.pathname);
 
         if(!fs.existsSync(pathname)) return this.throw404(response, pathname);
 
@@ -100,10 +99,10 @@ class Server extends AbstractService {
 
             let ext = path.extname(pathname).replace('.', '');
 
-            if ('string' !== typeof this.config.mimeTypes[ext])
+            if ('string' !== typeof this._config.mimeTypes[ext])
                 return this.throw500(response, 'Error getting the file. mime type not supported.');
 
-            response.setHeader('Content-type', this.config.mimeTypes[ext] || 'text/plain');
+            response.setHeader('Content-type', this._config.mimeTypes[ext] || 'text/plain');
             response.end(data);
 
         });
