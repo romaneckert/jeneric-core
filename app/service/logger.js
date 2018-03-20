@@ -13,8 +13,9 @@ class Logger extends AbstractService {
 
         this._config = {
             directory : 'var/logs',
-            maxSizePerLogFile: 1 * 1024 * 1024, // in byte - default 32 mb
+            maxSizePerLogFile: 16 * 1024 * 1024, // in byte - default 16 mb
             maxLogRotationsPerType: 10,
+            maxHistoryLength: 1000,
             levels : {
                 0 : {
                     name : 'emergency',
@@ -198,7 +199,7 @@ class Logger extends AbstractService {
 
     _addToHistory(log) {
         // remove older entries if log history greater then 200
-        if(this._history.length > 200) this._history.shift();
+        if(this._history.length > this._config.maxHistoryLength) this._history.shift();
 
         // add current log to history
         this._history.push(log);
