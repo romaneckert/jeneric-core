@@ -1,6 +1,6 @@
 {
   "name": "@jeneric/core",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "jeneric core",
   "main": "index.js",
   "scripts": {
@@ -10,13 +10,13 @@
   "license": "MIT",
   "repository": "https://github.com/romaneckert/jeneric-core",
   "dependencies": {
-    "mongodb": "^3.0.1",
+    "mongodb": "^3.0.4",
     "slug": "^0.9.1",
     "socket.io": "^2.0.4"
   },
   "devDependencies": {
     "docdash": "^0.4.0",
-    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp": "4.0.0",
     "gulp-exec": "^3.0.1",
     "jsdoc": "^3.5.5",
     "minami": "^1.2.3"
