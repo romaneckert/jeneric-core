@@ -50,7 +50,7 @@ class AbstractApplication extends Abstract {
                 case 'window':
                     for(let l2 in this.kernel.handler[l1]) {
                         $(window).on(l2, function(e) {
-                            this.logger.debug('handle event ' + l1 + '/' + l2,  {event:e});
+                            this.logger.debug('handle ' + l1 + '/' + l2,  {event:e});
                             this.kernel.handler[l1][l2].handle(e);
                         }.bind(this));
                     }
@@ -77,12 +77,14 @@ class AbstractApplication extends Abstract {
     _registerDocumentHandlerByType(type, class1, class2) {
 
         let selector = '.' + class1;
-        let logMessage = 'handle ' + type + ' event on document/' + class1;
+        let logMessage = 'handle document/' + class1;
 
         if('string' === typeof class2) {
             selector += ' .' + class2;
             logMessage += '/' + class2;
         }
+
+        logMessage += '/' + type;
 
         switch(type) {
             case 'scroll':
