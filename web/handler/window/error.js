@@ -8,8 +8,11 @@ class Error extends AbstractHandler {
     handle(event) {
         if(
             'object' === typeof event &&
+            null !== event &&
             'object' === typeof event.originalEvent &&
-            'object' === typeof event.originalEvent.error
+            null !== event.originalEvent &&
+            'object' === typeof event.originalEvent.error &&
+            null !== event.originalEvent.error
         ) {
 
             let error = event.originalEvent.error;
