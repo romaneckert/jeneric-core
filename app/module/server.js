@@ -1,7 +1,8 @@
 const path = require('path');
 const express = require('express')();
-const https = require('https');
+const helmet = require('helmet');
 const http = require('http');
+const https = require('https');
 const compression = require('compression');
 const AbstractModule = require('../abstract-module');
 
@@ -12,6 +13,8 @@ class Server extends AbstractModule {
         super();
 
         this.config = config;
+
+        express.use(helmet());
 
         express.set(
             'views',
@@ -41,12 +44,18 @@ class Server extends AbstractModule {
         let pathToKeyPem = path.join(process.cwd(), 'app/config/key.pem');
         let pathToCertPem = path.join(process.cwd(), 'app/config/cert.pem');
 
+        let server = null;
+
         if (!this.util.fs.existsSync(pathToKeyPem) || !this.util.fs.existsSync(pathToCertPem)) {
-            express.listen(3000, () => {
-                this.logger.error(`server started without https on port ${this.config.port}`);
-            });
+
+            server = http.createServer(express);
+            server.listen(this.config.port);
+
+            this.logger.warning(`server started with http on port ${this.config.port}`);
+
         } else {
-            const server = https.createServer({
+
+            server = https.createServer({
                 key: core.util.fs.readFileSync(pathToKeyPem),
                 cert: core.util.fs.readFileSync(pathToCertPem)
             }, express);
