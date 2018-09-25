@@ -1,60 +1,38 @@
 module.exports = {
-    entities: {
+    model: {
         log: {
-            class: require('../../common/entity/log')
+            class: require('../model/log')
         }
     },
-    repositories: {
-        log: {
-            class: require('../repository/log')
-        }
-    },
-    handler: {
-        error: {
-            class: require('../handler/error')
-        },
-        logger: {
-            log: {
-                class: require('../handler/logger/log')
+    module: {
+        db: {
+            class: require('../module/db'),
+            config: {
+                uri: 'mongodb://localhost/cms'
             }
         },
+        logger: {
+            class: require('../module/logger')
+        },
         server: {
-            io: {
-                connect: {
-                    class: require('../handler/server/io/connect')
-                },
-                disconnect: {
-                    class: require('../handler/server/io/disconnect')
-                }
+            class: require('../module/server'),
+            config: {
+                port: 3000
             }
         }
     },
-    services: {
-        observer: {
-            class: require('../service/observer')
-        },
-        logger: {
-            class: require('../service/logger')
-        },
-        data: {
-            class: require('../service/data')
-        },
-        server: {
-            class: require('../service/server')
-        }
-    },
-    utils: {
+    util: {
         error: {
-            class: require('../../common/util/error'),
+            class: require('../util/error')
         },
         fs: {
-            class: require('../util/fs'),
+            class: require('../util/fs')
         },
         object: {
-            class: require('../../common/util/object'),
+            class: require('../util/object')
         },
         string: {
-            class: require('../../common/util/string'),
+            class: require('../util/string')
         }
     }
-};
+}
