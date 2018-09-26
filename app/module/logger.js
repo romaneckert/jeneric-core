@@ -73,7 +73,13 @@ class Logger extends AbstractModule {
         let date = new Date();
 
         // detect module definition
-        let module = ('object' === typeof moduleDefinition) ? moduleDefinition.toString().toLowerCase() : '';
+        let moduleType = null;
+        let moduleName = null;
+
+        if (('object' === typeof moduleDefinition)) {
+            moduleType = moduleDefinition.type;
+            moduleName = moduleDefinition.name
+        }
 
         // cast to string
         message = this.util.string.cast(message).trim();
@@ -93,7 +99,7 @@ class Logger extends AbstractModule {
         stack = this._stackToString(stack);
 
         // create log entity
-        let log = new Log(code, date, message, meta, module, stack);
+        let log = new Log(code, date, message, meta, moduleType, moduleName, stack);
 
         // write log to log files
         this._writeToLogFiles(log);
@@ -111,27 +117,37 @@ class Logger extends AbstractModule {
         this._saveInDB(log);
     }
 
-    // TODO: add write log by module
     _writeToLogFiles(log) {
 
-        // write log entry in specific log file
-        let pathToLogFile = this._getPathToLogFile(log.code, 'type');
+        // write log entry in specific log file by type and by module name
+        let logFiles = [
+            this._getPathToLogFile(log.code, []),
+        ];
 
-        // check if log file exists and create if not
-        this.fs.ensureFileExists(pathToLogFile);
+        if (null !== log.moduleType && null !== log.moduleName) {
+            logFiles.push(
+                this._getPathToLogFile(log.code, [log.moduleType, log.moduleName])
+            );
+        }
 
-        // check if log rotation is necessary
-        this._rotateLogFile(pathToLogFile);
+        for (let logFile of logFiles) {
+            // check if log file exists and create if not
+            this.fs.ensureFileExists(logFile);
 
-        let output = '[' + this._dateStringFromDate(log.date) + '] ';
-        output += '[' + this._config.levels[log.code].name + '] ';
-        output += '[' + log.module + '] ';
-        output += '[' + log.message + ']';
-        if (log.meta.length > 0) output += ' [' + log.meta + ']';
-        output += ' [' + log.stack + ']';
+            // check if log rotation is necessary
+            this._rotateLogFile(logFile);
 
-        // write line to log file
-        this.fs.appendFileSync(pathToLogFile, output + '\n');
+            let output = '[' + this._dateStringFromDate(log.date) + '] ';
+            output += '[' + this._config.levels[log.code].name + '] ';
+            output += '[' + log.moduleType + '/' + log.moduleName + '] ';
+            output += '[' + log.message + ']';
+            if (log.meta.length > 0) output += ' [' + log.meta + ']';
+            output += ' [' + log.stack + ']';
+
+            // write line to log file
+            this.fs.appendFileSync(logFile, output + '\n');
+        }
+
     }
 
     _rotateLogFile(pathToLogFile) {
@@ -160,11 +176,11 @@ class Logger extends AbstractModule {
         this.fs.ensureFileExists(pathToLogFile);
     }
 
-    _getPathToLogFile(code, namespace) {
+    _getPathToLogFile(code, namespaces) {
         return path.join(
             process.cwd(),
             this._config.directory,
-            namespace,
+            namespaces.join('/'),
             this._config.levels[code].name + '.log'
         );
     }
@@ -175,7 +191,7 @@ class Logger extends AbstractModule {
         if (this._config.levels[log.code].console) {
 
             let consoleOutput = log.message + ' ';
-            consoleOutput += '[' + log.module + '] ';
+            consoleOutput += '[' + log.moduleType + '/' + log.moduleName + '] ';
             if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
             //consoleOutput += '[' + log.stack + ']';
 
@@ -199,10 +215,10 @@ class Logger extends AbstractModule {
 
         this._logsToSaveQueue.push(log);
 
-        if (this.module.db.ready) {
+        if (this.module.mongoose && this.module.mongoose.ready) {
 
             for (let logToSave of this._logsToSaveQueue) {
-                this.module.db.add(logToSave);
+                this.module.mongoose.add(logToSave);
             }
 
             this._logsToSaveQueue = [];

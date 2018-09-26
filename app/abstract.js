@@ -85,6 +85,10 @@ class Abstract {
         };
     }
 
+    get core() {
+        return this._core;
+    }
+
     get moduleDefinition() {
         return this._moduleDefinition;
     }

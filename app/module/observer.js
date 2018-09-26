@@ -5,8 +5,8 @@ class Observer extends AbstractModule {
         super();
     }
 
-    observe(caller, service, method) {
-        this._kernel.services.logger.log('service ' + caller + ' calls ' + service + '.' + method + '()', undefined, this.moduleDefinition, undefined, 8);
+    observe(caller, module, method) {
+        this.core.module.logger.log('module ' + caller + ' calls ' + module + '.' + method + '()', undefined, this.moduleDefinition, undefined, 8);
     }
 
     get ready() {

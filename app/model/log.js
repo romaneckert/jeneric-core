@@ -2,7 +2,7 @@ const AbstractModel = require('../abstract-model');
 
 class Log extends AbstractModel {
 
-    constructor(code, date, message, meta, module, stack) {
+    constructor(code, date, message, meta, moduleType, moduleName, stack) {
 
         super();
 
@@ -10,7 +10,8 @@ class Log extends AbstractModel {
         this._date = date;
         this._message = message;
         this._meta = meta;
-        this._module = module;
+        this._moduleType = moduleType;
+        this._moduleName = moduleName;
         this._stack = stack;
 
     }
@@ -31,8 +32,12 @@ class Log extends AbstractModel {
         return this._meta;
     }
 
-    get module() {
-        return this._module;
+    get moduleType() {
+        return this._moduleType;
+    }
+
+    get moduleName() {
+        return this._moduleName;
     }
 
     get stack() {

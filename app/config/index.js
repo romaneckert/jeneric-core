@@ -3,7 +3,7 @@ module.exports = {
         logger: {
             class: require('../module/logger')
         },
-        db: {
+        mongoose: {
             class: require('../module/mongoose'),
             config: {
                 uri: 'mongodb://localhost/cms'
@@ -14,6 +14,9 @@ module.exports = {
             config: {
                 port: 3000
             }
+        },
+        observer: {
+            class: require('../module/observer')
         }
     },
     util: {
