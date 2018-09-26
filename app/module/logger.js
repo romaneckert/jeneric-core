@@ -162,8 +162,7 @@ class Logger extends AbstractModule {
 
     _getPathToLogFile(code, namespace) {
         return path.join(
-            path.dirname(require.main.filename),
-            '../',
+            process.cwd(),
             this._config.directory,
             namespace,
             this._config.levels[code].name + '.log'

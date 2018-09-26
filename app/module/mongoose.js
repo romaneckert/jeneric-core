@@ -9,6 +9,16 @@ class Mongoose extends AbstractModule {
         this._db = {};
         this._ready = false;
 
+        this._config = {
+            connection: {
+                useNewUrlParser: true,
+                reconnectTries: Number.MAX_VALUE,
+                reconnectInterval: 1000
+            }
+        };
+
+        this.util.object.merge(this._config, config);
+
         mongoose.connection.on('error', (err) => {
             this.logger.error(err);
         });
@@ -23,13 +33,7 @@ class Mongoose extends AbstractModule {
             this._ready = true;
         });
 
-        let settings = {
-            useNewUrlParser: true,
-            reconnectTries: Number.MAX_VALUE,
-            reconnectInterval: 1000
-        };
-
-        mongoose.connect(config.uri, settings);
+        mongoose.connect(config.uri, this._config.connection);
 
         return mongoose;
 
