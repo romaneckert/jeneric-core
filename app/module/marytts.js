@@ -3,7 +3,7 @@ const querystring = require('querystring');
 const http = require('http');
 const slug = require('slug');
 const fs = require('fs');
-const AbstractService = require('../abstract-service');
+const AbstractModule = require('../abstract-module');
 const path = require('path');
 
 /**
@@ -11,14 +11,14 @@ const path = require('path');
  * @exports app/service/marytts
  * @class
  */
-class MaryTTS extends AbstractService {
+class MaryTTS extends AbstractModule {
 
     constructor(config) {
 
         super();
 
         this._config = {
-            directory : '../var/sounds',
+            directory: '../var/sounds',
             host: '127.0.0.1',
             port: 59125
         };
@@ -28,13 +28,13 @@ class MaryTTS extends AbstractService {
         this.utils.object.merge(this._config, config);
 
         // check if config bin set
-        if('string' !== typeof this._config.bin) throw new Error('you have to set the path to the marytts binary in config');
+        if ('string' !== typeof this._config.bin) throw new Error('you have to set the path to the marytts binary in config');
 
         this._config.directory = path.join(path.dirname(require.main.filename), this._config.directory);
         this._config.bin = path.join(path.dirname(require.main.filename), this._config.bin);
 
         // check if binary exists
-        if(!fs.existsSync(this._config.bin)) throw new Error(this._config.bin + 'does not exists');
+        if (!fs.existsSync(this._config.bin)) throw new Error(this._config.bin + 'does not exists');
 
         // check if directory exists
         this.fs.ensureFolderExists(this._config.directory);
@@ -43,7 +43,7 @@ class MaryTTS extends AbstractService {
 
         http.get('http://' + this._config.host + ':' + this._config.port + '/version', (response) => {
 
-            if(response && 200 === response.statusCode) {
+            if (response && 200 === response.statusCode) {
                 this._ready = true;
             } else {
                 this._startServer();
@@ -66,7 +66,7 @@ class MaryTTS extends AbstractService {
 
         child.stderr.on('data', (data) => {
             this.logger.debug(data.toString());
-            if(data.toString().includes('started in') && data.toString().includes('on port')) this._ready = true;
+            if (data.toString().includes('started in') && data.toString().includes('on port')) this._ready = true;
         });
 
         child.on('close', (code) => {
@@ -78,20 +78,20 @@ class MaryTTS extends AbstractService {
 
     textToSpeech(message, callback) {
 
-        let filePath = path.join(this._config.directory, slug(message, {lower: true}) + '.wav');
-        if(fs.existsSync(filePath)) {
+        let filePath = path.join(this._config.directory, slug(message, { lower: true }) + '.wav');
+        if (fs.existsSync(filePath)) {
             callback(message, filePath);
             return true;
         }
 
         let params = {
-            'INPUT_TEXT' : message,
+            'INPUT_TEXT': message,
             'INPUT_TYPE': 'TEXT',
-            'OUTPUT_TYPE' : 'AUDIO',
-            'AUDIO' : 'WAVE_FILE',
-            'LOCALE' : 'de',
-            'effect_Chorus_selected' : 'on',
-            'effect_Chorus_parameters' : 'delay1:466;amp1:0.54;delay2:600;amp2:-0.10;delay3:250;amp3:0.30'
+            'OUTPUT_TYPE': 'AUDIO',
+            'AUDIO': 'WAVE_FILE',
+            'LOCALE': 'de',
+            'effect_Chorus_selected': 'on',
+            'effect_Chorus_parameters': 'delay1:466;amp1:0.54;delay2:600;amp2:-0.10;delay3:250;amp3:0.30'
         };
 
         let queryString = querystring.stringify(params);
@@ -101,7 +101,7 @@ class MaryTTS extends AbstractService {
 
         http.get(url, (response) => {
 
-            if(response && 200 === response.statusCode) {
+            if (response && 200 === response.statusCode) {
 
                 let file = fs.createWriteStream(filePath);
 

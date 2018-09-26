@@ -89,8 +89,16 @@ class Abstract {
         return this._moduleDefinition;
     }
 
+    get model() {
+        return this._core.model;
+    }
+
     get util() {
         return this._core.util;
+    }
+
+    get fs() {
+        return this._core.util.fs;
     }
 
 }

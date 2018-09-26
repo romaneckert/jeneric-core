@@ -1,6 +1,6 @@
 const Abstract = require('./abstract');
 
-class AbstractService extends Abstract {
+class AbstractModule extends Abstract {
 
     constructor() {
         super('service');
@@ -12,4 +12,4 @@ class AbstractService extends Abstract {
 
 }
 
-module.exports = AbstractService;
+module.exports = AbstractModule;

@@ -3,9 +3,9 @@ const express = require('express')();
 const core = require('../../index');
 const https = require('https');
 const compression = require('compression');
-const AbstractService = require('../abstract-service');
+const AbstractModule = require('../abstract-module');
 
-class Server extends AbstractService {
+class Server extends AbstractModule {
 
     constructor(config) {
 
@@ -36,7 +36,7 @@ class Server extends AbstractService {
 
         server.listen(this.config.port);
 
-        console.log(this.logger.info('server started with port ' + this.config.port));
+        this.logger.info('server started with port ' + this.config.port);
 
     }
 }

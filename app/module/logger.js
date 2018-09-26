@@ -1,7 +1,8 @@
 const path = require('path');
-const AbstractService = require('../abstract-service');
+const AbstractModule = require('../abstract-module');
+const Log = require('../model/log');
 
-class Logger extends AbstractService {
+class Logger extends AbstractModule {
     constructor(config) {
 
         super();
@@ -92,7 +93,7 @@ class Logger extends AbstractService {
         stack = this._stackToString(stack);
 
         // create log entity
-        let log = new this.core.model.log(code, date, message, meta, module, stack);
+        let log = new Log(code, date, message, meta, module, stack);
 
         // write log to log files
         this._writeToLogFiles(log);
@@ -104,7 +105,7 @@ class Logger extends AbstractService {
         this._addToHistory(log);
 
         // call log handler (can be used by application)
-        this.handler.logger.log.handle(log);
+        // this.handler.logger.log.handle(log); TODO: check what this is
 
         // save log to db
         this._saveInDB(log);
@@ -160,8 +161,8 @@ class Logger extends AbstractService {
     }
 
     _getPathToLogFile(code, namespace) {
-        return this.fs.path.join(
-            this.fs.path.dirname(require.main.filename),
+        return path.join(
+            path.dirname(require.main.filename),
             '../',
             this._config.directory,
             namespace,
@@ -199,10 +200,10 @@ class Logger extends AbstractService {
 
         this._logsToSaveQueue.push(log);
 
-        if (this._kernel.services.data.ready) {
+        if (this.module.db.ready) {
 
             for (let logToSave of this._logsToSaveQueue) {
-                this._kernel.services.data.add(logToSave);
+                this.module.db.add(logToSave);
             }
 
             this._logsToSaveQueue = [];

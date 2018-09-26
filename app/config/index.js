@@ -1,18 +1,13 @@
 module.exports = {
-    model: {
-        log: {
-            class: require('../model/log')
-        }
-    },
     module: {
+        logger: {
+            class: require('../module/logger')
+        },
         db: {
-            class: require('../module/db'),
+            class: require('../module/mongoose'),
             config: {
                 uri: 'mongodb://localhost/cms'
             }
-        },
-        logger: {
-            class: require('../module/logger')
         },
         server: {
             class: require('../module/server'),
