@@ -198,6 +198,8 @@ class Logger extends AbstractModule {
             consoleOutput += '[' + log.classType + '/' + log.className + '] ';
             if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
 
+            consoleOutput += `[pid:${process.pid}] `;
+
             if (log.code < 4) {
                 consoleOutput += '[' + log.stack + ']';
             }

@@ -36,7 +36,7 @@ class Server extends AbstractModule {
 
         server.listen(this.config.port);
 
-        this.logger.info('server started with port ' + this.config.port);
+        this.logger.info(`server started with port ${this.config.port}`);
 
     }
 }

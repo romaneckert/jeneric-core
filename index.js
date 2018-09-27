@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const cluster = require('cluster');
+const os = require('os');
 
-const path = require('path');
 const ClassDefinition = require('./app/class-definition');
 
 class Core {
@@ -19,6 +20,19 @@ class Core {
     }
 
     init(config) {
+
+        if (cluster.isMaster) {
+            // Count the machine's CPUs
+            var cpuCount = os.cpus().length;
+
+            // Create a worker for each CPU
+            for (var i = 0; i < cpuCount; i++) {
+                cluster.fork();
+            }
+
+            return;
+
+        }
 
         this.config = require('./app/config');
 
