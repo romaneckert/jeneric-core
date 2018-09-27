@@ -42,12 +42,16 @@ module.exports = {
             class: require('../module/logger')
         },
         mongoose: {
-            class: require('../module/mongoose')
+            class: require('../module/mongoose'),
+            config: {
+                uri: 'mongodb://localhost/jeneric-core'
+            }
         },
         server: {
             class: require('../module/server'),
             config: {
-                port: 3000
+                port: 3000,
+                routes: require('./routes')
             }
         },
         observer: {

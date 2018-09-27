@@ -84,6 +84,9 @@ class Core {
             this.module.server.start();
         }
 
+        // TODO: only in main cluster process
+        this.module.logger.log('application run in env: ' + process.env.NODE_ENV);
+
     }
 
     _startCheckModules() {

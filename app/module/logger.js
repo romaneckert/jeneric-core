@@ -68,17 +68,25 @@ class Logger extends AbstractModule {
     }
     log(message, meta, classDefinition, stack, code) {
 
-        // create date for current log entry
-        let date = new Date();
+        if ('number' !== typeof code) {
+            code = 0;
+        }
+
+        if ('string' !== typeof message) {
+            message = 'undefined';
+        }
 
         // detect class definition
-        let classType = null;
-        let className = null;
+        let classType = 'undefined';
+        let className = 'undefined';
 
         if (('object' === typeof classDefinition)) {
             classType = classDefinition.type;
             className = classDefinition.name
         }
+
+        // create date for current log entry
+        let date = new Date();
 
         // cast to string
         message = this.util.string.cast(message).trim();
@@ -181,8 +189,9 @@ class Logger extends AbstractModule {
     }
 
     _getPathToLogFile(code, namespaces) {
+
         return path.join(
-            process.cwd(),
+            path.dirname(process.mainModule.filename),
             this._config.directory,
             namespaces.join('/'),
             this._config.levels[code].name + '.log'

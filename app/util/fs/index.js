@@ -1,6 +1,8 @@
 const path = require('path');
 let fs = require('fs');
 
+// TODO: make methods cluster save
+
 fs.copySync = function (src, dest) {
 
     // check if source exists

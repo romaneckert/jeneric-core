@@ -79,10 +79,6 @@ class Abstract {
         return this._core.model;
     }
 
-    get core() {
-        return this._core;
-    }
-
     get classDefinition() {
         return this._classDefinition;
     }
