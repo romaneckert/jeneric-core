@@ -75,16 +75,16 @@ class Abstract {
         };
     }
 
+    get model() {
+        return this._core.model;
+    }
+
     get core() {
         return this._core;
     }
 
     get classDefinition() {
         return this._classDefinition;
-    }
-
-    get model() {
-        return this._core.model;
     }
 
     get util() {

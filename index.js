@@ -1,13 +1,20 @@
+const mongoose = require('mongoose');
+
 const path = require('path');
 const ClassDefinition = require('./app/class-definition');
 
 class Core {
 
     constructor() {
+
+        this._classDefinition = new ClassDefinition('core', 'kernel');
+
         this.ready = false;
         this.consoleMode = false;
 
-        this._classDefinition = new ClassDefinition('core', 'kernel');
+        this.util = {};
+        this.module = {};
+        this.model = {};
 
     }
 
@@ -15,23 +22,32 @@ class Core {
 
         this.config = require('./app/config');
 
-        this.config.core = {
-            path: {}
-        };
-
-        this.util = {};
-
         // instantiate object util at first, because it used to merge configs
-        this.util.object = new this.config.util.object.class()
+        this.util.object = this._instantiate(this.config.util.object);
 
         // merge application specific config with default config
         if ('object' === typeof config) this.util.object.merge(this.config, config);
 
+        // instantiate error module at first
+        this.module.error = this._instantiate(this.config.module.error);
+
         // handle uncaught exceptions
         process.on('uncaughtException', this.module.error.handleUncaughtException.bind(this.module.error));
 
-        // instantiate all classes
+        // add model classes to core
+        for (let model in this.config.model) {
+
+            let schema = mongoose.Schema(this.config.model[model].config.schema);
+            this.model[model] = mongoose.model(model, schema)
+
+        }
+
+        // instantiate all classes except models
         for (let namespace in this.config) {
+
+            if ('model' === namespace) {
+                continue;
+            }
 
             let instance = this._instantiate(this.config[namespace]);
 
@@ -53,6 +69,7 @@ class Core {
         } else {
             this.module.server.start();
         }
+
     }
 
     _startCheckModules() {

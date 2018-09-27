@@ -1,6 +1,5 @@
 const path = require('path');
 const AbstractModule = require('../abstract-module');
-const Log = require('../model/log');
 
 class Logger extends AbstractModule {
     constructor(config) {
@@ -99,7 +98,15 @@ class Logger extends AbstractModule {
         stack = this._stackToString(stack);
 
         // create log entity
-        let log = new Log(code, date, message, meta, classType, className, stack);
+        let log = new this.model.log({
+            code: code,
+            date: date,
+            message: message,
+            meta: meta,
+            classType: classType,
+            className: className,
+            stack: stack
+        });
 
         // write log to log files
         this._writeToLogFiles(log);
@@ -109,9 +116,6 @@ class Logger extends AbstractModule {
 
         // add log entry to history
         this._addToHistory(log);
-
-        // call log handler (can be used by application)
-        // this.handler.logger.log.handle(log); TODO: check what this is
 
         // save log to db
         this._saveInDB(log);
@@ -193,7 +197,10 @@ class Logger extends AbstractModule {
             let consoleOutput = log.message + ' ';
             consoleOutput += '[' + log.classType + '/' + log.className + '] ';
             if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
-            //consoleOutput += '[' + log.stack + ']';
+
+            if (log.code < 4) {
+                consoleOutput += '[' + log.stack + ']';
+            }
 
             console.log(this._config.levels[log.code].color, consoleOutput, "\x1b[0m");
         }
@@ -215,11 +222,13 @@ class Logger extends AbstractModule {
 
         this._logsToSaveQueue.push(log);
 
-        if (this.module.mongoose && this.module.mongoose.ready) {
+        if (this.module.mongoose && 1 === this.module.mongoose.connection.readyState) {
 
-            for (let logToSave of this._logsToSaveQueue) {
-                this.module.mongoose.add(logToSave);
-            }
+            this.model.log.insertMany(this._logsToSaveQueue, function (err) {
+                if (err) {
+                    console.error(err);
+                }
+            });
 
             this._logsToSaveQueue = [];
         }
@@ -253,10 +262,6 @@ class Logger extends AbstractModule {
             ('0' + date.getDate()).slice(-2) +
             ' ' +
             date.toTimeString().slice(0, 8);
-    }
-
-    get ready() {
-        return true;
     }
 
     get history() {

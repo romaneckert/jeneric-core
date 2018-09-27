@@ -7,7 +7,6 @@ class Mongoose extends AbstractModule {
         super();
 
         this._db = {};
-        this._ready = false;
 
         this._config = {
             connection: {
@@ -25,12 +24,10 @@ class Mongoose extends AbstractModule {
 
         mongoose.connection.on('disconnected', (err) => {
             this.logger.info('disconnect from mongodb');
-            this._ready = false;
         });
 
         mongoose.connection.on('connected', (err, client) => {
             this.logger.info('connected to mongodb');
-            this._ready = true;
         });
 
         mongoose.connect(config.uri, this._config.connection);

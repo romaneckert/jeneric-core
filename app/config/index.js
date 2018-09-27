@@ -1,4 +1,39 @@
 module.exports = {
+    model: {
+        log: {
+            config: {
+                schema: {
+                    code: {
+                        type: Number,
+                        required: true
+                    },
+                    date: {
+                        type: Date,
+                        required: true,
+                    },
+                    message: {
+                        type: String,
+                        required: true,
+                    },
+                    meta: {
+                        type: String
+                    },
+                    classType: {
+                        type: String,
+                        required: true
+                    },
+                    className: {
+                        type: String,
+                        required: true
+                    },
+                    stack: {
+                        type: String,
+                        required: true
+                    }
+                }
+            }
+        }
+    },
     module: {
         error: {
             class: require('../module/error')

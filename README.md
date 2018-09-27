@@ -13,4 +13,4 @@ Jeneric needs sponsors!
 
 ## Links
 
-[API](./doc/index.html)
+https://mongoosejs.com/docs/advanced_schemas.html

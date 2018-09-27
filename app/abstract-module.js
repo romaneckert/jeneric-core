@@ -6,10 +6,6 @@ class AbstractModule extends Abstract {
         super('module');
     }
 
-    get ready() {
-        return true;
-    }
-
 }
 
 module.exports = AbstractModule;

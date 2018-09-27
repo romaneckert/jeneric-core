@@ -8,9 +8,8 @@ class Error extends AbstractModule {
     handleUncaughtException(error) {
 
         try {
-            this.module.logger.log(error.message, null, this.classDefinition, this.util.error.stack(error), 0);
+            this.core.module.logger.log(error.message, null, this.classDefinition, this.util.error.stack(error), 0);
         } catch (err) {
-            console.error(err);
             throw error;
         }
 
