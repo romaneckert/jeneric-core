@@ -4,10 +4,7 @@ module.exports = {
             class: require('../module/logger')
         },
         mongoose: {
-            class: require('../module/mongoose'),
-            config: {
-                uri: 'mongodb://localhost/cms'
-            }
+            class: require('../module/mongoose')
         },
         server: {
             class: require('../module/server'),
