@@ -1,10 +1,14 @@
 const path = require('path');
+const ClassDefinition = require('./app/class-definition');
 
 class Core {
 
     constructor() {
         this.ready = false;
         this.consoleMode = false;
+
+        this._classDefinition = new ClassDefinition('core', 'kernel');
+
     }
 
     init(config) {
@@ -17,13 +21,14 @@ class Core {
 
         this.util = {};
 
-        // get util
-        for (let util in this.config.util) {
-            this.util[util] = new this.config.util[util].class()
-        }
+        // instantiate object util at first, because it used to merge configs
+        this.util.object = new this.config.util.object.class()
 
         // merge application specific config with default config
         if ('object' === typeof config) this.util.object.merge(this.config, config);
+
+        // handle uncaught exceptions
+        process.on('uncaughtException', this.module.error.handleUncaughtException.bind(this.module.error));
 
         // instantiate all classes
         for (let namespace in this.config) {

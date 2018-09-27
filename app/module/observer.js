@@ -6,7 +6,7 @@ class Observer extends AbstractModule {
     }
 
     observe(caller, module, method) {
-        this.core.module.logger.log('module ' + caller + ' calls ' + module + '.' + method + '()', undefined, this.moduleDefinition, undefined, 8);
+        this.core.module.logger.log('module ' + caller + ' calls ' + module + '.' + method + '()', undefined, this.classDefinition, undefined, 8);
     }
 
     get ready() {

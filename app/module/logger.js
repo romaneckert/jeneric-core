@@ -67,18 +67,18 @@ class Logger extends AbstractModule {
         this._logsToSaveQueue = [];
         this._history = [];
     }
-    log(message, meta, moduleDefinition, stack, code) {
+    log(message, meta, classDefinition, stack, code) {
 
         // create date for current log entry
         let date = new Date();
 
-        // detect module definition
-        let moduleType = null;
-        let moduleName = null;
+        // detect class definition
+        let classType = null;
+        let className = null;
 
-        if (('object' === typeof moduleDefinition)) {
-            moduleType = moduleDefinition.type;
-            moduleName = moduleDefinition.name
+        if (('object' === typeof classDefinition)) {
+            classType = classDefinition.type;
+            className = classDefinition.name
         }
 
         // cast to string
@@ -99,7 +99,7 @@ class Logger extends AbstractModule {
         stack = this._stackToString(stack);
 
         // create log entity
-        let log = new Log(code, date, message, meta, moduleType, moduleName, stack);
+        let log = new Log(code, date, message, meta, classType, className, stack);
 
         // write log to log files
         this._writeToLogFiles(log);
@@ -119,14 +119,14 @@ class Logger extends AbstractModule {
 
     _writeToLogFiles(log) {
 
-        // write log entry in specific log file by type and by module name
+        // write log entry in specific log file by type and by class type/name
         let logFiles = [
             this._getPathToLogFile(log.code, []),
         ];
 
-        if (null !== log.moduleType && null !== log.moduleName) {
+        if (null !== log.classType && null !== log.className) {
             logFiles.push(
-                this._getPathToLogFile(log.code, [log.moduleType, log.moduleName])
+                this._getPathToLogFile(log.code, [log.classType, log.className])
             );
         }
 
@@ -139,7 +139,7 @@ class Logger extends AbstractModule {
 
             let output = '[' + this._dateStringFromDate(log.date) + '] ';
             output += '[' + this._config.levels[log.code].name + '] ';
-            output += '[' + log.moduleType + '/' + log.moduleName + '] ';
+            output += '[' + log.classType + '/' + log.className + '] ';
             output += '[' + log.message + ']';
             if (log.meta.length > 0) output += ' [' + log.meta + ']';
             output += ' [' + log.stack + ']';
@@ -191,7 +191,7 @@ class Logger extends AbstractModule {
         if (this._config.levels[log.code].console) {
 
             let consoleOutput = log.message + ' ';
-            consoleOutput += '[' + log.moduleType + '/' + log.moduleName + '] ';
+            consoleOutput += '[' + log.classType + '/' + log.className + '] ';
             if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
             //consoleOutput += '[' + log.stack + ']';
 
@@ -246,13 +246,13 @@ class Logger extends AbstractModule {
 
     _dateStringFromDate(date) {
 
-        return date.getFullYear()
-            + '-'
-            + ('0' + (date.getMonth() + 1)).slice(-2)
-            + '-'
-            + ('0' + date.getDate()).slice(-2)
-            + ' '
-            + date.toTimeString().slice(0, 8);
+        return date.getFullYear() +
+            '-' +
+            ('0' + (date.getMonth() + 1)).slice(-2) +
+            '-' +
+            ('0' + date.getDate()).slice(-2) +
+            ' ' +
+            date.toTimeString().slice(0, 8);
     }
 
     get ready() {

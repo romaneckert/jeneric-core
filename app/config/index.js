@@ -1,5 +1,8 @@
 module.exports = {
     module: {
+        error: {
+            class: require('../module/error')
+        },
         logger: {
             class: require('../module/logger')
         },
