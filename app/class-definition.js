@@ -1,17 +1,8 @@
 class ClassDefinition {
 
     constructor(type, name) {
-
-        if ('string' !== typeof type) {
-            type = 'undefined';
-        }
-
-        if ('string' !== typeof name) {
-            name = 'undefined';
-        }
-
-        this._type = type.toLowerCase();
-        this._name = name.toLowerCase();
+        this._type = ('string' === typeof type) ? type.toLowerCase() : 'undefined';
+        this._name = ('string' === typeof name) ? name.toLowerCase() : 'undefined';
     }
 
     get type() {
