@@ -85,7 +85,7 @@ class Core {
         }
 
         // TODO: only in main cluster process
-        this.module.logger.log('application run in env: ' + process.env.NODE_ENV);
+        this.module.logger.log('application run in env: ' + process.env.NODE_ENV, '', this._classDefinition, undefined, 6);
 
     }
 
