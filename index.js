@@ -8,7 +8,7 @@ class Core {
 
     constructor() {
 
-        this._classDefinition = new ClassDefinition('core', 'kernel');
+        this._classDefinition = new ClassDefinition('core', 'core');
 
         this.ready = false;
         this.consoleMode = false;

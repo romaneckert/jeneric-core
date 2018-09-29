@@ -13,26 +13,26 @@ class Abstract {
 
     get module() {
 
-        if (this._classDefinition.type === 'module') {
-
-            let observed = false;
-
-            return new Proxy({}, {
-                get: function (target, moduleName) {
-                    return new Proxy(this._core.module[moduleName], {
-                        get: function (target, method) {
-                            if ('function' === typeof target[method] && observed === false) {
-                                this._core.module.observer.observe(this._classDefinition.name, moduleName, method);
-                                observed = true;
-                            }
-                            return target[method];
-                        }.bind(this)
-                    });
-                }.bind(this)
-            });
-        } else {
+        if (this._classDefinition.type !== 'module') {
             return this._core.module;
         }
+
+        let observed = false;
+
+        return new Proxy({}, {
+            get: function (target, moduleName) {
+                return new Proxy(this._core.module[moduleName], {
+                    get: function (target, method) {
+                        if ('function' === typeof target[method] && observed === false) {
+                            this._core.module.observer.observe(this._classDefinition.name, moduleName, method);
+                            observed = true;
+                        }
+                        return target[method];
+                    }.bind(this)
+                });
+            }.bind(this)
+        });
+
     }
 
     get logger() {

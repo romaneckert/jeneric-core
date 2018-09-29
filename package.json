@@ -4,6 +4,7 @@
   "description": "jeneric core",
   "main": "index.js",
   "scripts": {
+    "start": "node test/development.js",
     "test-production": "NODE_ENV=production node test/production.js"
   },
   "author": "Roman Eckert",
