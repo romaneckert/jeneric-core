@@ -34,7 +34,13 @@ fs.ensureFileExists = function (filePath) {
 
     this.ensureDirExists(path.dirname(filePath));
 
-    this.writeFileSync(filePath, '');
+    try {
+        this.writeFileSync(filePath, '');
+    } catch (err) {
+        if ('EEXIST' !== err.code) {
+            throw err;
+        }
+    }
 
     return true;
 };
@@ -43,7 +49,14 @@ fs.ensureDirExists = function (directoryPath) {
     if (this.existsSync(directoryPath)) return true;
 
     this.ensureDirExists(path.dirname(directoryPath));
-    this.mkdirSync(directoryPath);
+
+    try {
+        this.mkdirSync(directoryPath);
+    } catch (err) {
+        if ('EEXIST' !== err.code) {
+            throw err;
+        }
+    }
 
     return true;
 };
