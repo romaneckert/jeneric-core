@@ -3,7 +3,7 @@ module.exports = {
         statusCode404: {
             path: '/404',
             method: 'get',
-            controller: require('../controller/core/statusCode404')
+            class: require('../action/core/statusCode404')
         }
     }
 };

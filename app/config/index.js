@@ -51,7 +51,8 @@ module.exports = {
             class: require('../module/server'),
             config: {
                 port: 3000,
-                routes: require('./routes')
+                routes: require('./routes'),
+                errorHandler: require('../action/core/statusCode500')
             }
         },
         observer: {

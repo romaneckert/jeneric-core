@@ -33,7 +33,8 @@ class Server extends AbstractModule {
             let route = routes[routeName];
 
             if ('string' === typeof route.path) {
-                express[route.method](route.path, route.controller);
+                let controller = new route.class();
+                express[route.method](route.path, controller.action.bind(controller));
             } else if ('object' === typeof route) {
                 this._addRoutes(route);
             }
@@ -43,6 +44,10 @@ class Server extends AbstractModule {
     start() {
 
         this._addRoutes(this.config.routes);
+
+        // TODO: register as middleware
+        let errorHandler = new this.config.errorHandler();
+        express.use(errorHandler.action.bind(errorHandler));
 
         // TODO: optimize handling missing certificates
 
