@@ -25,19 +25,24 @@ class Server extends AbstractModule {
         );
 
         express.set('view engine', 'pug');
-
         express.use(compression());
+    }
 
-        for (let routeName in this.config.routes) {
+    _addRoutes(routes) {
+        for (let routeName in routes) {
+            let route = routes[routeName];
 
-            let route = this.config.routes[routeName];
-
-            express.get(route.path, route.controller);
-
+            if ('string' === typeof route.path) {
+                express[route.method](route.path, route.controller);
+            } else if ('object' === typeof route) {
+                this._addRoutes(route);
+            }
         }
     }
 
     start() {
+
+        this._addRoutes(this.config.routes);
 
         // TODO: optimize handling missing certificates
 
