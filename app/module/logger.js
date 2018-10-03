@@ -203,7 +203,10 @@ class Logger extends AbstractModule {
         // write log entry to console
         if (this._config.levels[log.code].console) {
 
-            let consoleOutput = log.message + ' ';
+            let consoleOutput = '';
+
+            consoleOutput += `[${this._config.levels[log.code].name}] `;
+            consoleOutput += log.message + ' ';
             consoleOutput += '[' + log.classType + '/' + log.className + '] ';
             if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
 
