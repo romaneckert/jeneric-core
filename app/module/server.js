@@ -56,7 +56,7 @@ class Server extends AbstractModule {
 
         let server = null;
 
-        if (!this.util.fs.existsSync(pathToKeyPem) || !this.util.fs.existsSync(pathToCertPem)) {
+        if (!this.fs.existsSync(pathToKeyPem) || !this.fs.existsSync(pathToCertPem)) {
 
             server = http.createServer(express);
             server.listen(this.config.port);
@@ -65,8 +65,8 @@ class Server extends AbstractModule {
         } else {
 
             server = https.createServer({
-                key: core.util.fs.readFileSync(pathToKeyPem),
-                cert: core.util.fs.readFileSync(pathToCertPem)
+                key: core.fs.readFileSync(pathToKeyPem),
+                cert: core.fs.readFileSync(pathToCertPem)
             }, express);
 
             server.listen(this.config.port);
