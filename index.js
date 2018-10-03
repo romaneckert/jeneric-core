@@ -29,6 +29,14 @@ class Core {
 
         this.config = require('./app/config');
 
+        if ('string' !== typeof this.config.env) {
+            if ('string' === typeof process.env.NODE_ENV) {
+                this.config.env = process.env.NODE_ENV;
+            } else {
+                this.config.env = 'production';
+            }
+        }
+
         // instantiate object util at first, because it used to merge configs
         this.util.object = this._instantiate(this.config.util.object);
 
@@ -71,9 +79,10 @@ class Core {
         // check ready state modules
         this._startCheckModules();
 
+        // TODO: Work on console mode
         // detect console mode
         if ('string' === typeof process.argv[2]) {
-            this.consoleMode = true;
+            //this.consoleMode = true;
         }
 
         if (this.consoleMode) {

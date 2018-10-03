@@ -4,8 +4,8 @@
   "description": "jeneric core",
   "main": "index.js",
   "scripts": {
-    "start": "export NODE_ENV=dev && node test/development.js",
-    "test-production": "export NODE_ENV=prod && node test/production.js"
+    "start": "export NODE_ENV=development && node test/development.js",
+    "test-production": "export NODE_ENV=production && node test/production.js"
   },
   "author": "Roman Eckert",
   "license": "MIT",

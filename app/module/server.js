@@ -60,7 +60,6 @@ class Server extends AbstractModule {
 
             server = http.createServer(express);
             server.listen(this.config.port);
-
             this.logger.warning(`server started with http on port ${this.config.port}`);
 
         } else {
