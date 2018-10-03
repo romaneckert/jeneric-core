@@ -21,17 +21,10 @@ class Core {
 
     init(config) {
 
+        // create process for each CPU
         if (cluster.isMaster) {
-            // Count the machine's CPUs
-            var cpuCount = os.cpus().length;
-
-            // Create a worker for each CPU
-            for (var i = 0; i < cpuCount; i++) {
-                cluster.fork();
-            }
-
+            for (var i = 0; i < os.cpus().length; i++) cluster.fork();
             return;
-
         }
 
         this.config = require('./app/config');

@@ -1,0 +1,14 @@
+{
+    "version": "1.0.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Test Production",
+            "program": "${workspaceFolder}/test/production.js",
+            "env": {
+                "NODE_ENV": "production"
+            }
+        }
+    ]
+}
