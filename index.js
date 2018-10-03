@@ -73,7 +73,7 @@ class Core {
 
         // log informations about start process of core
         if (cluster.worker && cluster.worker.id === 1) {
-            this.module.logger.log('application run in env: ' + process.env.NODE_ENV, '', this._classDefinition, undefined, 6);
+            this.module.logger.log('application run in env: ' + process.env.NODE_ENV, '', this._classDefinition, undefined, 5);
         }
 
         // check ready state modules

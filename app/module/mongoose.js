@@ -23,11 +23,11 @@ class Mongoose extends AbstractModule {
         });
 
         mongoose.connection.on('disconnected', (err) => {
-            this.logger.info('disconnect from mongodb');
+            this.logger.notice('disconnect from mongodb');
         });
 
         mongoose.connection.on('connected', (err, client) => {
-            this.logger.info('connected to mongodb');
+            this.logger.notice('connected to mongodb');
         });
 
         mongoose.connect(config.uri, this._config.connection);
