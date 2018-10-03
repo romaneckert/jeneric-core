@@ -198,26 +198,33 @@ class Logger extends AbstractModule {
         );
     }
 
+    // write log entry to console
     _writeToConsole(log) {
 
-        // write log entry to console
-        if (this._config.levels[log.code].console) {
-
-            let consoleOutput = '';
-
-            consoleOutput += `[${this._config.levels[log.code].name}] `;
-            consoleOutput += log.message + ' ';
-            consoleOutput += '[' + log.classType + '/' + log.className + '] ';
-            if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
-
-            consoleOutput += `[pid:${process.pid}] `;
-
-            if (log.code < 4) {
-                consoleOutput += '[' + log.stack + ']';
-            }
-
-            console.log(this._config.levels[log.code].color, consoleOutput, "\x1b[0m");
+        // disabled, if config console disabled
+        if (!this._config.levels[log.code].console) {
+            return;
         }
+
+        // disabled, if log level less then notice and in mode production
+        if (log.code > 5 && this.env === 'production') {
+            return;
+        }
+
+        let consoleOutput = '';
+
+        consoleOutput += `[${this._config.levels[log.code].name}] `;
+        consoleOutput += log.message + ' ';
+        consoleOutput += '[' + log.classType + '/' + log.className + '] ';
+        if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
+
+        consoleOutput += `[pid:${process.pid}] `;
+
+        if (log.code < 4) {
+            consoleOutput += '[' + log.stack + ']';
+        }
+
+        console.log(this._config.levels[log.code].color, consoleOutput, "\x1b[0m");
 
     }
 

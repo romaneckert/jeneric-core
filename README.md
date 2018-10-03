@@ -14,3 +14,8 @@ Jeneric needs sponsors!
 ## Links
 
 https://mongoosejs.com/docs/advanced_schemas.html
+
+## Tests
+
+npm run test-development
+npm run test-production

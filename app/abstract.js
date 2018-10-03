@@ -91,6 +91,10 @@ class Abstract {
         return this._core.util.fs;
     }
 
+    get env() {
+        return this._core.config.env;
+    }
+
 }
 
 module.exports = Abstract;
