@@ -1,9 +1,9 @@
 module.exports = {
     core: {
-        statusCode404: {
-            path: '/404',
+        test: {
+            path: '/test',
             method: 'get',
-            class: require('../action/core/statusCode404')
+            class: require('../handler/core/test')
         }
     }
 };

@@ -1,4 +1,12 @@
 module.exports = {
+    middleware: {
+        error: {
+            class: require('../middleware/error')
+        },
+        notFound: {
+            class: require('../middleware/not-found')
+        }
+    },
     model: {
         log: {
             config: {
@@ -51,8 +59,7 @@ module.exports = {
             class: require('../module/server'),
             config: {
                 port: 3000,
-                routes: require('./routes'),
-                errorHandler: require('../action/core/statusCode500')
+                routes: require('./routes')
             }
         },
         observer: {

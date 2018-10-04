@@ -75,6 +75,10 @@ class Abstract {
         };
     }
 
+    get middleware() {
+        return this._core.middleware;
+    }
+
     get model() {
         return this._core.model;
     }

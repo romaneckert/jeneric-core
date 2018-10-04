@@ -45,9 +45,9 @@ class Server extends AbstractModule {
 
         this._addRoutes(this.config.routes);
 
-        // TODO: register as middleware
-        let errorHandler = new this.config.errorHandler();
-        express.use(errorHandler.action.bind(errorHandler));
+        for (let middleware in this.middleware) {
+            express.use(this.middleware[middleware].handle.bind(this.middleware[middleware]));
+        }
 
         // TODO: optimize handling missing certificates
 
