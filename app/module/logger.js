@@ -1,5 +1,5 @@
 const path = require('path');
-const AbstractModule = require('../abstract-module');
+const AbstractModule = require('../core/abstract-module');
 
 class Logger extends AbstractModule {
     constructor(config) {

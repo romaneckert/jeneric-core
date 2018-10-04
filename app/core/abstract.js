@@ -8,7 +8,7 @@ class Abstract {
 
         this._classDefinition = new ClassDefinition(classType, this.constructor.name);
 
-        this._core = require('../index');
+        this._core = require('./index');
     }
 
     get module() {

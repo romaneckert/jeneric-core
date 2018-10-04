@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const AbstractModule = require('../abstract-module');
+const AbstractModule = require('../core/abstract-module');
 
 class Mongoose extends AbstractModule {
     constructor(config) {

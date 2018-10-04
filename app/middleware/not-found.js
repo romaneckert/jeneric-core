@@ -1,4 +1,4 @@
-const AbstractMiddleware = require('../abstract-middleware');
+const AbstractMiddleware = require('../core/abstract-middleware');
 
 class NotFound extends AbstractMiddleware {
 

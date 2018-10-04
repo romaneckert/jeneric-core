@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const cluster = require('cluster');
 const os = require('os');
 
-const ClassDefinition = require('../class-definition');
+const ClassDefinition = require('./class-definition');
 
 class Core {
 

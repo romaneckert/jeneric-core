@@ -1,4 +1,4 @@
-const AbstractHandler = require('../../abstract-handler');
+const AbstractHandler = require('../../core/abstract-handler');
 
 class Test extends AbstractHandler {
 

@@ -1,4 +1,4 @@
-const AbstractModule = require('../abstract-module');
+const AbstractModule = require('../core/abstract-module');
 
 class Error extends AbstractModule {
     constructor() {
