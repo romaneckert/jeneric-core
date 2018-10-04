@@ -34,7 +34,7 @@ class Server extends AbstractModule {
 
             if ('string' === typeof route.path) {
                 let controller = new route.class();
-                express[route.method](route.path, controller.action.bind(controller));
+                express[route.method](route.path, controller.handle.bind(controller));
             } else if ('object' === typeof route) {
                 this._addRoutes(route);
             }
