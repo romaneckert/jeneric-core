@@ -220,7 +220,7 @@ class Logger extends AbstractModule {
 
         consoleOutput += `[pid:${process.pid}] `;
 
-        if (log.code < 4) {
+        if (log.code < 4 && this.env !== 'production') {
             consoleOutput += '[' + log.stack + ']';
         }
 
