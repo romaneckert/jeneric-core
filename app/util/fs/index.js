@@ -1,8 +1,6 @@
 const path = require('path');
 let fs = require('fs');
 
-// TODO: make methods cluster save
-
 fs.copySync = function (src, dest) {
 
     // check if source exists
@@ -14,7 +12,14 @@ fs.copySync = function (src, dest) {
     let stats = fs.statSync(src);
 
     if (stats.isDirectory()) {
-        fs.mkdirSync(dest);
+        try {
+            this.mkdirSync(dest);
+        } catch (err) {
+            if ('EEXIST' !== err.code) {
+                throw err;
+            }
+        }
+
         let files = fs.readdirSync(src);
 
         for (let file of files) {
