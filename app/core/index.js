@@ -8,6 +8,7 @@ class Core {
 
     constructor() {
 
+        // set class definition
         this._classDefinition = new ClassDefinition('core', 'core');
 
         this.ready = false;
@@ -29,6 +30,7 @@ class Core {
 
         this.config = require('../config');
 
+        // set config env if not set
         if ('string' !== typeof this.config.env) {
             if ('string' === typeof process.env.NODE_ENV) {
                 this.config.env = process.env.NODE_ENV;
@@ -73,7 +75,7 @@ class Core {
 
         // log informations about start process of core
         if (cluster.worker && cluster.worker.id === 1) {
-            this.module.logger.log('application run in env: ' + process.env.NODE_ENV, '', this._classDefinition, undefined, 5);
+            this.module.logger.log('application run in env: "' + process.env.NODE_ENV + '"', '', this._classDefinition, undefined, 5);
         }
 
         // check ready state modules

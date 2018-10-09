@@ -1,11 +1,15 @@
 const Abstract = require('./abstract');
 
-class AbstractModule extends Abstract {
+class AbstractHandler extends Abstract {
 
     constructor() {
         super('handler');
     }
 
+    handle() {
+        throw new Error('handler must implement handler method.');
+    }
+
 }
 
-module.exports = AbstractModule;
+module.exports = AbstractHandler;

@@ -14,6 +14,9 @@ class Server extends AbstractModule {
 
         this.config = config;
 
+        this._pathToKeyPem = path.join(process.cwd(), 'app/config/key.pem');
+        this._pathToCertPem = path.join(process.cwd(), 'app/config/cert.pem');
+
         express.use(helmet());
 
         express.set(
@@ -43,36 +46,38 @@ class Server extends AbstractModule {
 
     start() {
 
+        let https = true;
+
+        // register routes
         this._addRoutes(this.config.routes);
 
+        // register middlewares
         for (let middleware in this.middleware) {
             express.use(this.middleware[middleware].handle.bind(this.middleware[middleware]));
         }
 
-        // TODO: optimize handling missing certificates
-
-        let pathToKeyPem = path.join(process.cwd(), 'app/config/key.pem');
-        let pathToCertPem = path.join(process.cwd(), 'app/config/cert.pem');
+        // check certificates
+        if (!this.fs.existsSync(this._pathToKeyPem) || !this.fs.existsSync(this._pathToCertPem)) {
+            https = false;
+            this.logger.warning(`.key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
+        }
 
         let server = null;
 
-        if (!this.fs.existsSync(pathToKeyPem) || !this.fs.existsSync(pathToCertPem)) {
-
-            server = http.createServer(express);
-            server.listen(this.config.port);
-            this.logger.warning(`server started with http on port ${this.config.port}`);
-
-        } else {
-
+        if (https) {
+            // start https server
             server = https.createServer({
                 key: core.fs.readFileSync(pathToKeyPem),
                 cert: core.fs.readFileSync(pathToCertPem)
             }, express);
 
             server.listen(this.config.port);
-
             this.logger.notice(`server started with port ${this.config.port}`);
-
+        } else {
+            // start http server
+            server = http.createServer(express);
+            server.listen(this.config.port);
+            this.logger.notice(`server started on port ${this.config.port}`);
         }
 
     }
