@@ -46,7 +46,7 @@ class Server extends AbstractModule {
 
     start() {
 
-        let https = true;
+        let isHttps = true;
 
         // register routes
         this._addRoutes(this.config.routes);
@@ -58,17 +58,17 @@ class Server extends AbstractModule {
 
         // check certificates
         if (!this.fs.existsSync(this._pathToKeyPem) || !this.fs.existsSync(this._pathToCertPem)) {
-            https = false;
+            isHttps = false;
             this.logger.warning(`.key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
         }
 
         let server = null;
 
-        if (https) {
+        if (isHttps) {
             // start https server
             server = https.createServer({
-                key: core.fs.readFileSync(pathToKeyPem),
-                cert: core.fs.readFileSync(pathToCertPem)
+                key: this.fs.readFileSync(this._pathToKeyPem),
+                cert: this.fs.readFileSync(this._pathToCertPem)
             }, express);
 
             server.listen(this.config.port);
