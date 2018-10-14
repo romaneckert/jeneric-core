@@ -20,11 +20,11 @@ class Core {
 
     }
 
-    init(config) {
+    init(...config) {
 
         // create process for each CPU
         if (cluster.isMaster) {
-            for (var i = 0; i < os.cpus().length; i++) cluster.fork();
+            for (var i = 0; i < os.cpus().length - 1; i++) cluster.fork();
             return;
         }
 
@@ -43,7 +43,11 @@ class Core {
         this.util.object = this._instantiate(this.config.util.object);
 
         // merge application specific config with default config
-        if ('object' === typeof config) this.util.object.merge(this.config, config);
+        if ('object' === typeof config && config.length > 0) {
+            for (let c in config) {
+                this.util.object.merge(this.config, config[c]);
+            }
+        }
 
         // instantiate error module at first
         this.module.error = this._instantiate(this.config.module.error);
