@@ -27,16 +27,10 @@ class Mongoose {
         });
 
         mongoose.connection.on('connected', (err, client) => {
-
-            console.log(this);
-            process.exit();
-
             this.logger.notice('connected to mongodb');
-
-
         });
 
-        mongoose.connect(config.uri, this._config.connection);
+        mongoose.connect(this._config.uri, this._config.connection);
     }
 }
 

@@ -84,6 +84,8 @@ class Core {
             //this.consoleMode = true;
         }
 
+        this.module.mongoose.start();
+
         if (this.consoleMode) {
             this._loadFixtures();
         } else {
@@ -194,7 +196,6 @@ class Core {
                         })
                     }.bind(instance)
                 });
-
             }
         });
 
