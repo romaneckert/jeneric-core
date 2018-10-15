@@ -1,10 +1,10 @@
 module.exports = {
     middleware: {
         error: {
-            class: require('../middleware/error')
+            class: require('../src/middleware/error')
         },
         notFound: {
-            class: require('../middleware/not-found')
+            class: require('../src/middleware/not-found')
         }
     },
     model: {
@@ -44,40 +44,40 @@ module.exports = {
     },
     module: {
         error: {
-            class: require('../module/error')
+            class: require('../src/module/error')
         },
         logger: {
-            class: require('../module/logger')
+            class: require('../src/module/logger')
         },
         mongoose: {
-            class: require('../module/mongoose'),
+            class: require('../src/module/mongoose'),
             config: {
                 uri: 'mongodb://localhost/jeneric-core'
             }
         },
         server: {
-            class: require('../module/server'),
+            class: require('../src/module/server'),
             config: {
                 port: 3000,
                 routes: require('./routes')
             }
         },
         observer: {
-            class: require('../module/observer')
+            class: require('../src/module/observer')
         }
     },
     util: {
         error: {
-            class: require('../util/error')
+            class: require('../src/util/error')
         },
         fs: {
-            class: require('../util/fs')
+            class: require('../src/util/fs')
         },
         object: {
-            class: require('../util/object')
+            class: require('../src/util/object')
         },
         string: {
-            class: require('../util/string')
+            class: require('../src/util/string')
         }
     }
 }

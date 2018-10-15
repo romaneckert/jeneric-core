@@ -1,6 +1,6 @@
-const Abstract = require('./abstract');
+const Container = require('./container');
 
-class AbstractHandler extends Abstract {
+class Handler extends Container {
 
     constructor() {
         super('handler');
@@ -12,4 +12,4 @@ class AbstractHandler extends Abstract {
 
 }
 
-module.exports = AbstractHandler;
+module.exports = Handler;

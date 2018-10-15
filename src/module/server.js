@@ -4,9 +4,9 @@ const helmet = require('helmet');
 const http = require('http');
 const https = require('https');
 const compression = require('compression');
-const AbstractModule = require('../core/abstract-module');
+const Module = require('../../module');
 
-class Server extends AbstractModule {
+class Server extends Module {
 
     constructor(config) {
 

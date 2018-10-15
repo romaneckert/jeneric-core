@@ -1,21 +1,24 @@
 {
-  "name": "@jeneric/core",
-  "version": "2.0.0",
-  "description": "jeneric core",
-  "main": "index.js",
-  "scripts": {
-    "test-development": "export NODE_ENV=development && node test/development.js",
-    "test-production": "export NODE_ENV=production && node test/production.js"
-  },
-  "author": "Roman Eckert",
-  "license": "MIT",
-  "repository": "https://github.com/romaneckert/jeneric-core",
-  "dependencies": {
-    "compression": "1.7.3",
-    "express": "4.16.3",
-    "helmet": "^3.13.0",
-    "mongoose": "5.3.0",
-    "pug": "2.0.3",
-    "slug": "0.9.1"
-  }
+    "name": "@jeneric/core",
+    "version": "2.0.0",
+    "description": "jeneric core",
+    "main": "index.js",
+    "scripts": {
+        "test-development": "export NODE_ENV=development && node test/development.js",
+        "test-production": "export NODE_ENV=production && node test/production.js"
+    },
+    "author": "Roman Eckert",
+    "license": "MIT",
+    "repository": "https://github.com/romaneckert/jeneric-core",
+    "directories": {
+        "bin": "./src",
+        "lib": "./src"
+    },
+    "dependencies": {
+        "compression": "1.7.3",
+        "express": "4.16.4",
+        "helmet": "3.14.0",
+        "mongoose": "5.3.4",
+        "pug": "2.0.3"
+    }
 }

@@ -1,6 +1,6 @@
-const AbstractModule = require('../core/abstract-module');
+const Module = require('../../module');
 
-class Observer extends AbstractModule {
+class Observer extends Module {
     constructor() {
         super();
     }

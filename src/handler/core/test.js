@@ -1,6 +1,6 @@
-const AbstractHandler = require('../../core/abstract-handler');
+const Handler = require('../../../handler');
 
-class Test extends AbstractHandler {
+class Test extends Handler {
 
     handle(req, res) {
         this.logger.debug('Test: ' + req.url);

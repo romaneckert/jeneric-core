@@ -1,6 +1,6 @@
 const ClassDefinition = require('./class-definition');
 
-class Abstract {
+class Container {
 
     constructor(classType) {
 
@@ -101,4 +101,4 @@ class Abstract {
 
 }
 
-module.exports = Abstract;
+module.exports = Container;

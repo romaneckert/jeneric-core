@@ -1,7 +1,7 @@
 const path = require('path');
-const AbstractModule = require('../core/abstract-module');
+const Module = require('../../module');
 
-class Logger extends AbstractModule {
+class Logger extends Module {
     constructor(config) {
 
         super();

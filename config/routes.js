@@ -3,7 +3,7 @@ module.exports = {
         test: {
             path: '/test',
             method: 'get',
-            class: require('../handler/core/test')
+            class: require('../src/handler/core/test')
         }
     }
 };

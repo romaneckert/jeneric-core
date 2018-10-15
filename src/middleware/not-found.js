@@ -1,6 +1,6 @@
-const AbstractMiddleware = require('../core/abstract-middleware');
+const Middleware = require('../../middleware');
 
-class NotFound extends AbstractMiddleware {
+class NotFound extends Middleware {
 
     handle(req, res) {
         return res.render('core/middleware/not-found');
