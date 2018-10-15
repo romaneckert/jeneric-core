@@ -4,6 +4,8 @@ const os = require('os');
 
 const ClassDefinition = require('./class-definition');
 
+const objectUtil = require('./util/object');
+
 class Core {
 
     constructor() {
@@ -14,7 +16,6 @@ class Core {
         this.ready = false;
         this.consoleMode = false;
 
-        this.util = {};
         this.module = {};
         this.model = {};
 
@@ -39,13 +40,10 @@ class Core {
             }
         }
 
-        // instantiate object util at first, because it used to merge configs
-        this.util.object = this._instantiate(this.config.util.object);
-
         // merge application specific config with default config
         if ('object' === typeof config && config.length > 0) {
             for (let c in config) {
-                this.util.object.merge(this.config, config[c]);
+                objectUtil.merge(this.config, config[c]);
             }
         }
 

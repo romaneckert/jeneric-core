@@ -87,14 +87,6 @@ class Container {
         return this._classDefinition;
     }
 
-    get util() {
-        return this._core.util;
-    }
-
-    get fs() {
-        return this._core.util.fs;
-    }
-
     get env() {
         return this._core.config.env;
     }

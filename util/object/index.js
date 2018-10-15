@@ -1,5 +1,5 @@
-class ObjectUtil {
-    merge(obj1, obj2) {
+module.exports = {
+    merge: function (obj1, obj2) {
         for (let key in obj2) {
             if ('object' === typeof obj1[key] && 'object' === typeof obj2[key]) {
                 obj1[key] = this.merge(obj1[key], obj2[key]);
@@ -10,5 +10,3 @@ class ObjectUtil {
         return obj1;
     }
 }
-
-module.exports = ObjectUtil;

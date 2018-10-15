@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Module = require('../../module');
+const objectUtil = require('../../util/object');
 
 class Mongoose extends Module {
     constructor(config) {
@@ -16,7 +17,7 @@ class Mongoose extends Module {
             }
         };
 
-        this.util.object.merge(this._config, config);
+        objectUtil.merge(this._config, config);
 
         mongoose.connection.on('error', (err) => {
             this.logger.error(err);

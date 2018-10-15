@@ -5,6 +5,7 @@ const http = require('http');
 const https = require('https');
 const compression = require('compression');
 const Module = require('../../module');
+const fs = require('../../util/fs');
 
 class Server extends Module {
 
@@ -57,7 +58,7 @@ class Server extends Module {
         }
 
         // check certificates
-        if (!this.fs.existsSync(this._pathToKeyPem) || !this.fs.existsSync(this._pathToCertPem)) {
+        if (!fs.existsSync(this._pathToKeyPem) || !fs.existsSync(this._pathToCertPem)) {
             isHttps = false;
             this.logger.warning(`.key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
         }
@@ -67,8 +68,8 @@ class Server extends Module {
         if (isHttps) {
             // start https server
             server = https.createServer({
-                key: this.fs.readFileSync(this._pathToKeyPem),
-                cert: this.fs.readFileSync(this._pathToCertPem)
+                key: fs.readFileSync(this._pathToKeyPem),
+                cert: fs.readFileSync(this._pathToCertPem)
             }, express);
 
             server.listen(this.config.port);

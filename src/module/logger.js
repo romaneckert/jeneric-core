@@ -1,5 +1,9 @@
 const path = require('path');
 const Module = require('../../module');
+const errorUtil = require('../../util/error');
+const objectUtil = require('../../util/object');
+const stringUtil = require('../../util/string');
+const fs = require('../../util/fs');
 
 class Logger extends Module {
     constructor(config) {
@@ -61,11 +65,12 @@ class Logger extends Module {
         };
 
         // merge config
-        this.util.object.merge(this._config, config);
+        objectUtil.merge(this._config, config);
 
         this._logsToSaveQueue = [];
         this._history = [];
     }
+
     log(message, meta, classDefinition, stack, code) {
 
         if ('number' !== typeof code) {
@@ -89,17 +94,17 @@ class Logger extends Module {
         let date = new Date();
 
         // cast to string
-        message = this.util.string.cast(message).trim();
+        message = stringUtil.cast(message).trim();
 
         // remove line breaks from message
         message = message.replace(/(\r?\n|\r)/gm, ' ');
 
         // cast meta data like objects to string
-        meta = this.util.string.cast(meta);
+        meta = stringUtil.cast(meta);
 
         // create call stack if not defined
         if ('object' !== typeof stack) {
-            stack = this.util.error.stack(new Error());
+            stack = errorUtil.stack(new Error());
             stack.shift();
             stack.shift();
         }
@@ -144,7 +149,7 @@ class Logger extends Module {
 
         for (let logFile of logFiles) {
             // check if log file exists and create if not
-            this.fs.ensureFileExists(logFile);
+            fs.ensureFileExists(logFile);
 
             // check if log rotation is necessary
             this._rotateLogFile(logFile);
@@ -157,14 +162,14 @@ class Logger extends Module {
             output += ' [' + log.stack + ']';
 
             // write line to log file
-            this.fs.appendFileSync(logFile, output + '\n');
+            fs.appendFileSync(logFile, output + '\n');
         }
 
     }
 
     _rotateLogFile(pathToLogFile) {
 
-        let fileSize = this.fs.statSync(pathToLogFile).size;
+        let fileSize = fs.statSync(pathToLogFile).size;
 
         if (fileSize < this._config.maxSizePerLogFile) return false;
 
@@ -173,19 +178,19 @@ class Logger extends Module {
             let pathToArchivedLogFile = pathToLogFile + '.' + i;
 
             // check if archived file exists
-            if (!this.fs.existsSync(pathToArchivedLogFile)) continue;
+            if (!fs.existsSync(pathToArchivedLogFile)) continue;
 
             // unlink last log file
             if (this._config.maxLogRotationsPerType - 1 === i) {
-                this.fs.unlinkSync(pathToArchivedLogFile);
+                fs.unlinkSync(pathToArchivedLogFile);
                 continue;
             }
 
-            this.fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
+            fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
         }
 
-        this.fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
-        this.fs.ensureFileExists(pathToLogFile);
+        fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
+        fs.ensureFileExists(pathToLogFile);
     }
 
     _getPathToLogFile(code, namespaces) {

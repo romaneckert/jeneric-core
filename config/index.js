@@ -65,19 +65,5 @@ module.exports = {
         observer: {
             class: require('../src/module/observer')
         }
-    },
-    util: {
-        error: {
-            class: require('../src/util/error')
-        },
-        fs: {
-            class: require('../src/util/fs')
-        },
-        object: {
-            class: require('../src/util/object')
-        },
-        string: {
-            class: require('../src/util/string')
-        }
     }
 }

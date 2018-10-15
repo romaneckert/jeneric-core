@@ -66,10 +66,4 @@ fs.ensureDirExists = function (directoryPath) {
     return true;
 };
 
-class FileSystemUtil {
-    constructor() {
-        return fs;
-    }
-}
-
-module.exports = FileSystemUtil;
+module.exports = fs;
