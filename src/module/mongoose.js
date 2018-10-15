@@ -1,13 +1,10 @@
 const mongoose = require('mongoose');
-const Module = require('../../module');
 const objectUtil = require('../../util/object');
 
-class Mongoose extends Module {
+class Mongoose {
     constructor(config) {
 
-        super();
-
-        this._db = {};
+        this.instance = mongoose;
 
         this._config = {
             connection: {
@@ -18,7 +15,9 @@ class Mongoose extends Module {
         };
 
         objectUtil.merge(this._config, config);
+    }
 
+    start() {
         mongoose.connection.on('error', (err) => {
             this.logger.error(err);
         });
@@ -28,13 +27,16 @@ class Mongoose extends Module {
         });
 
         mongoose.connection.on('connected', (err, client) => {
+
+            console.log(this);
+            process.exit();
+
             this.logger.notice('connected to mongodb');
+
+
         });
 
         mongoose.connect(config.uri, this._config.connection);
-
-        return mongoose;
-
     }
 }
 

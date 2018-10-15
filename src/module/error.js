@@ -1,9 +1,4 @@
-const Module = require('../../module');
-
-class Error extends Module {
-    constructor() {
-        super();
-    }
+class Error {
 
     handleUncaughtException(error) {
 

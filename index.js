@@ -2,16 +2,11 @@ const mongoose = require('mongoose');
 const cluster = require('cluster');
 const os = require('os');
 
-const ClassDefinition = require('./class-definition');
-
 const objectUtil = require('./util/object');
 
 class Core {
 
     constructor() {
-
-        // set class definition
-        this._classDefinition = new ClassDefinition('core', 'core');
 
         this.ready = false;
         this.consoleMode = false;
@@ -25,7 +20,7 @@ class Core {
 
         // create process for each CPU
         if (cluster.isMaster) {
-            for (var i = 0; i < os.cpus().length - 1; i++) cluster.fork();
+            for (var i = 0; i < os.cpus().length; i++) cluster.fork();
             return;
         }
 
@@ -48,7 +43,7 @@ class Core {
         }
 
         // instantiate error module at first
-        this.module.error = this._instantiate(this.config.module.error);
+        this.module.error = this._instantiate(this.config.module.error, 'module', 'error');
 
         // handle uncaught exceptions
         process.on('uncaughtException', this.module.error.handleUncaughtException.bind(this.module.error));
@@ -68,7 +63,7 @@ class Core {
                 continue;
             }
 
-            let instance = this._instantiate(this.config[namespace]);
+            let instance = this._instantiate(this.config[namespace], namespace, namespace);
 
             if (null !== instance) {
                 this[namespace] = instance;
@@ -77,7 +72,7 @@ class Core {
 
         // log informations about start process of core
         if (cluster.worker && cluster.worker.id === 1) {
-            this.module.logger.log('application run in env: "' + this.config.env + '"', '', this._classDefinition, undefined, 5);
+            this.module.logger.log('application run in env: "' + this.config.env + '"', '', 'core', 'core', undefined, 5);
         }
 
         // check ready state modules
@@ -145,7 +140,7 @@ class Core {
         this.module.mongoose.disconnect();
     }
 
-    _instantiate(namespace) {
+    _instantiate(namespace, type, name) {
 
         if ('object' !== typeof namespace) {
             return null;
@@ -153,14 +148,14 @@ class Core {
 
         if ('class' in namespace && 'function' === typeof namespace.class) {
             if ('config' in namespace && 'object' === typeof namespace.config) {
-                return new namespace.class(namespace.config);
+                return this._addContainer(new namespace.class(namespace.config), type, name);
             }
-            return new namespace.class();
+            return this._addContainer(new namespace.class(), type, name);
         } else {
             let obj = {};
 
             for (let key in namespace) {
-                let instance = this._instantiate(namespace[key]);
+                let instance = this._instantiate(namespace[key], type, key);
 
                 if (null !== instance) {
                     obj[key] = instance
@@ -169,6 +164,82 @@ class Core {
 
             return obj;
         }
+    }
+
+    _addContainer(instance, type, name) {
+
+        instance._core = this;
+        instance.model = this.model;
+        instance._type = type;
+        instance._name = name;
+        instance.env = this.config.env;
+
+        Object.defineProperty(instance, 'module', {
+            get: function () {
+
+                let observed = false;
+
+                return new Proxy({}, {
+                    get: function (target, moduleName) {
+
+                        return new Proxy(this._core.module[moduleName], {
+                            get: function (target, method) {
+
+                                if ('function' === typeof target[method] && !observed) {
+                                    this._core.module.observer.observe(name, moduleName, method);
+                                    observed = true;
+                                }
+                                return target[method];
+                            }.bind(instance)
+                        })
+                    }.bind(instance)
+                });
+
+            }
+        });
+
+        Object.defineProperty(instance, 'logger', {
+            get: function () {
+                // building layer between real logger service to set the module definition to logger
+                return {
+                    emergency: function (message, meta, stack) {
+                        this.module.logger.log(message, meta, this._type, this._name, stack, 0);
+                    }.bind(instance),
+
+                    alert: function (message, meta, stack) {
+                        this.module.logger.log(message, meta, this._type, this._name, stack, 1);
+                    }.bind(instance),
+
+                    critical: function (message, meta, stack) {
+                        this.module.logger.log(message, meta, this._type, this._name, stack, 2);
+                    }.bind(instance),
+
+                    error: function (message, meta, stack) {
+                        this.module.logger.log(message, meta, this._type, this._name, stack, 3);
+                    }.bind(instance),
+
+                    warning: function (message, meta, stack) {
+                        this.module.logger.log(message, meta, this._type, this._name, stack, 4);
+                    }.bind(instance),
+
+                    notice: function (message, meta, stack) {
+                        this.module.logger.log(message, meta, this._type, this._name, stack, 5);
+                    }.bind(instance),
+
+                    info: function (message, meta, stack) {
+                        this.module.logger.log(message, meta, this._type, this._name, stack, 6);
+                    }.bind(instance),
+
+                    debug: function (message, meta, stack) {
+                        this.module.logger.log(message, meta, this._type, this._name, stack, 7);
+                    }.bind(instance),
+
+                    history: instance.module.logger.history
+                };
+            }
+        });
+
+        return instance;
     }
 }
 

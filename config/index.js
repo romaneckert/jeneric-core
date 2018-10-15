@@ -26,11 +26,11 @@ module.exports = {
                     meta: {
                         type: String
                     },
-                    classType: {
+                    type: {
                         type: String,
                         required: true
                     },
-                    className: {
+                    name: {
                         type: String,
                         required: true
                     },

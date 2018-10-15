@@ -4,14 +4,11 @@ const helmet = require('helmet');
 const http = require('http');
 const https = require('https');
 const compression = require('compression');
-const Module = require('../../module');
 const fs = require('../../util/fs');
 
-class Server extends Module {
+class Server {
 
     constructor(config) {
-
-        super();
 
         this.config = config;
 

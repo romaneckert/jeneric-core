@@ -1,14 +1,11 @@
 const path = require('path');
-const Module = require('../../module');
 const errorUtil = require('../../util/error');
 const objectUtil = require('../../util/object');
 const stringUtil = require('../../util/string');
 const fs = require('../../util/fs');
 
-class Logger extends Module {
+class Logger {
     constructor(config) {
-
-        super();
 
         this._config = {
             directory: 'var/logs',
@@ -71,7 +68,7 @@ class Logger extends Module {
         this._history = [];
     }
 
-    log(message, meta, classDefinition, stack, code) {
+    log(message, meta, type, name, stack, code) {
 
         if ('number' !== typeof code) {
             code = 0;
@@ -82,13 +79,8 @@ class Logger extends Module {
         }
 
         // detect class definition
-        let classType = 'undefined';
-        let className = 'undefined';
-
-        if (('object' === typeof classDefinition)) {
-            classType = classDefinition.type;
-            className = classDefinition.name
-        }
+        type = ('string' === typeof type) ? type : 'undefined';
+        name = ('string' === typeof name) ? name : 'undefined';
 
         // create date for current log entry
         let date = new Date();
@@ -116,8 +108,8 @@ class Logger extends Module {
             date: date,
             message: message,
             meta: meta,
-            classType: classType,
-            className: className,
+            type: type,
+            name: name,
             stack: stack
         });
 
@@ -141,9 +133,9 @@ class Logger extends Module {
             this._getPathToLogFile(log.code, []),
         ];
 
-        if (null !== log.classType && null !== log.className) {
+        if (null !== log.type && null !== log.name) {
             logFiles.push(
-                this._getPathToLogFile(log.code, [log.classType, log.className])
+                this._getPathToLogFile(log.code, [log.type, log.name])
             );
         }
 
@@ -156,7 +148,7 @@ class Logger extends Module {
 
             let output = '[' + this._dateStringFromDate(log.date) + '] ';
             output += '[' + this._config.levels[log.code].name + '] ';
-            output += '[' + log.classType + '/' + log.className + '] ';
+            output += '[' + log.type + '/' + log.name + '] ';
             output += '[' + log.message + ']';
             if (log.meta.length > 0) output += ' [' + log.meta + ']';
             output += ' [' + log.stack + ']';
@@ -220,7 +212,7 @@ class Logger extends Module {
 
         consoleOutput += `[${this._config.levels[log.code].name}] `;
         consoleOutput += log.message + ' ';
-        consoleOutput += '[' + log.classType + '/' + log.className + '] ';
+        consoleOutput += '[' + log.type + '/' + log.name + '] ';
         if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
 
         consoleOutput += `[pid:${process.pid}] `;
@@ -248,7 +240,7 @@ class Logger extends Module {
 
         this._logsToSaveQueue.push(log);
 
-        if (this.module.mongoose && 1 === this.module.mongoose.connection.readyState) {
+        if (this.module.mongoose && 1 === this.module.mongoose.instance.connection.readyState) {
 
             this.model.log.insertMany(this._logsToSaveQueue, function (err) {
                 if (err) {

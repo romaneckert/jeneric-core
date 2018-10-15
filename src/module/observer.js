@@ -1,12 +1,6 @@
-const Module = require('../../module');
-
-class Observer extends Module {
-    constructor() {
-        super();
-    }
-
+class Observer {
     observe(caller, module, method) {
-        this._core.module.logger.log('module ' + caller + ' calls ' + module + '.' + method + '()', undefined, this.classDefinition, undefined, 8);
+        this._core.module.logger.log('module ' + caller + ' calls ' + module + '.' + method + '()', undefined, 'module', 'observer', undefined, 8);
     }
 
     get ready() {
