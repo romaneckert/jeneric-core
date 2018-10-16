@@ -1,6 +1,6 @@
 class Observer {
     observe(caller, module, method) {
-        this._core.module.logger.log('module ' + caller + ' calls ' + module + '.' + method + '()', undefined, 'module', 'observer', undefined, 8);
+        this.core.module.logger.log('module ' + caller + ' calls ' + module + '.' + method + '()', undefined, 'module', 'observer', undefined, 8);
     }
 
     get ready() {

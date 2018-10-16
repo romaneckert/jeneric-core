@@ -170,12 +170,11 @@ class Core {
 
     _addContainer(instance, type, name) {
 
-        instance._core = this;
         instance._type = type;
         instance._name = name;
 
+        instance.core = this;
         instance.model = this.model;
-        instance.handler = this.handler;
         instance.env = this.config.env;
 
         Object.defineProperty(instance, 'module', {
@@ -186,11 +185,11 @@ class Core {
                 return new Proxy({}, {
                     get: function (target, moduleName) {
 
-                        return new Proxy(this._core.module[moduleName], {
+                        return new Proxy(this.core.module[moduleName], {
                             get: function (target, method) {
 
                                 if ('function' === typeof target[method] && !observed) {
-                                    this._core.module.observer.observe(name, moduleName, method);
+                                    this.core.module.observer.observe(name, moduleName, method);
                                     observed = true;
                                 }
                                 return target[method];

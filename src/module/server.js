@@ -44,7 +44,7 @@ class Server {
     }
 
     _getHandlerFromHandlerString(handlerString) {
-        return handlerString.split('/').reduce((o, i) => o[i], this.handler);
+        return handlerString.split('/').reduce((o, i) => o[i], this.core.handler);
     }
 
     start() {
@@ -55,8 +55,8 @@ class Server {
         this._addRoutes(this.config.routes);
 
         // register middlewares
-        for (let middleware in this.middleware) {
-            express.use(this.middleware[middleware].handle.bind(this.middleware[middleware]));
+        for (let middleware in this.core.middleware) {
+            express.use(this.core.middleware[middleware].handle.bind(this.core.middleware[middleware]));
         }
 
         // check certificates
