@@ -11,7 +11,7 @@ class Logger {
             directory: 'var/logs',
             maxSizePerLogFile: 16 * 1024 * 1024, // in byte - default 16 mb
             maxLogRotationsPerType: 10,
-            maxHistoryLength: 1000,
+            maxHistoryLength: 100000000000000000000000000,
             levels: {
                 0: {
                     name: 'emergency',
@@ -113,17 +113,52 @@ class Logger {
             stack: stack
         });
 
+        // add log entry to history
+        this._addToHistory(log);
+
+        // check if log is duplicated
+        if (this._isDublicated(log)) {
+            return;
+        }
+
         // write log to log files
         this._writeToLogFiles(log);
 
         // write log to console
         this._writeToConsole(log);
 
-        // add log entry to history
-        this._addToHistory(log);
-
         // save log to db
         this._saveInDB(log);
+    }
+
+    _isDublicated(log) {
+
+        let k = 0;
+
+        for (let oldLog of this._history) {
+
+            if (0 === k) {
+                k++;
+                continue;
+            }
+
+            /*
+            if (log.date - oldLog.date > 10000) {
+                break;
+            }*/
+
+            if (
+                oldLog.code === log.code
+                && oldLog.message === log.message
+                && oldLog.meta === log.meta
+                && oldLog.type === log.type
+                && oldLog.date - log.date < 10000
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     _writeToLogFiles(log) {
@@ -226,11 +261,15 @@ class Logger {
     }
 
     _addToHistory(log) {
-        // remove older entries if log history greater then 200
-        if (this._history.length > this._config.maxHistoryLength) this._history.shift();
+
+        // remove older entries if log history greater then max histroy length
+        if (this._history.length > this._config.maxHistoryLength) this._history.pop();
 
         // add current log to history
         this._history.push(log);
+
+        // sort log histroy by date desc
+        this._history.sort((a, b) => (a.date < b.date));
     }
 
     _saveInDB(log) {
