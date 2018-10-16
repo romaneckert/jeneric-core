@@ -20,8 +20,8 @@ class Server {
         express.set(
             'views',
             [
-                path.join(__dirname, '../view'),
-                path.join(__dirname), path.join(process.cwd(), 'app/view')
+                path.join(__dirname, '../../view'),
+                path.join(__dirname), path.join(process.cwd(), 'view')
             ]
         );
 
@@ -34,12 +34,17 @@ class Server {
             let route = routes[routeName];
 
             if ('string' === typeof route.path) {
-                let controller = new route.class();
-                express[route.method](route.path, controller.handle.bind(controller));
+                let handler = this._getHandlerFromHandlerString(route.handler);
+
+                express[route.method](route.path, handler.handle.bind(handler));
             } else if ('object' === typeof route) {
                 this._addRoutes(route);
             }
         }
+    }
+
+    _getHandlerFromHandlerString(handlerString) {
+        return handlerString.split('/').reduce((o, i) => o[i], this.handler);
     }
 
     start() {

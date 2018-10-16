@@ -1,4 +1,11 @@
 module.exports = {
+    handler: {
+        core: {
+            test: {
+                class: require('../src/handler/core/test')
+            }
+        }
+    },
     middleware: {
         error: {
             class: require('../src/middleware/error')

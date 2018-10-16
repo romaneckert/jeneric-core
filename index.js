@@ -171,9 +171,11 @@ class Core {
     _addContainer(instance, type, name) {
 
         instance._core = this;
-        instance.model = this.model;
         instance._type = type;
         instance._name = name;
+
+        instance.model = this.model;
+        instance.handler = this.handler;
         instance.env = this.config.env;
 
         Object.defineProperty(instance, 'module', {
