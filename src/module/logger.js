@@ -11,7 +11,7 @@ class Logger {
             directory: 'var/logs',
             maxSizePerLogFile: 16 * 1024 * 1024, // in byte - default 16 mb
             maxLogRotationsPerType: 10,
-            maxHistoryLength: 100000000000000000000000000,
+            maxHistoryLength: 1000000,
             levels: {
                 0: {
                     name: 'emergency',
@@ -113,13 +113,13 @@ class Logger {
             stack: stack
         });
 
-        // add log entry to history
-        this._addToHistory(log);
-
         // check if log is duplicated
         if (this._isDublicated(log)) {
             return;
         }
+
+        // add log entry to history
+        this._addToHistory(log);
 
         // write log to log files
         this._writeToLogFiles(log);
@@ -137,22 +137,12 @@ class Logger {
 
         for (let oldLog of this._history) {
 
-            if (0 === k) {
-                k++;
-                continue;
-            }
-
-            /*
-            if (log.date - oldLog.date > 10000) {
-                break;
-            }*/
-
             if (
                 oldLog.code === log.code
                 && oldLog.message === log.message
                 && oldLog.meta === log.meta
                 && oldLog.type === log.type
-                && oldLog.date - log.date < 10000
+                && log.date - oldLog.date < 10000
             ) {
                 return true;
             }
