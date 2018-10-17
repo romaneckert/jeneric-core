@@ -10,10 +10,6 @@
     "author": "Roman Eckert",
     "license": "MIT",
     "repository": "https://github.com/romaneckert/jeneric-core",
-    "directories": {
-        "bin": "./src",
-        "lib": "./src"
-    },
     "dependencies": {
         "compression": "1.7.3",
         "express": "4.16.4",
