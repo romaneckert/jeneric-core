@@ -66,4 +66,12 @@ fs.ensureDirExists = function (directoryPath) {
     return true;
 };
 
+fs.isFileSync = function (directory) {
+    return this.lstatSync(directory).isFile();
+}
+
+fs.isDirectorySync = function (directory) {
+    return this.lstatSync(directory).isDirectory();
+}
+
 module.exports = fs;

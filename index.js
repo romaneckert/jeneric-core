@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 const cluster = require('cluster');
 const os = require('os');
+const path = require('path');
 
 const objectUtil = require('./util/object');
+const fsUtil = require('./util/fs');
 
 class Core {
 
@@ -34,6 +36,14 @@ class Core {
                 this.config.env = 'production';
             }
         }
+
+        let classes = this._autoload(path.join(__dirname, 'src'));
+
+        console.log(classes);
+
+        process.exit();
+
+        this._autoload();
 
         // merge application specific config with default config
         if ('object' === typeof config && config.length > 0) {
@@ -166,6 +176,43 @@ class Core {
 
             return obj;
         }
+    }
+
+    _autoload(directory) {
+        let obj = {};
+
+        if (fsUtil.isDirectorySync(directory)) {
+
+            for (let dirName of fsUtil.readdirSync(directory)) {
+                let result = this._autoload(path.join(directory, dirName));
+
+                if ('function' === typeof result) {
+                    let key = dirName.split('.')[0];
+                    let parts = key.split('-');
+
+                    for (let p in parts) {
+                        if (0 == p) {
+                            continue;
+                        }
+                        parts[p] = parts[p].charAt(0).toUpperCase() + parts[p].slice(1)
+                    }
+
+                    obj[parts.join('')] = result;
+                } else if ('object' === typeof result && null !== result) {
+                    obj[dirName] = result;
+                }
+            }
+
+        } else if (fsUtil.isFileSync(directory)) {
+
+            if ('.js' === path.extname(directory)) {
+                return require(directory);
+            }
+
+            return null;
+        }
+
+        return obj;
     }
 
     _addContainer(instance, type, name) {
