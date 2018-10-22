@@ -35,7 +35,6 @@ class Server {
 
             if ('string' === typeof route.path && 'string' === typeof route.handler) {
                 let handler = this._getHandlerFromHandlerString(route.handler);
-
                 express[route.method](route.path, handler.handle.bind(handler));
             } else if ('object' === typeof route) {
                 this._addRoutes(route);
@@ -44,7 +43,7 @@ class Server {
     }
 
     _getHandlerFromHandlerString(handlerString) {
-        return handlerString.split('/').reduce((o, i) => o[i], this.core.handler);
+        return handlerString.split('/').reduce((o, i) => o[i], this.container.handler);
     }
 
     start() {
