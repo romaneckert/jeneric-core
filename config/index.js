@@ -39,8 +39,7 @@ module.exports = {
             uri: 'mongodb://localhost/jeneric-core'
         },
         server: {
-            port: 3000,
-            routes: require('./routes')
+            port: 3000
         },
         observer: {
             class: require('../src/module/observer')

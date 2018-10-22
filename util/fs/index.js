@@ -67,10 +67,20 @@ fs.ensureDirExists = function (directoryPath) {
 };
 
 fs.isFileSync = function (directory) {
+
+    if (!this.existsSync(directory)) {
+        return false;
+    }
+
     return this.lstatSync(directory).isFile();
 }
 
 fs.isDirectorySync = function (directory) {
+
+    if (!this.existsSync(directory)) {
+        return false;
+    }
+
     return this.lstatSync(directory).isDirectory();
 }
 

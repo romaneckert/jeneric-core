@@ -35,10 +35,16 @@ class Core {
         let classes = {};
 
         for (let directory of directories) {
-            this.config = objectUtil.merge(
-                this.config,
-                path.join(directory, 'config/index.js')
-            );
+
+            let pathToConfig = path.join(directory, 'config/index.js');
+
+            if (fsUtil.isFileSync(pathToConfig)) {
+                this.config = objectUtil.merge(
+                    this.config,
+                    require(pathToConfig)
+                );
+            }
+
             classes = objectUtil.merge(
                 classes,
                 this._autoload(path.join(directory, 'src'))
@@ -54,7 +60,12 @@ class Core {
             }
         }
 
-        console.log(classes);
+        let instances = {};
+
+        this._instantiate(classes, this.config, instances);
+
+        console.log(instances);
+
         process.exit();
 
         // instantiate error module at first
@@ -153,7 +164,32 @@ class Core {
         this.module.mongoose.disconnect();
     }
 
-    _instantiate(namespace, type, name) {
+    _instantiate(classes, config, instances, type) {
+
+        if ('string' !== typeof type) {
+            type = 'undefined';
+        }
+
+        if ('object' !== typeof instances) {
+            instances = {};
+        }
+
+        for (let namespace in classes) {
+            if ('object' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
+                instances[namespace] = this._instantiate(classes[namespace], config[namespace]);
+            } else if ('function' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
+                instances[namespace] = new classes[namespace](config[namespace]);
+            } else if ('object' === typeof classes[namespace]) {
+                instances[namespace] = this._instantiate(classes[namespace], {});
+            } else if ('function' === typeof classes[namespace]) {
+                instances[namespace] = new classes[namespace]();
+            }
+        }
+
+        return instances;
+    }
+
+    _instantiateOld(namespace, type, name) {
 
         if ('object' !== typeof namespace) {
             return null;
