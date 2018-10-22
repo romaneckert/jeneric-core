@@ -1,35 +1,33 @@
 module.exports = {
     model: {
         log: {
-            config: {
-                schema: {
-                    code: {
-                        type: Number,
-                        required: true
-                    },
-                    date: {
-                        type: Date,
-                        required: true,
-                    },
-                    message: {
-                        type: String,
-                        required: true,
-                    },
-                    meta: {
-                        type: String
-                    },
-                    type: {
-                        type: String,
-                        required: true
-                    },
-                    name: {
-                        type: String,
-                        required: true
-                    },
-                    stack: {
-                        type: String,
-                        required: true
-                    }
+            schema: {
+                code: {
+                    type: Number,
+                    required: true
+                },
+                date: {
+                    type: Date,
+                    required: true,
+                },
+                message: {
+                    type: String,
+                    required: true,
+                },
+                meta: {
+                    type: String
+                },
+                type: {
+                    type: String,
+                    required: true
+                },
+                name: {
+                    type: String,
+                    required: true
+                },
+                stack: {
+                    type: String,
+                    required: true
                 }
             }
         }

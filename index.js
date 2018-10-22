@@ -68,7 +68,7 @@ class Core {
         // add model classes to core
         for (let model in this.config.model) {
 
-            let schema = mongoose.Schema(this.config.model[model].config.schema);
+            let schema = mongoose.Schema(this.config.model[model].schema);
             this.container.model[model] = mongoose.model(model, schema)
 
         }
@@ -147,21 +147,15 @@ class Core {
 
     _instantiate(classes, config, type, instances) {
 
-        if ('object' !== typeof instances) {
-            instances = {};
-        }
+        if ('object' !== typeof instances) instances = {};
 
         let setType = false;
 
-        if ('string' !== typeof type) {
-            setType = true;
-        }
+        if ('string' !== typeof type) setType = true;
 
         for (let namespace in classes) {
 
-            if (setType) {
-                type = namespace;
-            }
+            if (setType) type = namespace;
 
             if ('object' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
                 instances[namespace] = this._instantiate(classes[namespace], config[namespace], type);
