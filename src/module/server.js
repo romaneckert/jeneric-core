@@ -55,8 +55,8 @@ class Server {
         this._addRoutes(this.config.routes);
 
         // register middlewares
-        for (let middleware in this.core.middleware) {
-            express.use(this.core.middleware[middleware].handle.bind(this.core.middleware[middleware]));
+        for (let middleware in this.container.middleware) {
+            express.use(this.container.middleware[middleware].handle.bind(this.container.middleware[middleware]));
         }
 
         // check certificates

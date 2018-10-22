@@ -12,9 +12,9 @@ class Core {
 
         this.ready = false;
         this.consoleMode = false;
-
-        this.module = {};
-        this.model = {};
+        this.container = {
+            model: {}
+        };
 
     }
 
@@ -60,41 +60,22 @@ class Core {
             }
         }
 
-        let instances = {};
-
-        this._instantiate(classes, this.config, instances);
-
-        console.log(instances);
-
-        process.exit();
-
-        // instantiate error module at first
-        this.module.error = this._instantiate(classes.module.error, 'module', 'error');
+        this._instantiate(classes, this.config, null, this.container);
 
         // handle uncaught exceptions
-        process.on('uncaughtException', this.module.error.handleUncaughtException.bind(this.module.error));
+        process.on('uncaughtException', this.container.module.error.handleUncaughtException.bind(this.container.module.error));
 
         // add model classes to core
         for (let model in this.config.model) {
 
             let schema = mongoose.Schema(this.config.model[model].config.schema);
-            this.model[model] = mongoose.model(model, schema)
+            this.container.model[model] = mongoose.model(model, schema)
 
-        }
-
-        // instantiate all classes except models
-        for (let namespace in classes) {
-
-            let instance = this._instantiate(this.classes[namespace], namespace, namespace);
-
-            if (null !== instance) {
-                this[namespace] = instance;
-            }
         }
 
         // log informations about start process of core
         if (cluster.worker && cluster.worker.id === 1) {
-            this.module.logger.log('application run in env: "' + this.config.env + '"', '', 'core', 'core', undefined, 5);
+            this.container.module.logger.log('application run in env: "' + this.config.env + '"', '', 'core', 'core', undefined, 5);
         }
 
         // check ready state modules
@@ -106,12 +87,12 @@ class Core {
             //this.consoleMode = true;
         }
 
-        this.module.mongoose.start();
+        this.container.module.mongoose.start();
 
         if (this.consoleMode) {
             this._loadFixtures();
         } else {
-            this.module.server.start();
+            this.container.module.server.start();
         }
 
     }
@@ -164,55 +145,36 @@ class Core {
         this.module.mongoose.disconnect();
     }
 
-    _instantiate(classes, config, instances, type) {
-
-        if ('string' !== typeof type) {
-            type = 'undefined';
-        }
+    _instantiate(classes, config, type, instances) {
 
         if ('object' !== typeof instances) {
             instances = {};
         }
 
+        let setType = false;
+
+        if ('string' !== typeof type) {
+            setType = true;
+        }
+
         for (let namespace in classes) {
+
+            if (setType) {
+                type = namespace;
+            }
+
             if ('object' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
-                instances[namespace] = this._instantiate(classes[namespace], config[namespace]);
+                instances[namespace] = this._instantiate(classes[namespace], config[namespace], type);
             } else if ('function' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
-                instances[namespace] = new classes[namespace](config[namespace]);
+                instances[namespace] = this._addContainer(new classes[namespace](config[namespace]), type, namespace);
             } else if ('object' === typeof classes[namespace]) {
-                instances[namespace] = this._instantiate(classes[namespace], {});
+                instances[namespace] = this._instantiate(classes[namespace], {}, type);
             } else if ('function' === typeof classes[namespace]) {
-                instances[namespace] = new classes[namespace]();
+                instances[namespace] = this._addContainer(new classes[namespace](), type, namespace);
             }
         }
 
         return instances;
-    }
-
-    _instantiateOld(namespace, type, name) {
-
-        if ('object' !== typeof namespace) {
-            return null;
-        }
-
-        if ('class' in namespace && 'function' === typeof namespace.class) {
-            if ('object' == typeof namespace && 'object' === typeof namespace.config) {
-                return this._addContainer(new namespace.class(namespace.config), type, name);
-            }
-            return this._addContainer(new namespace.class(), type, name);
-        } else {
-            let obj = {};
-
-            for (let key in namespace) {
-                let instance = this._instantiate(namespace[key], type, key);
-
-                if (null !== instance) {
-                    obj[key] = instance
-                }
-            }
-
-            return obj;
-        }
     }
 
     _autoload(directory) {
@@ -257,8 +219,8 @@ class Core {
         instance._type = type;
         instance._name = name;
 
-        instance.core = this;
-        instance.model = this.model;
+        instance.container = this.container;
+        instance.model = this.container.model;
         instance.env = this.config.env;
 
         Object.defineProperty(instance, 'module', {
@@ -269,11 +231,11 @@ class Core {
                 return new Proxy({}, {
                     get: function (target, moduleName) {
 
-                        return new Proxy(this.core.module[moduleName], {
+                        return new Proxy(this.container.module[moduleName], {
                             get: function (target, method) {
 
                                 if ('function' === typeof target[method] && !observed) {
-                                    this.core.module.observer.observe(name, moduleName, method);
+                                    this.container.module.observer.observe(name, moduleName, method);
                                     observed = true;
                                 }
                                 return target[method];
