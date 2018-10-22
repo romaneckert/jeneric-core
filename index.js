@@ -18,7 +18,9 @@ class Core {
 
     }
 
-    init(...config) {
+    init(...directories) {
+
+        directories.unshift(__dirname);
 
         // create process for each CPU
         if (cluster.isMaster) {
@@ -26,7 +28,22 @@ class Core {
             return;
         }
 
+        // init default config
         this.config = require('./config');
+
+        // autoload all classes from src folders of given directories
+        let classes = {};
+
+        for (let directory of directories) {
+            this.config = objectUtil.merge(
+                this.config,
+                path.join(directory, 'config/index.js')
+            );
+            classes = objectUtil.merge(
+                classes,
+                this._autoload(path.join(directory, 'src'))
+            );
+        }
 
         // set config env if not set
         if ('string' !== typeof this.config.env) {
@@ -37,23 +54,11 @@ class Core {
             }
         }
 
-        let classes = this._autoload(path.join(__dirname, 'src'));
-
         console.log(classes);
-
         process.exit();
 
-        this._autoload();
-
-        // merge application specific config with default config
-        if ('object' === typeof config && config.length > 0) {
-            for (let c in config) {
-                objectUtil.merge(this.config, config[c]);
-            }
-        }
-
         // instantiate error module at first
-        this.module.error = this._instantiate(this.config.module.error, 'module', 'error');
+        this.module.error = this._instantiate(classes.module.error, 'module', 'error');
 
         // handle uncaught exceptions
         process.on('uncaughtException', this.module.error.handleUncaughtException.bind(this.module.error));
@@ -67,13 +72,9 @@ class Core {
         }
 
         // instantiate all classes except models
-        for (let namespace in this.config) {
+        for (let namespace in classes) {
 
-            if ('model' === namespace) {
-                continue;
-            }
-
-            let instance = this._instantiate(this.config[namespace], namespace, namespace);
+            let instance = this._instantiate(this.classes[namespace], namespace, namespace);
 
             if (null !== instance) {
                 this[namespace] = instance;
@@ -159,7 +160,7 @@ class Core {
         }
 
         if ('class' in namespace && 'function' === typeof namespace.class) {
-            if ('config' in namespace && 'object' === typeof namespace.config) {
+            if ('object' == typeof namespace && 'object' === typeof namespace.config) {
                 return this._addContainer(new namespace.class(namespace.config), type, name);
             }
             return this._addContainer(new namespace.class(), type, name);
