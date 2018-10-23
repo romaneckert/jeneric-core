@@ -74,13 +74,13 @@ class Server {
             }, express);
 
             server.listen(this.config.port);
-            this.logger.notice(`server started with port ${this.config.port}`);
         } else {
             // start http server
             server = http.createServer(express);
             server.listen(this.config.port);
-            this.logger.notice(`server started on port ${this.config.port}`);
         }
+
+        this.logger.notice(`server started with port ${this.config.port}`);
 
     }
 }
