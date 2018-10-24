@@ -31,6 +31,9 @@ class Core {
         // init default config
         this.config = require('./config');
 
+        // add directories to config - useful for other modules
+        this.config.directories = directories;
+
         // autoload all classes from src folders of given directories
         let classes = {};
 
@@ -61,6 +64,9 @@ class Core {
         }
 
         this._instantiate(classes, this.config, null, this.container);
+
+        // add config to container
+        this.container.config = this.config;
 
         // handle uncaught exceptions
         process.on('uncaughtException', this.container.module.error.handleUncaughtException.bind(this.container.module.error));
@@ -215,7 +221,6 @@ class Core {
 
         instance.container = this.container;
         instance.model = this.container.model;
-        instance.env = this.config.env;
 
         Object.defineProperty(instance, 'module', {
             get: function () {

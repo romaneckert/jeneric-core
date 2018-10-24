@@ -229,7 +229,7 @@ class Logger {
         }
 
         // disabled, if log level less then notice and in mode production
-        if (log.code > 5 && this.env === 'production') {
+        if (log.code > 5 && this.container.config.env === 'production') {
             return;
         }
 
@@ -242,7 +242,7 @@ class Logger {
 
         consoleOutput += `[pid:${process.pid}] `;
 
-        if (log.code < 4 && this.env !== 'production') {
+        if (log.code < 4 && this.container.config.env !== 'production') {
             consoleOutput += '[' + log.stack + ']';
         }
 

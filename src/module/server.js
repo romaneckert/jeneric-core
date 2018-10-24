@@ -17,14 +17,6 @@ class Server {
 
         express.use(helmet());
 
-        express.set(
-            'views',
-            [
-                path.join(__dirname, '../../view'),
-                path.join(__dirname), path.join(process.cwd(), 'view')
-            ]
-        );
-
         express.set('view engine', 'pug');
         express.use(compression());
     }
@@ -47,6 +39,15 @@ class Server {
     }
 
     start() {
+
+        // register view paths
+        let viewPaths = [];
+
+        for (let directory of this.container.config.directories) {
+            viewPaths.push(path.join(directory, 'view/pug'));
+        }
+
+        express.set('views', viewPaths);
 
         let isHttps = true;
 
