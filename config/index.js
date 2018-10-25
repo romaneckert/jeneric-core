@@ -37,7 +37,13 @@ module.exports = {
             uri: 'mongodb://localhost/jeneric-core'
         },
         server: {
-            port: 3000
+            port: 3000,
+            middleware: {
+                0: 'locals',
+                1: 'router',
+                9998: 'error',
+                9999: 'notFound'
+            }
         }
     }
 }

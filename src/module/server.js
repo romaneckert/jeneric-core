@@ -51,12 +51,17 @@ class Server {
 
         let isHttps = true;
 
-        // register routes
-        this._addRoutes(this.config.routes);
-
         // register middlewares
-        for (let middleware in this.container.middleware) {
-            express.use(this.container.middleware[middleware].handle.bind(this.container.middleware[middleware]));
+        for (let m in this.config.middleware) {
+
+            let middlewareName = this.config.middleware[m];
+
+            if ('router' === middlewareName) {
+                // register routes
+                this._addRoutes(this.config.routes);
+            } else {
+                express.use(this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
+            }
         }
 
         // check certificates
