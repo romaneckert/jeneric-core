@@ -39,6 +39,7 @@ module.exports = {
         server: {
             port: 3000,
             middleware: {
+                0: 'access',
                 1000: 'locals',
                 1001: 'router',
                 10000: 'error',
