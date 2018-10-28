@@ -1,7 +1,7 @@
 class Locals {
 
     handle(req, res, next) {
-        res.locals.user = {};
+        //res.locals.user = {};
         next();
     }
 
