@@ -12,9 +12,10 @@
     "repository": "https://github.com/romaneckert/jeneric-core",
     "dependencies": {
         "compression": "1.7.3",
+        "cookie-parser": "1.4.3",
         "express": "4.16.4",
         "helmet": "3.14.0",
-        "mongoose": "5.3.4",
+        "mongoose": "5.3.7",
         "pug": "2.0.3"
     }
 }

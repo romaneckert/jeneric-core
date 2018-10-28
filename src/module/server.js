@@ -5,6 +5,7 @@ const http = require('http');
 const https = require('https');
 const compression = require('compression');
 const fs = require('../../util/fs');
+const cookieParser = require('cookie-parser')
 
 class Server {
 
@@ -48,6 +49,7 @@ class Server {
         }
 
         express.set('views', viewPaths);
+        express.use(cookieParser());
 
         let isHttps = true;
 
