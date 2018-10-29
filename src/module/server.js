@@ -29,7 +29,12 @@ class Server {
 
             if ('string' === typeof route.path && 'string' === typeof route.handler) {
                 let handler = this._getHandlerFromHandlerString(route.handler);
-                express[route.method](route.path, handler.handle.bind(handler));
+                let methods = route.methods.split(',');
+
+                for (let method of methods) {
+                    express[method](route.path, handler.handle.bind(handler));
+                }
+
             } else if ('object' === typeof route) {
                 this._addRoutes(route);
             }
