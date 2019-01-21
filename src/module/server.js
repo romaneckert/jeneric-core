@@ -14,8 +14,8 @@ class Server {
 
         this.config = config;
 
-        this._pathToKeyPem = path.join(process.cwd(), 'app/config/key.pem');
-        this._pathToCertPem = path.join(process.cwd(), 'app/config/cert.pem');
+        this._pathToKeyPem = path.join(process.cwd(), 'config/key.pem');
+        this._pathToCertPem = path.join(process.cwd(), 'config/cert.pem');
 
         express.use(helmet());
 
