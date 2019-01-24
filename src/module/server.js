@@ -24,6 +24,7 @@ class Server {
     }
 
     _addRoutes(routes) {
+
         for (let routeName in routes) {
             let route = routes[routeName];
 
@@ -31,8 +32,12 @@ class Server {
                 let handler = this._getHandlerFromHandlerString(route.handler);
                 let methods = route.methods.split(',');
 
-                for (let method of methods) {
-                    express[method](route.path, handler.handle.bind(handler));
+                if(undefined === handler) {
+                    this.logger.warning(`can not get handler for route ${routeName}`);
+                } else {
+                    for (let method of methods) {
+                        express[method](route.path, handler.handle.bind(handler));
+                    }
                 }
 
             } else if ('object' === typeof route) {
