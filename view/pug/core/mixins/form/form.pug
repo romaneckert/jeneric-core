@@ -1,0 +1,11 @@
+mixin form()
+
+    -
+        if(undefined === attributes.form) {
+            throw new Error('form has no attribute form');
+        }
+
+        delete attributes.form
+
+    form&attributes(attributes)
+        block

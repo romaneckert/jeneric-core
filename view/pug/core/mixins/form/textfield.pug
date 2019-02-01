@@ -1,3 +1,16 @@
 mixin textfield()
-  - attributes = merge(locals.attributes, attributes)
-  input(attributes)
+
+    -
+        if(undefined === attributes.name) {
+            throw new Error('textfield has no attribute name');
+        }
+
+        if(undefined === form) {
+            throw new Error('textfield has no form wrapper');
+        }
+
+        if(form && form.data && form.data[attributes.name]) {
+            attributes.value = form.data[attributes.name];
+        }
+
+    input&attributes(attributes)
