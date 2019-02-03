@@ -33,9 +33,6 @@ module.exports = {
         }
     },
     module: {
-        mongoose: {
-            uri: 'mongodb://localhost/jeneric-core'
-        },
         server: {
             port: 3000,
             middleware: {
