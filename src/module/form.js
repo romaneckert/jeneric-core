@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
+const objectUtil = require('../../util/object');
 
 class Form {
 
-    handle(Model, data) {
+    handle(instance, data) {
 
         let result = {
-            instance: null,
+            instance: instance,
             errors: null,
             submitted: false,
             valid: false
@@ -17,7 +18,7 @@ class Form {
 
         result.submitted = true;
 
-        result.instance = new Model(data);
+        objectUtil.merge(instance, data);
 
         let errors = result.instance.validateSync();
 

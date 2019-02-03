@@ -1,0 +1,11 @@
+mixin formError()
+
+    -
+        if(undefined === attributes.form) {
+            throw new Error('form has no attribute form');
+        }
+
+    if form && form.errors
+        ul
+            each error in form.errors
+                li=error.message
