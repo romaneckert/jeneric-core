@@ -5,12 +5,14 @@ mixin textfield()
             throw new Error('textfield has no attribute name');
         }
 
-        if(undefined === form) {
-            throw new Error('textfield has no form wrapper');
+        if(undefined === attributes.form) {
+            throw new Error('textfield has no attribute form');
         }
 
-        if(form && form.data && form.data[attributes.name]) {
-            attributes.value = form.data[attributes.name];
+        if(attributes.form && attributes.form.data && attributes.form.data[attributes.name]) {
+            attributes.value = attributes.form.data[attributes.name];
         }
+
+        delete attributes.form;
 
     input&attributes(attributes)
