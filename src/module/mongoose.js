@@ -30,6 +30,11 @@ class Mongoose {
             this.logger.notice('connected to mongodb');
         });
 
+        if ('string' !== typeof this._config.uri || 0 === this._config.uri.length) {
+            this.logger.error('missing uri for mongodb');
+            return;
+        }
+
         mongoose.connect(this._config.uri, this._config.connection);
     }
 }
