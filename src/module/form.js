@@ -2,27 +2,24 @@ const mongoose = require('mongoose');
 
 class Form {
 
-    handle(schema, req) {
+    handle(Model, data) {
 
         let result = {
-            data: null,
+            instance: null,
             errors: null,
             submitted: false,
             valid: false
         };
 
-        if (0 === Object.keys(req.body).length) {
+        if (0 === Object.keys(data).length) {
             return result;
         }
 
         result.submitted = true;
 
-        let mongooseSchema = mongoose.Schema(schema);
-        let Model = mongoose.model('form', schema);
+        result.instance = new Model(data);
 
-        result.data = new Model(req.body);
-
-        let errors = result.data.validateSync();
+        let errors = result.instance.validateSync();
 
         if (undefined === errors) {
             result.valid = true;
