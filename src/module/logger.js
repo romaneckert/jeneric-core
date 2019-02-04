@@ -238,6 +238,7 @@ class Logger {
         consoleOutput += `[${this._config.levels[log.code].name}] `;
         consoleOutput += log.message + ' ';
         consoleOutput += '[' + log.type + '/' + log.name + '] ';
+
         if (log.meta.length > 0) consoleOutput += '[' + log.meta + '] ';
 
         consoleOutput += `[pid:${process.pid}] `;

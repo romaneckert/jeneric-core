@@ -11,28 +11,30 @@ module.exports = {
 
     cast: function (val) {
 
-        switch (typeof val) {
-            case 'object':
-                if (val === null) {
-                    return '';
-                } else {
+        if (null === val) return '';
 
-                    let cache = [];
+        if (val instanceof Error) return String(val);
 
-                    return JSON.stringify(val, function (key, val) {
+        if (val instanceof ReferenceError) return String(val);
 
-                        // prevent cycles
-                        if (typeof val === 'object') {
-                            if (cache.indexOf(val) >= 0) return;
-                            cache.push(val)
-                        }
-                        return val
-                    });
+        if ('object' === typeof val) {
+            let cache = [];
+
+            return JSON.stringify(val, function (key, val) {
+
+                // prevent cycles
+                if (typeof val === 'object') {
+                    if (cache.indexOf(val) >= 0) return;
+                    cache.push(val)
                 }
-            case 'undefined':
-                return '';
-            default:
-                return String(val);
+                return val
+            });
         }
+
+        if ('undefined' === typeof val) {
+            return '';
+        }
+
+        return String(val);
     }
 };
