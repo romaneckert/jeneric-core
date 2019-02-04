@@ -103,14 +103,14 @@ class I18n {
 
         this._init();
 
-        return this.provider[0].__(string, args)
+        return this.provider[0].__(string, args);
     }
 
     translatePlurals(phrase, count) {
 
         this._init();
 
-        return this.provider[0].__n(phrase, count)
+        return this.provider[0].__n(phrase, count);
     }
 
 }
