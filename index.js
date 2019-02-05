@@ -101,6 +101,8 @@ class Core {
             this.container.module.server.start();
         }
 
+        this.container.module.i18n.init();
+
     }
 
     _startCheckModules() {

@@ -1,116 +1,84 @@
-const i18n = require('i18n');
 const path = require('path');
 const fs = require('../../util/fs');
 const objectUtil = require('../../util/object');
+const util = require('util');
 
 class I18n {
 
     constructor(config) {
 
         this._config = {
-            locales: ['en', 'de'],
+            locales: ['en'],
             defaultLocale: 'en'
         };
 
         objectUtil.merge(this._config, config);
 
-        this.provider = [];
-
         this._initialized = false;
+        this._catalog = {};
     }
 
-    _init() {
+    init() {
 
         if (this._initialized) return;
 
-        this.provider = [];
-
         for (let directory of this.container.config.directories) {
-
-            let config = {};
 
             let pathToLocales = path.join(directory, 'view/locale');
 
-            if (!fs.existsSync(pathToLocales)) {
-                continue;
+            if (!fs.isDirectorySync(pathToLocales)) continue;
+
+            let files = fs.readdirSync(pathToLocales);
+
+            for (let filename of files) {
+
+                let fileDetails = path.parse(filename);
+
+                if ('.json' !== fileDetails.ext) continue;
+
+                if (-1 === this._config.locales.indexOf(fileDetails.name)) continue;
+
+                let fileContent = fs.readFileSync(path.join(pathToLocales, filename));
+
+                if (undefined === this._catalog[fileDetails.name]) {
+                    this._catalog[fileDetails.name] = {};
+                }
+
+                objectUtil.merge(this._catalog[fileDetails.name], JSON.parse(fileContent));
+
             }
 
-            config.directory = pathToLocales;
-
-            objectUtil.merge(config, this._config);
-
-            let provider = require('i18n');
-
-            provider.configure(config);
-
-            this.provider.push(provider);
-        }
-
-        if (0 === this.provider.length) {
-
-            this.logger.wran('no locale folder exists');
-
-            let provider = require('i18n');
-
-            provider.configure(this._config);
-
-            this.provider.push(provider);
         }
 
         this._initialized = true;
     }
 
-    getCatalog() {
+    get defaultLocale() {
+        return this._config.defaultLocale;
+    }
 
-        this._init();
+    get catalog() {
+        return this._catalog;
+    }
 
-        let catalog = {};
+    get locales() {
+        return this._config.locales;
+    }
 
-        for (let provider of this.provider) {
-            objectUtil.merge(catalog, provider.getCatalog());
+    translate(locale, key, ...args) {
+
+        if (-1 === this._config.locales.indexOf(locale)) {
+            locale = this._config.defaultLocale;
         }
 
-        return catalog;
-    }
-
-    getLocales() {
-
-        this._init();
-
-        return this.provider[0].getLocales();
-    }
-
-    get locale() {
-
-        this._init();
-
-        return this.provider[0].getLocale();
-    }
-
-    set locale(locale) {
-
-        this._init();
-
-        if (this.getLocales().indexOf(locale) !== -1) return;
-
-        for (let provider of this.provider) {
-            provider.setLocale(locale);
+        try {
+            return util.format(key.split('.').reduce((o, i) => o[i], this._catalog[locale]), ...args);
+        } catch (err) {
+            this.logger.warning(`the translation key ${key} is missing in locale ${locale}`);
         }
 
-    }
+        return key;
 
-    translate(string, args = undefined) {
-
-        this._init();
-
-        return this.provider[0].__(string, args);
-    }
-
-    translatePlurals(phrase, count) {
-
-        this._init();
-
-        return this.provider[0].__n(phrase, count);
     }
 
 }
