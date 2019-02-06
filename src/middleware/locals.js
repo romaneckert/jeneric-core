@@ -11,13 +11,12 @@ class Locals {
             locale = req.query._locale;
         }
 
-        let browserLocale = req.get('Accept-Language');
+        // try to get locale from browser if query parameter not set
+        if (null === locale) {
+            let browserLanguage = req.acceptsLanguages(...this.module.i18n.locales);
 
-        if (null === locale && -1 !== this.module.i18n.locales.indexOf(browserLocale)) {
-            locale = browserLocale;
+            if ('string' === typeof browserLanguage) locale = browserLanguage;
         }
-
-        // try to get locale from browser
 
         res.trans = res.locals.trans = function (message, ...args) {
             return this.module.i18n.translate(locale, message, ...args);

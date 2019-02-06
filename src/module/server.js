@@ -32,7 +32,7 @@ class Server {
                 let handler = this._getHandlerFromHandlerString(route.handler);
                 let methods = route.methods.split(',');
 
-                if(undefined === handler) {
+                if (undefined === handler) {
                     this.logger.warning(`can not get handler for route ${routeName}`);
                 } else {
                     for (let method of methods) {
