@@ -19,7 +19,7 @@ class Locals {
 
         // try to get locale from browser
 
-        res.__ = res.locals.__ = function (message, ...args) {
+        res.trans = res.locals.trans = function (message, ...args) {
             return this.module.i18n.translate(locale, message, ...args);
         }.bind(this);
 
