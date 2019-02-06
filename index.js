@@ -54,13 +54,11 @@ class Core {
             );
         }
 
-        // set config env if not set
-        if ('string' !== typeof this.config.env) {
-            if ('string' === typeof process.env.NODE_ENV) {
-                this.config.env = process.env.NODE_ENV;
-            } else {
-                this.config.env = 'production';
-            }
+        // set config env
+        if ('string' === typeof process.env.NODE_ENV) {
+            this.config.env = process.env.NODE_ENV;
+        } else {
+            this.config.env = 'development';
         }
 
         this._instantiate(classes, this.config, null, this.container);

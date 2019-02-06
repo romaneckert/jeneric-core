@@ -91,11 +91,11 @@ class I18n {
         } catch (err) { }
 
         if ('string' === typeof translation) {
-            this.logger.warning(`the translation key ${key} could not be found for the locale ${locale}, fallback to ${this._config.defaultLocale}`);
+            this.logger.debug(`the translation key ${key} could not be found for the locale ${locale}, fallback to ${this._config.defaultLocale}`);
             return util.format(translation, ...args);
         }
 
-        this.logger.warning(`the translation key ${key} could not be found for the locale ${locale}`);
+        this.logger.debug(`the translation key ${key} could not be found for the locale ${locale}`);
 
         return key;
 
