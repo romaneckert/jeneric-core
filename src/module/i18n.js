@@ -78,26 +78,24 @@ class I18n {
             translation = key.split('.').reduce((o, i) => o[i], this._catalog[locale]);
         } catch (err) { }
 
+        if ('string' === typeof translation) {
+            return util.format(translation, ...args);
+        }
+
         // if translation not found, try to get from fallback
-        // TODO: fallback
+        // TODO: add fallback setting support
 
         // if translation not found from fallback, try to get from default locale
-        if ('string' !== typeof translation) {
-            try {
-                translation = key.split('.').reduce((o, i) => o[i], this._catalog[defaultLocale]);
-            } catch (err) { }
-        }
-
-        if ('string' !== typeof translation) {
-            this.logger.warning(`the translation key ${key} is missing in locale ${locale}`);
-            return key;
-        }
-
         try {
+            translation = key.split('.').reduce((o, i) => o[i], this._catalog[this._config.defaultLocale]);
+        } catch (err) { }
+
+        if ('string' === typeof translation) {
+            this.logger.warning(`the translation key ${key} could not be found for the locale ${locale}, fallback to ${this._config.defaultLocale}`);
             return util.format(translation, ...args);
-        } catch (err) {
-            this.logger.warning(`the translation key ${key} is missing in locale ${locale}`);
         }
+
+        this.logger.warning(`the translation key ${key} could not be found for the locale ${locale}`);
 
         return key;
 
