@@ -13,7 +13,8 @@ class Core {
         this.ready = false;
         this.consoleMode = false;
         this.container = {
-            model: {}
+            model: {},
+            component: {}
         };
 
     }
@@ -61,7 +62,16 @@ class Core {
             this.config.env = 'development';
         }
 
-        this._instantiate(classes, this.config, null, this.container);
+        // add component classes to container
+        this.container.component = classes.component;
+
+        let classesToInstantiate = {
+            module: classes.module,
+            middleware: classes.middleware,
+            handler: classes.handler
+        };
+
+        this._instantiate(classesToInstantiate, this.config, null, this.container);
 
         // add config to container
         this.container.config = this.config;
@@ -69,7 +79,7 @@ class Core {
         // handle uncaught exceptions
         process.on('uncaughtException', this.container.module.error.handleUncaughtException.bind(this.container.module.error));
 
-        // add model classes to core
+        // add model classes to container
         for (let model in this.config.model) {
 
             let schema = mongoose.Schema(this.config.model[model].schema);
@@ -221,6 +231,7 @@ class Core {
 
         instance.container = this.container;
         instance.model = this.container.model;
+        instance.component = this.container.component;
 
         Object.defineProperty(instance, 'module', {
             get: function () {
