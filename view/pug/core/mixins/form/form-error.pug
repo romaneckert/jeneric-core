@@ -1,7 +1,5 @@
 mixin formError()
 
-    - console.log(form.errors);
-
     -
         if(undefined === attributes.form) {
             throw new Error('form has no attribute form');
@@ -9,5 +7,5 @@ mixin formError()
 
     if form && form.errors
         ul
-            each error in form.errors
-                li=error.message
+            each error,key in form.errors
+                li(class=key)=error
