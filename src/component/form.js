@@ -4,15 +4,15 @@ const objectUtil = require('../../util/object');
 class Form {
     constructor(schema, instance) {
 
+        if ('object' !== typeof schema) {
+            throw new Error('schema have to be defined');
+        }
+
+        this.instance = ('object' === typeof instance) ? instance : null;
         this.schema = schema;
-        this.instance = instance;
         this.errors = {};
         this.submitted = false;
         this.valid = false;
-
-        if (null === this.schema && null === this.instance) {
-            throw new Error('schema and instance are null');
-        }
     }
 
     handle(data) {
@@ -25,17 +25,19 @@ class Form {
 
         this.submitted = true;
 
-        let instance = null;
+        let Model = mongoose.model('JenericForm', new mongoose.Schema(this.schema));
+        let instanceToValidate = new Model(data);
 
-        if (null !== this.schema) {
-            let Model = mongoose.model('JenericForm', new mongoose.Schema(this.schema));
-            instance = new Model(data);
-        } else {
-            instance = this.instance;
-            objectUtil.merge(instance, data);
+        objectUtil.merge(instanceToValidate, data);
+
+        let errors = {};
+
+        if (null !== this.instance) {
+            objectUtil.merge(this.instance, data);
+            this.instance.validateSync();
         }
 
-        let errors = instance.validateSync();
+        objectUtil.merge(errors, instanceToValidate.validateSync());
 
         mongoose.deleteModel('JenericForm');
 
