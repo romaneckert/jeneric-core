@@ -1,4 +1,7 @@
 module.exports = {
+    core: {
+        cluster: false
+    },
     model: {
         log: {
             schema: {

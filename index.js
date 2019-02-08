@@ -23,12 +23,6 @@ class Core {
 
         directories.unshift(__dirname);
 
-        // create process for each CPU
-        if (cluster.isMaster) {
-            for (var i = 0; i < os.cpus().length; i++) cluster.fork();
-            return;
-        }
-
         // init default config
         this.config = require('./config');
 
@@ -53,6 +47,12 @@ class Core {
                 classes,
                 this._autoload(path.join(directory, 'src'))
             );
+        }
+
+        // create process for each CPU
+        if (cluster.isMaster && this.config.core.cluster) {
+            for (var i = 0; i < os.cpus().length; i++) cluster.fork();
+            return;
         }
 
         // set config env
