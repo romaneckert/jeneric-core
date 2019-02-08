@@ -17,39 +17,70 @@ class Form {
 
     handle(data) {
 
-        this.errors = {};
-
-        if (0 === Object.keys(data).length) {
-            return this;
-        }
-
+        // set form to status submitted
         this.submitted = true;
 
-        let Model = mongoose.model('JenericForm', new mongoose.Schema(this.schema));
-        let instanceToValidate = new Model(data);
+        // set errors empty
+        this.errors = {};
 
-        objectUtil.merge(instanceToValidate, data);
+        // test if data is empty
+        if ('object' !== typeof data || 0 === Object.keys(data).length) return this;
 
-        let errors = {};
+        let instanceErrors = {};
 
-        if (null !== this.instance) {
-            objectUtil.merge(this.instance, data);
-            this.instance.validateSync();
+        // remove values from data which are not in schema
+        for (let key in data) {
+            if (undefined === this.schema[key]) delete data[key];
         }
 
-        objectUtil.merge(errors, instanceToValidate.validateSync());
+        // merge data to instance and generate errors
+        if (null !== this.instance) {
+            objectUtil.merge(this.instance, data);
+            instanceErrors = this._getErrors(this.instance);
+        }
 
-        mongoose.deleteModel('JenericForm');
+        // generate a random string for mongoose model name
+        let randomModelName = 'jeneric-form-' + Math.random().toString(26).slice(2);
+        let instanceToValidate = new mongoose.model(randomModelName, new mongoose.Schema(this.schema))(data);
 
-        if (undefined === errors) {
+        // merge data to instance of custom schema
+        objectUtil.merge(instanceToValidate, data);
+        let instanceToValidateErrors = this._getErrors(this.instance);
+
+        // delete random model from mongoose
+        mongoose.deleteModel(randomModelName);
+
+        // merge errors of instance and custom instance
+        for (let key in instanceToValidateErrors) {
+            if (undefined === instanceErrors[key]) continue;
+            this.errors[key] = [...new Set(concat(instanceErrors[key], instanceToValidateErrors[key]))];
+        }
+
+        // set from to valid if errors empty
+        if (0 === Object.keys(this.errors).length) {
             this.valid = true;
-        } else {
-            for (let key in errors.errors) {
-                this.errors[key] = errors.errors[key].message;
-            }
         }
 
         return this;
+    }
+
+    _getErrors(instance) {
+        let instanceErrors = instance.validateSync();
+
+        if ('object' !== typeof instanceErrors || 'object' !== typeof instanceErrors.errors) {
+            return {};
+        }
+
+        let errors = {};
+
+        for (let key in instanceErrors.errors) {
+            if ('string' !== typeof instanceErrors.errors[key].message) continue;
+
+            if (undefined === errors[key]) errors[key] = [];
+            errors[key].push(instanceErrors.errors[key].message);
+        }
+
+        return errors;
     }
 
     addError(key, message) {
