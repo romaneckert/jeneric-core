@@ -95,7 +95,7 @@ class I18n {
             return util.format(translation, ...args);
         }
 
-        this.logger.debug(`the translation key ${key} could not be found for the locale ${locale}`);
+        this.logger.error(`the translation key ${key} could not be found for the locale ${locale}`);
 
         return key;
 

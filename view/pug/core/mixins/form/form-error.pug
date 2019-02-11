@@ -8,4 +8,4 @@ mixin formError()
     if form && form.errors
         ul
             each error,key in form.errors
-                li(class=key)=error
+                li(class=key)=trans(error)
