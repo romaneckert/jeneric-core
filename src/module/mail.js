@@ -26,40 +26,30 @@ class Mail {
             connectionTimeout: this._config.connectionTimeout
         });
 
-        this.transporter = nodemailer.createTransport(url.parse(mailUrl), {
+        this.transporter = nodemailer.createTransport(mailUrl.format(), {
             from: this._config.defaultFrom
         });
     }
 
     async send(options) {
 
-        try {
-            await new Promise((resolve, reject) => {
-                this.transporter.sendMail(options, (err) => {
-                    if (err) reject(err);
-                    resolve();
-                });
-            });
+        return this.transporter.sendMail(options).then(info => {
+            return info;
+        }).catch(err => {
+            throw err;
+        });
 
-            return true;
-        } catch (err) {
-            return false;
-        }
     }
 
     async render(path, opt, res) {
 
-        try {
-            return await new Promise(resolve => {
-                res.render(path, opt, (err, html) => {
-                    if (err) throw new Error(err);
-                    return resolve(html);
-                });
+        return new Promise(resolve => {
+            res.render(path, opt, (err, html) => {
+                if (err) throw err;
+                resolve(html);
             });
-        } catch (err) {
-            this.logger.error(err);
-        }
-        return
+        });
+
     }
 
 }
