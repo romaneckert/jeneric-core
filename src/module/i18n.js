@@ -14,13 +14,10 @@ class I18n {
 
         objectUtil.merge(this._config, config);
 
-        this._initialized = false;
         this._catalog = {};
     }
 
     init() {
-
-        if (this._initialized) return;
 
         for (let directory of this.container.config.directories) {
 
@@ -47,10 +44,7 @@ class I18n {
                 objectUtil.merge(this._catalog[fileDetails.name], JSON.parse(fileContent));
 
             }
-
         }
-
-        this._initialized = true;
     }
 
     get defaultLocale() {
@@ -71,7 +65,7 @@ class I18n {
             locale = this._config.defaultLocale;
         }
 
-        if (0 < key.replace(/[a-zA-Z0-9.]/g, '').length) {
+        if (0 < key.replace(/[a-zA-Z0-9._]/g, '').length) {
             this.logger.warning(`the translation key '${key}' does not seem to be valid`);
             return key;
         }
