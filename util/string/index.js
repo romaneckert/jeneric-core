@@ -20,7 +20,7 @@ module.exports = {
         if ('object' === typeof val) {
             let cache = [];
 
-            return JSON.stringify(val, function (key, val) {
+            return JSON.stringify(val, (key, val) => {
 
                 // prevent cycles
                 if (typeof val === 'object') {
