@@ -71,6 +71,11 @@ class I18n {
             locale = this._config.defaultLocale;
         }
 
+        if (0 < key.replace(/[a-zA-Z0-9.]/g, '').length) {
+            this.logger.warning(`the translation key '${key}' does not seem to be valid`);
+            return key;
+        }
+
         let translation = null;
 
         // get translation for correct locale
@@ -91,11 +96,11 @@ class I18n {
         } catch (err) { }
 
         if ('string' === typeof translation) {
-            this.logger.debug(`the translation key ${key} could not be found for the locale ${locale}, fallback to ${this._config.defaultLocale}`);
+            this.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this._config.defaultLocale}`);
             return util.format(translation, ...args);
         }
 
-        this.logger.error(`the translation key ${key} could not be found for the locale ${locale}`);
+        this.logger.warning(`the translation key '${key}' could not be found for the default locale ${this._config.defaultLocale}`);
 
         return key;
 
