@@ -88,7 +88,7 @@ class Core {
         }
 
         // log informations about start process of core
-        if (cluster.worker && cluster.worker.id === 1) {
+        if (!this.config.core.cluster || (cluster.worker && 1 === cluster.worker.id)) {
             this.container.module.logger.log('application run in env: "' + this.config.env + '"', '', 'core', 'core', undefined, 5);
         }
 
@@ -110,6 +110,7 @@ class Core {
         }
 
         this.container.module.i18n.init();
+        this.container.module.report.start();
 
     }
 
