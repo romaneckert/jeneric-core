@@ -20,9 +20,6 @@ class Form {
         // set form to status submitted
         this.submitted = true;
 
-        // set errors empty
-        this.errors = {};
-
         // test if data is empty
         if ('object' !== typeof data || 0 === Object.keys(data).length) return this;
 
@@ -41,19 +38,28 @@ class Form {
 
         // generate a random string for mongoose model name
         let randomModelName = 'jeneric-form-' + Math.random().toString(26).slice(2);
-        let instanceToValidate = new mongoose.model(randomModelName, new mongoose.Schema(this.schema))(data);
 
-        // merge data to instance of custom schema
-        objectUtil.merge(instanceToValidate, data);
-        let instanceToValidateErrors = this._getErrors(this.instance);
+        // generate a temp instance for validation
+        let instanceToValidate = new mongoose.model(randomModelName, new mongoose.Schema(this.schema))(data);
+        let instanceToValidateErrors = this._getErrors(instanceToValidate);
 
         // delete random model from mongoose
         mongoose.deleteModel(randomModelName);
 
-        // merge errors of instance and custom instance
+        // create errors
+        this.errors = {};
+
+        // init errors array
+        for (let key in instanceErrors) {
+            this.errors[key] = instanceErrors[key];
+        }
+
         for (let key in instanceToValidateErrors) {
-            if (undefined === instanceErrors[key]) continue;
-            this.errors[key] = [...new Set(concat(instanceErrors[key], instanceToValidateErrors[key]))];
+            if (undefined === instanceErrors[key]) {
+                this.errors[key] = instanceToValidateErrors[key];
+            } else {
+                this.errors[key] = [...new Set(this.errors[key].concat(instanceToValidateErrors[key]))];
+            }
         }
 
         // set from to valid if errors empty
