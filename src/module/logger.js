@@ -179,7 +179,7 @@ class Logger {
             output += ' [' + log.stack + ']';
 
             // write line to log file
-            fs.appendFileSync(logFile, output + '\n');
+            fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
         }
 
     }
@@ -247,7 +247,7 @@ class Logger {
             consoleOutput += '[' + log.stack + ']';
         }
 
-        console.log(this._config.levels[log.code].color, consoleOutput, "\x1b[0m");
+        console.log(this._config.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
 
     }
 
