@@ -7,5 +7,6 @@ mixin formError()
 
     if form && form.errors
         ul
-            each error,key in form.errors
-                li(class=key)=trans(error)
+            each errors,key in form.errors
+                each error in errors
+                    li(class=key)=trans(error)
