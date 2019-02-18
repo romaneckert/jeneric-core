@@ -9,4 +9,4 @@ mixin formError()
         ul
             each errors,key in form.errors
                 each error in errors
-                    li(class=key)=trans(error)
+                    li(class='form-error-' + key)=trans(error.message)

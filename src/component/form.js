@@ -47,20 +47,7 @@ class Form {
         mongoose.deleteModel(randomModelName);
 
         // create errors
-        this.errors = {};
-
-        // init errors array
-        for (let key in instanceErrors) {
-            this.errors[key] = instanceErrors[key];
-        }
-
-        for (let key in instanceToValidateErrors) {
-            if (undefined === instanceErrors[key]) {
-                this.errors[key] = instanceToValidateErrors[key];
-            } else {
-                this.errors[key] = [...new Set(this.errors[key].concat(instanceToValidateErrors[key]))];
-            }
-        }
+        this.errors = objectUtil.merge(instanceErrors, instanceToValidateErrors);
 
         // set from to valid if errors empty
         if (0 === Object.keys(this.errors).length) {
@@ -83,15 +70,27 @@ class Form {
             if ('string' !== typeof instanceErrors.errors[key].message) continue;
 
             if (undefined === errors[key]) errors[key] = [];
-            errors[key].push(instanceErrors.errors[key].message);
+            errors[key].push({
+                kind: instanceErrors.errors[key].kind,
+                message: instanceErrors.errors[key].message
+            });
         }
 
         return errors;
     }
 
-    addError(key, message) {
+    addError(key, message, kind) {
 
-        this.errors[key] = message;
+        if ('string' !== typeof kind || 0 === kind.length) {
+            kind = 'undefined'
+        }
+
+        if (undefined === this.errors[key]) this.errors[key] = [];
+
+        this.errors[key].push({
+            kind: kind,
+            message: message
+        });
 
         return this;
     }
