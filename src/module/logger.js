@@ -12,6 +12,7 @@ class Logger {
             maxSizePerLogFile: 16 * 1024 * 1024, // in byte - default 16 mb
             maxLogRotationsPerType: 10,
             maxHistoryLength: 1000,
+            duplicateTime: 10000,
             levels: {
                 0: {
                     name: 'emergency',
@@ -142,7 +143,7 @@ class Logger {
                 && oldLog.message === log.message
                 && oldLog.meta === log.meta
                 && oldLog.type === log.type
-                && log.date - oldLog.date < 10000
+                && log.date - oldLog.date < this._config.duplicateTime
             ) {
                 return true;
             }
