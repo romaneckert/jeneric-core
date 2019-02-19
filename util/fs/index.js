@@ -66,6 +66,15 @@ fs.ensureDirExists = function (directoryPath) {
     return true;
 };
 
+fs.creationDate = function (directory) {
+
+    if (!this.existsSync(directory)) {
+        return false;
+    }
+
+    return this.lstatSync(directory).ctime;
+};
+
 fs.isFileSync = function (directory) {
 
     if (!this.existsSync(directory)) {
@@ -73,7 +82,7 @@ fs.isFileSync = function (directory) {
     }
 
     return this.lstatSync(directory).isFile();
-}
+};
 
 fs.isDirectorySync = function (directory) {
 
@@ -82,6 +91,24 @@ fs.isDirectorySync = function (directory) {
     }
 
     return this.lstatSync(directory).isDirectory();
+};
+
+fs.removeSync = function (directory) {
+
+    if (this.isFileSync(directory)) {
+        this.unlinkSync(directory);
+        return true;
+    }
+
+    if (this.isDirectorySync(directory)) {
+        for (let file of this.readdirSync(directory)) {
+            this.removeSync(path.join(directory, file));
+        }
+
+        this.rmdirSync(directory);
+    }
+
+    return true;
 }
 
 module.exports = fs;

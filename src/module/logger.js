@@ -11,7 +11,7 @@ class Logger {
             directory: 'var/logs',
             maxSizePerLogFile: 16 * 1024 * 1024, // in byte - default 16 mb
             maxLogRotationsPerType: 10,
-            maxHistoryLength: 1000000,
+            maxHistoryLength: 1000,
             levels: {
                 0: {
                     name: 'emergency',
@@ -259,7 +259,7 @@ class Logger {
         // add current log to history
         this._history.push(log);
 
-        // sort log histroy by date desc
+        // sort log history by date desc
         this._history.sort((a, b) => (a.date < b.date));
     }
 

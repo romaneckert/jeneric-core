@@ -29,6 +29,9 @@ class Core {
         // add directories to config - useful for other modules
         this.config.directories = directories;
 
+        // add application start date - useful for asset module
+        this.config.startDate = new Date();
+
         // autoload all classes from src folders of given directories
         let classes = {};
 
@@ -111,6 +114,7 @@ class Core {
 
         this.container.module.i18n.init();
         this.container.module.report.start();
+        this.container.module.asset.start();
 
     }
 

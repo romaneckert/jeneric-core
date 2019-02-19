@@ -1,8 +1,6 @@
-class Locals {
+class Locale {
 
     handle(req, res, next) {
-
-        //res.locals.user = {};
 
         let locale = null;
 
@@ -27,4 +25,4 @@ class Locals {
 
 }
 
-module.exports = Locals;
+module.exports = Locale;
