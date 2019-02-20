@@ -6,7 +6,7 @@ mixin formError()
         }
 
     if form && form.errors
-        ul
+        ul.form-error
             each errors,key in form.errors
                 each error in errors
-                    li(class='form-error-' + key)=trans(error.message)
+                    li(class='form-error form-error-' + key)=trans(error.message)

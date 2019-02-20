@@ -1,5 +1,5 @@
 const path = require('path');
-const express = require('express')();
+const express = require('express');
 const helmet = require('helmet');
 const http = require('http');
 const https = require('https');
@@ -17,10 +17,11 @@ class Server {
         this._pathToKeyPem = path.join(process.cwd(), 'config/key.pem');
         this._pathToCertPem = path.join(process.cwd(), 'config/cert.pem');
 
-        express.use(helmet());
+        this._app = express();
 
-        express.set('view engine', 'pug');
-        express.use(compression());
+        this._app.use(helmet());
+        this._app.set('view engine', 'pug');
+        this._app.use(compression());
     }
 
     _addRoutes(routes) {
@@ -36,7 +37,7 @@ class Server {
                     this.logger.warning(`can not get handler for route ${routeName}`);
                 } else {
                     for (let method of methods) {
-                        express[method](route.path, handler.handle.bind(handler));
+                        this._app[method](route.path, handler.handle.bind(handler));
                     }
                 }
 
@@ -56,12 +57,24 @@ class Server {
         let viewPaths = [];
 
         for (let directory of this.container.config.directories) {
-            viewPaths.push(path.join(directory, 'view/pug'));
+
+            let viewPath = path.join(directory, 'view/pug');
+
+            if (fs.isDirectorySync(viewPath)) {
+                viewPaths.push(viewPath);
+            }
+
+            let publicPath = path.join(directory, 'public');
+
+            if (fs.isDirectorySync(publicPath)) {
+                this._app.use(express.static(publicPath, { maxAge: '30 days' }));
+            }
+
         }
 
-        express.set('views', viewPaths);
-        express.use(cookieParser());
-        express.use(bodyParser.urlencoded({ extended: false }));
+        this._app.set('views', viewPaths);
+        this._app.use(cookieParser());
+        this._app.use(bodyParser.urlencoded({ extended: false }));
 
         let isHttps = true;
 
@@ -74,7 +87,7 @@ class Server {
                 // register routes
                 this._addRoutes(this.config.routes);
             } else {
-                express.use(this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
+                this._app.use(this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
             }
         }
 
@@ -91,12 +104,12 @@ class Server {
             server = https.createServer({
                 key: fs.readFileSync(this._pathToKeyPem),
                 cert: fs.readFileSync(this._pathToCertPem)
-            }, express);
+            }, this._app);
 
             server.listen(this.config.port);
         } else {
             // start http server
-            server = http.createServer(express);
+            server = http.createServer(this._app);
             server.listen(this.config.port);
         }
 
