@@ -10,7 +10,7 @@ class Form {
 
         this.instance = ('object' === typeof instance) ? instance : null;
         this.schema = schema;
-        this.errors = {};
+        this.errors = null;
         this.submitted = false;
         this.valid = false;
     }
@@ -52,6 +52,7 @@ class Form {
         // set from to valid if errors empty
         if (0 === Object.keys(this.errors).length) {
             this.valid = true;
+            this.errors = null;
         }
 
         return this;
