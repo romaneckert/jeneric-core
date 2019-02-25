@@ -1,6 +1,6 @@
 const path = require('path');
+const objectUtil = require('../../util/object');
 const fs = require('../../util/fs');
-const cluster = require('cluster');
 
 class Asset {
 
@@ -17,7 +17,14 @@ class Asset {
 
     }
 
-    asset(src) {
+    asset(src, opt) {
+
+        if ('object' !== typeof opt) opt = {};
+
+        if (opt.source) {
+            return fs.readFileSync(path.join(this.pathToPublic, src));
+        }
+
         return path.join('/', src) + '?' + Math.floor(this.container.config.startDate.getTime() / 1000);
     }
 

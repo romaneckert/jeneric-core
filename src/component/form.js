@@ -82,6 +82,8 @@ class Form {
 
     addError(key, message, kind) {
 
+        if(null === this.errors) this.errors = {};
+
         if ('string' !== typeof kind || 0 === kind.length) {
             kind = 'undefined'
         }
