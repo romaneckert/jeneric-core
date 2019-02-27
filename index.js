@@ -17,6 +17,8 @@ class Core {
             component: {}
         };
 
+        this.env = {};
+
     }
 
     init(...directories) {
@@ -30,7 +32,7 @@ class Core {
         this.config.directories = directories;
 
         // add application start date - useful for asset module
-        this.config.startDate = new Date();
+        this.env.startDate = new Date();
 
         // autoload all classes from src folders of given directories
         let classes = {};
@@ -78,6 +80,9 @@ class Core {
 
         // add config to container
         this.container.config = this.config;
+
+        // add env to container
+        this.container.env = this.env;
 
         // handle uncaught exceptions
         process.on('uncaughtException', this.container.module.error.handleUncaughtException.bind(this.container.module.error));

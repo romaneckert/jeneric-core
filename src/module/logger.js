@@ -255,7 +255,7 @@ class Logger {
     _addToHistory(log) {
 
         // remove older entries if log history greater then max histroy length
-        if (this._history.length > this._config.maxHistoryLength) this._history.pop();
+        while (this._history.length > this._config.maxHistoryLength) this._history.pop();
 
         // add current log to history
         this._history.push(log);
