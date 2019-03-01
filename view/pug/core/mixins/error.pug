@@ -1,0 +1,12 @@
+mixin error(errors)
+
+    -
+        if(undefined === attributes.errors) {
+            throw new Error('no attribute errors');
+        }
+
+    if attributes.errors
+        ul.jeneric-errors
+            each errors,key in attributes.errors
+                each error in errors
+                    li(class='jeneric-error jeneric-error-' + key)=trans(error.message)
