@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const objectUtil = require('../../util/object');
+const objectUtil = require('../util/object');
 const url = require('url');
 const querystring = require('querystring');
 

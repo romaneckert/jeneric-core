@@ -1,4 +1,4 @@
-const errorUtil = require('../../util/error');
+const errorUtil = require('../util/error');
 
 class Error {
 

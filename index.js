@@ -1,10 +1,9 @@
-const mongoose = require('mongoose');
 const cluster = require('cluster');
 const os = require('os');
 const path = require('path');
 
-const objectUtil = require('./util/object');
-const fsUtil = require('./util/fs');
+const objectUtil = require('./src/util/object');
+const fsUtil = require('./src/util/fs');
 
 class Core {
 
@@ -48,10 +47,16 @@ class Core {
                 );
             }
 
-            classes = objectUtil.merge(
-                classes,
-                this._autoload(path.join(directory, 'src'))
-            );
+            for (let namespace of ['model', 'module', 'middleware', 'handler']) {
+
+                if (undefined === classes[namespace]) classes[namespace] = {};
+
+                classes[namespace] = objectUtil.merge(
+                    classes[namespace],
+                    this._autoload(path.join(directory, 'src/' + namespace))
+                );
+            }
+
         }
 
         // create process for each CPU
@@ -66,9 +71,6 @@ class Core {
         } else {
             this.config.env = 'development';
         }
-
-        // add component classes to container
-        this.container.component = classes.component;
 
         let classesToInstantiate = {
             module: classes.module,
@@ -88,11 +90,11 @@ class Core {
         process.on('uncaughtException', this.container.module.error.handleUncaughtException.bind(this.container.module.error));
 
         // add model classes to container
-        for (let model in this.config.model) {
+        for (let model in classes.model) {
 
-            let schema = mongoose.Schema(this.config.model[model].schema);
-            this.container.model[model] = mongoose.model(model, schema)
+            if ('index' === model) continue;
 
+            this.container.model[model] = (new classes.model[model]()).model;
         }
 
         // log informations about start process of core

@@ -1,6 +1,6 @@
 const path = require('path');
-const fs = require('../../util/fs');
-const objectUtil = require('../../util/object');
+const fs = require('../util/fs');
+const objectUtil = require('../util/object');
 const util = require('util');
 
 class I18n {

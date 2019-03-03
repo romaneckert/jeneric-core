@@ -1,8 +1,8 @@
 const path = require('path');
-const errorUtil = require('../../util/error');
-const objectUtil = require('../../util/object');
-const stringUtil = require('../../util/string');
-const fs = require('../../util/fs');
+const errorUtil = require('../util/error');
+const objectUtil = require('../util/object');
+const stringUtil = require('../util/string');
+const fs = require('../util/fs');
 
 class Logger {
     constructor(config) {

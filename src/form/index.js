@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const objectUtil = require('../../util/object');
+const objectUtil = require('../util/object');
 
 class Form {
     constructor(schema, instance) {

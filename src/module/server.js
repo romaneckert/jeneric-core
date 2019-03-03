@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const http = require('http');
 const https = require('https');
 const compression = require('compression');
-const fs = require('../../util/fs');
+const fs = require('../util/fs');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
