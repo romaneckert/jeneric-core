@@ -4,6 +4,7 @@ class Model {
     constructor() {
         this._model = null;
         this._schema = null;
+        this._schemaOptions = { versionKey: false };
     }
 
     get model() {
@@ -11,7 +12,7 @@ class Model {
         if (null === this._schema) throw new Error('schema not defined');
 
         if (null === this._model) {
-            let schema = mongoose.Schema(this._schema);
+            let schema = mongoose.Schema(this._schema, this._schemaOptions);
             this._model = new mongoose.model(this.constructor.name, schema);
         }
 
