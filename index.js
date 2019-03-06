@@ -12,11 +12,12 @@ class Core {
         this.ready = false;
         this.consoleMode = false;
         this.container = {
-            model: {},
-            component: {}
+            model: {}
         };
 
-        this.env = {};
+        this.env = {
+            context: 'development'
+        };
 
     }
 
@@ -59,6 +60,11 @@ class Core {
 
         }
 
+        // merge env from config
+        if ('object' === typeof this.config.env) {
+            objectUtil.merge(this.env, this.config.env);
+        }
+
         // create process for each CPU
         if (cluster.isMaster && this.config.core.cluster) {
             for (var i = 0; i < os.cpus().length; i++) cluster.fork();
@@ -67,9 +73,7 @@ class Core {
 
         // set config env
         if ('string' === typeof process.env.NODE_ENV) {
-            this.config.env = process.env.NODE_ENV;
-        } else {
-            this.config.env = 'development';
+            this.env.context = process.env.NODE_ENV;
         }
 
         let classesToInstantiate = {
@@ -243,7 +247,6 @@ class Core {
 
         instance.container = this.container;
         instance.model = this.container.model;
-        instance.component = this.container.component;
 
         Object.defineProperty(instance, 'module', {
             get: function () {

@@ -43,6 +43,8 @@ class Mail {
 
     async render(path, opt, res) {
 
+        opt.baseUrl = this.container.env.baseUrl;
+
         return new Promise(resolve => {
             res.render(path, opt, (err, html) => {
                 if (err) throw err;

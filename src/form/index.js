@@ -17,11 +17,11 @@ class Form {
 
     handle(data) {
 
-        // set form to status submitted
-        this.submitted = true;
-
         // test if data is empty
         if ('object' !== typeof data || 0 === Object.keys(data).length) return this;
+
+        // set form to status submitted
+        this.submitted = true;
 
         let instanceErrors = {};
 
@@ -82,7 +82,7 @@ class Form {
 
     addError(key, message, kind) {
 
-        if(null === this.errors) this.errors = {};
+        if (null === this.errors) this.errors = {};
 
         if ('string' !== typeof kind || 0 === kind.length) {
             kind = 'undefined'
