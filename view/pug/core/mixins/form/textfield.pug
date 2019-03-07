@@ -9,7 +9,7 @@ mixin textfield()
             throw new Error('textfield has no attribute form');
         }
 
-        if(attributes.form && attributes.form.instance && attributes.form.instance[attributes.name]) {
+        if(attributes.form.instance && attributes.form.instance[attributes.name]) {
             attributes.value = attributes.form.instance[attributes.name];
         }
 

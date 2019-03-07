@@ -13,6 +13,7 @@ class Form {
         this.errors = null;
         this.submitted = false;
         this.valid = false;
+        this.data = null;
     }
 
     handle(data) {
@@ -29,6 +30,8 @@ class Form {
         for (let key in data) {
             if (undefined === this.schema[key]) delete data[key];
         }
+
+        this.data = data;
 
         // merge data to instance and generate errors
         if (null !== this.instance) {

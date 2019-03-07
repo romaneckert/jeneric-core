@@ -24,31 +24,36 @@ class Server {
         this._app.use(compression());
     }
 
-    _addRoutes(routes) {
+    _addRoutes(routes, namespace) {
 
-        for (let routeName in routes) {
-            let route = routes[routeName];
+        for (let routeNs in routes) {
 
-            if ('string' === typeof route.path && 'string' === typeof route.handler) {
-                let handler = this._getHandlerFromHandlerString(route.handler);
-                let methods = route.methods.split(',');
+            let currentNamespace = namespace.slice();
+            currentNamespace.push(routeNs);
 
-                if (undefined === handler) {
-                    this.logger.warning(`can not get handler for route ${routeName}`);
-                } else {
-                    for (let method of methods) {
-                        this._app[method](route.path, handler.handle.bind(handler));
-                    }
+            if ('string' === typeof routes[routeNs].path) {
+
+                let handler = currentNamespace.reduce((o, i) => o[i], this.container.handler);
+
+                if ('object' !== typeof handler || 'function' !== typeof handler.handle) {
+                    this.logger.warning(`route ${routes[routeNs].path} has no handler. Please create a handler with method 'handle' in path: ${path.join('src/handler', currentNamespace.join('/'))}`);
+                    continue;
                 }
 
-            } else if ('object' === typeof route) {
-                this._addRoutes(route);
-            }
-        }
-    }
+                if ('object' !== typeof routes[routeNs].methods) {
+                    this.logger.warning(`route ${routes[routeNs].path} has no methods`);
+                    continue;
+                }
 
-    _getHandlerFromHandlerString(handlerString) {
-        return handlerString.split('/').reduce((o, i) => o[i], this.container.handler);
+                for (let method of routes[routeNs].methods) {
+                    this._app[method](routes[routeNs].path, handler.handle.bind(handler));
+                }
+
+            } else {
+                this._addRoutes(routes[routeNs], currentNamespace);
+            }
+
+        }
     }
 
     start() {
@@ -85,7 +90,7 @@ class Server {
 
             if ('router' === middlewareName) {
                 // register routes
-                this._addRoutes(this.config.routes);
+                this._addRoutes(this.config.routes, []);
             } else {
                 this._app.use(this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
             }
