@@ -17,7 +17,7 @@ class Mongoose {
         objectUtil.merge(this._config, config);
     }
 
-    start() {
+    init() {
         mongoose.connection.on('error', (err) => {
             this.logger.error(err);
         });

@@ -31,32 +31,52 @@ class Server {
             let currentNamespace = namespace.slice();
             currentNamespace.push(routeNs);
 
-            if ('string' === typeof routes[routeNs].path) {
-
-                let handler = currentNamespace.reduce((o, i) => o[i], this.container.handler);
-
-                if ('object' !== typeof handler || 'function' !== typeof handler.handle) {
-                    this.logger.warning(`route ${routes[routeNs].path} has no handler. Please create a handler with method 'handle' in path: ${path.join('src/handler', currentNamespace.join('/'))}`);
-                    continue;
-                }
-
-                if ('object' !== typeof routes[routeNs].methods) {
-                    this.logger.warning(`route ${routes[routeNs].path} has no methods`);
-                    continue;
-                }
-
-                for (let method of routes[routeNs].methods) {
-                    this._app[method](routes[routeNs].path, handler.handle.bind(handler));
-                }
-
-            } else {
+            if ('string' !== typeof routes[routeNs].path) {
                 this._addRoutes(routes[routeNs], currentNamespace);
+                continue;
+            }
+
+            let handler = currentNamespace.reduce((o, i) => o[i], this.container.handler);
+            let routePath = routes[routeNs].path;
+            let routeMethods = routes[routeNs].methods;
+
+            if ('object' !== typeof handler || 'function' !== typeof handler.handle) {
+                this.logger.warning(`route ${routePath} has no handler. Please create a handler with method 'handle' in path: ${path.join('src/handler', currentNamespace.join('/'))}`);
+                continue;
+            }
+
+            if ('object' !== typeof routeMethods) {
+                this.logger.warning(`route ${routePath} has no methods`);
+                continue;
+            }
+
+            // register middlewares
+
+            for (let m in this.config.middleware) {
+
+                let middlewareName = this.config.middleware[m];
+
+                switch (middlewareName) {
+                    case 'roles':
+                        for (let method of routeMethods) {
+                            this._app[method](routePath, this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
+                        }
+                        break;
+                    case 'handler':
+                        for (let method of routeMethods) {
+                            this._app[method](routePath, handler.handle.bind(handler));
+                        }
+                        break;
+                    default:
+                        this._app.use(routePath, this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
+                        break;
+                }
             }
 
         }
     }
 
-    start() {
+    init() {
 
         // register view paths
         let viewPaths = [];
@@ -83,18 +103,17 @@ class Server {
 
         let isHttps = true;
 
-        // register middlewares
-        for (let m in this.config.middleware) {
+        // add access middleware
+        this._app.use(this.container.middleware.access.handle.bind(this.container.middleware.access));
 
-            let middlewareName = this.config.middleware[m];
+        // add custom middleware and routes
+        this._addRoutes(this.config.routes, []);
 
-            if ('router' === middlewareName) {
-                // register routes
-                this._addRoutes(this.config.routes, []);
-            } else {
-                this._app.use(this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
-            }
-        }
+        // add error middleware
+        this._app.use(this.container.middleware.error.handle.bind(this.container.middleware.error));
+
+        // add notFound middleware
+        this._app.use(this.container.middleware.notFound.handle.bind(this.container.middleware.notFound));
 
         // check certificates
         if (!fs.existsSync(this._pathToKeyPem) || !fs.existsSync(this._pathToCertPem)) {

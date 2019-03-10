@@ -115,17 +115,16 @@ class Core {
             //this.consoleMode = true;
         }
 
-        this.container.module.mongoose.start();
+        this.container.module.mongoose.init();
+        this.container.module.i18n.init();
+        this.container.module.report.init();
+        this.container.module.asset.init();
 
         if (this.consoleMode) {
             this._loadFixtures();
         } else {
-            this.container.module.server.start();
+            this.container.module.server.init();
         }
-
-        this.container.module.i18n.init();
-        this.container.module.report.start();
-        this.container.module.asset.start();
 
     }
 

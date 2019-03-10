@@ -1,5 +1,4 @@
 const path = require('path');
-const objectUtil = require('../util/object');
 const fs = require('../util/fs');
 
 class Asset {
@@ -11,10 +10,8 @@ class Asset {
         this.pathToPublic = null;
     }
 
-    start() {
-
+    init() {
         this.pathToPublic = path.join(this.container.config.directories.slice(-1).pop(), 'public');
-
     }
 
     asset(src, opt) {
