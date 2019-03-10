@@ -4,13 +4,28 @@ class Roles {
 
     constructor(config) {
 
-        this._config = {
+        this.config = {
             redirectPath: '/'
         };
 
-        objectUtil.merge(this._config, config);
+        objectUtil.merge(this.config, config);
 
-        this._paths = {};
+        this._roles = {};
+
+        for (let routeNs in this.config.routes) {
+
+            let route = this.config.routes[routeNs];
+
+            if ('string' === typeof route.path && 'object' === typeof route.roles) {
+                this._roles[path] = route.roles;
+            }
+
+            if ('object' === typeof route) {
+                return this._getRolesFromPath(route.path, route);
+            }
+        }
+
+        console.log(this._roles);
 
     }
 
@@ -20,12 +35,14 @@ class Roles {
             throw new Error('can not get route path from request');
         }
 
-        let roles = this._getRolesFromPath(req.route.path, this.container.config.module.server.routes);
+        let routeRoles = this._roles[req.route.path];
+
+        if ('object' !== typeof routeRoles) throw new Error('route has no roles');
 
         if (0 === roles.length) return next();
 
         if ('object' !== typeof req.user || 'object' !== typeof req.user.roles) {
-            return res.redirect(this._config.redirectPath);
+            return res.redirect(this.config.redirectPath);
         }
 
         for (let role of req.user.roles) {
@@ -34,29 +51,7 @@ class Roles {
             }
         }
 
-        return res.redirect(this._config.redirectPath);
-
-    }
-
-    _getRolesFromPath(path, routes) {
-
-        if ('object' === typeof this._paths[path]) return this._paths[path];
-
-        for (let routeNs in routes) {
-
-            let route = routes[routeNs];
-
-            if ('string' === typeof route.path && 'object' === typeof route.roles) {
-                this._paths[path] = route.roles;
-                return route.roles;
-            }
-
-            if ('object' === typeof route) {
-                return this._getRolesFromPath(path, route);
-            }
-        }
-
-        return [];
+        return res.redirect(this.config.redirectPath);
 
     }
 

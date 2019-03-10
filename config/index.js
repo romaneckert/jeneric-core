@@ -6,9 +6,10 @@ module.exports = {
         server: {
             port: 3000,
             middleware: {
-                100: 'roles',
-                200: 'locale',
-                300: 'asset',
+                100: 'auth',
+                200: 'roles',
+                300: 'locale',
+                400: 'asset',
                 1000: 'handler'
             }
         }

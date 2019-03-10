@@ -39,6 +39,7 @@ class Server {
             let handler = currentNamespace.reduce((o, i) => o[i], this.container.handler);
             let routePath = routes[routeNs].path;
             let routeMethods = routes[routeNs].methods;
+            let routeRoles = routes[routeNs].roles;
 
             if ('object' !== typeof handler || 'function' !== typeof handler.handle) {
                 this.logger.warning(`route ${routePath} has no handler. Please create a handler with method 'handle' in path: ${path.join('src/handler', currentNamespace.join('/'))}`);
@@ -58,8 +59,10 @@ class Server {
 
                 switch (middlewareName) {
                     case 'roles':
-                        for (let method of routeMethods) {
-                            this._app[method](routePath, this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
+                        if ('object' === typeof routeRoles) {
+                            for (let method of routeMethods) {
+                                this._app[method](routePath, this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
+                            }
                         }
                         break;
                     case 'handler':
@@ -77,6 +80,12 @@ class Server {
     }
 
     init() {
+
+        // check certificates
+        if (!fs.existsSync(this._pathToKeyPem) || !fs.existsSync(this._pathToCertPem)) {
+            this.logger.error(`can not start server: .key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
+            return;
+        }
 
         // register view paths
         let viewPaths = [];
@@ -115,27 +124,15 @@ class Server {
         // add notFound middleware
         this._app.use(this.container.middleware.notFound.handle.bind(this.container.middleware.notFound));
 
-        // check certificates
-        if (!fs.existsSync(this._pathToKeyPem) || !fs.existsSync(this._pathToCertPem)) {
-            isHttps = false;
-            this.logger.warning(`.key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
-        }
-
         let server = null;
 
-        if (isHttps) {
-            // start https server
-            server = https.createServer({
-                key: fs.readFileSync(this._pathToKeyPem),
-                cert: fs.readFileSync(this._pathToCertPem)
-            }, this._app);
+        // start https server
+        server = https.createServer({
+            key: fs.readFileSync(this._pathToKeyPem),
+            cert: fs.readFileSync(this._pathToCertPem)
+        }, this._app);
 
-            server.listen(this.config.port);
-        } else {
-            // start http server
-            server = http.createServer(this._app);
-            server.listen(this.config.port);
-        }
+        server.listen(this.config.port);
 
         this.logger.notice(`server started with port ${this.config.port}`);
 
