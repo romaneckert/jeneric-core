@@ -127,7 +127,7 @@ class Server {
 
         // add notFound middleware
         this._app.use(this.container.middleware.notFound.handle.bind(this.container.middleware.notFound));
-        
+
         // start https server
         let server = https.createServer({
             key: fs.readFileSync(this._pathToKeyPem),

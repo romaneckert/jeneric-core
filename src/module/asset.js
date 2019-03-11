@@ -22,7 +22,7 @@ class Asset {
             return fs.readFileSync(path.join(this.pathToPublic, src));
         }
 
-        return path.join('/', src) + '?' + Math.floor(this.container.env.startDate.getTime() / 1000);
+        return path.join('/assets/', src) + '?' + Math.floor(this.container.env.startDate.getTime() / 1000);
     }
 
 }
