@@ -19,9 +19,11 @@ class Server {
 
         this._app = express();
 
+        this._app.enable('strict routing');
         this._app.use(helmet());
         this._app.set('view engine', 'pug');
         this._app.use(compression());
+
     }
 
     _addRoutes(routes, namespace) {
@@ -109,8 +111,6 @@ class Server {
         this._app.set('views', viewPaths);
         this._app.use(cookieParser());
         this._app.use(bodyParser.urlencoded({ extended: false }));
-
-        let isHttps = true;
 
         // add access middleware
         this._app.use(this.container.middleware.access.handle.bind(this.container.middleware.access));

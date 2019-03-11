@@ -20,7 +20,7 @@ class Locale {
             return this.module.i18n.translate(locale, message, ...args);
         }.bind(this);
 
-        next();
+        return next();
     }
 
 }

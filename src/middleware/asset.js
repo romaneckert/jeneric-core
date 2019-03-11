@@ -5,7 +5,7 @@ class Asset {
             return this.module.asset.asset(src, opt);
         }.bind(this);
 
-        next();
+        return next();
     }
 
 }

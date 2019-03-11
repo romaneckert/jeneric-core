@@ -12,45 +12,48 @@ class Roles {
 
         this._roles = {};
 
-        for (let routeNs in this.config.routes) {
+        this._initRoles(this.config.routes);
 
-            let route = this.config.routes[routeNs];
+    }
+
+    _initRoles(routes) {
+
+        for (let routeNs in routes) {
+
+            let route = routes[routeNs];
 
             if ('string' === typeof route.path && 'object' === typeof route.roles) {
-                this._roles[path] = route.roles;
+                this._roles[route.path] = route.roles;
             }
 
             if ('object' === typeof route) {
-                return this._getRolesFromPath(route.path, route);
+                this._initRoles(route);
             }
         }
-
-        console.log(this._roles);
-
     }
 
     handle(req, res, next) {
 
+        // check route.path from request
         if ('object' !== typeof req.route || 'string' !== typeof req.route.path) {
-            throw new Error('can not get route path from request');
+            throw new Error('can not get route.path from request');
         }
 
+        // get route roles
         let routeRoles = this._roles[req.route.path];
 
+        // check if route has roles
         if ('object' !== typeof routeRoles) throw new Error('route has no roles');
 
-        if (0 === roles.length) return next();
+        // check if user has authentificated
+        if ('object' !== typeof req.user || 'object' !== typeof req.user.roles) return res.redirect(this.config.redirectPath);
 
-        if ('object' !== typeof req.user || 'object' !== typeof req.user.roles) {
-            return res.redirect(this.config.redirectPath);
-        }
-
+        // check if one role in user roles match route roles
         for (let role of req.user.roles) {
-            if (this._roles.indexOf(role) > -1) {
-                return next();
-            }
+            if (routeRoles.indexOf(role) > -1) return next();
         }
 
+        // redirect to redirect path / maybe sign in route
         return res.redirect(this.config.redirectPath);
 
     }
