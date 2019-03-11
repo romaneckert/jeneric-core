@@ -81,6 +81,10 @@ class Server {
         }
     }
 
+    get routes() {
+        return this.config.routes;
+    }
+
     init() {
 
         // check certificates
@@ -123,11 +127,9 @@ class Server {
 
         // add notFound middleware
         this._app.use(this.container.middleware.notFound.handle.bind(this.container.middleware.notFound));
-
-        let server = null;
-
+        
         // start https server
-        server = https.createServer({
+        let server = https.createServer({
             key: fs.readFileSync(this._pathToKeyPem),
             cert: fs.readFileSync(this._pathToCertPem)
         }, this._app);

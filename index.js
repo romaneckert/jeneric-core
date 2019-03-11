@@ -115,15 +115,13 @@ class Core {
             //this.consoleMode = true;
         }
 
-        this.container.module.mongoose.init();
-        this.container.module.i18n.init();
-        this.container.module.report.init();
-        this.container.module.asset.init();
+        // call init methods on modules and middlewares
+        for (let ns of ['module', 'middleware']) {
 
-        if (this.consoleMode) {
-            this._loadFixtures();
-        } else {
-            this.container.module.server.init();
+            for (let k in this.container[ns]) {
+                if ('function' === typeof this.container[ns][k].init) this.container[ns][k].init();
+            }
+
         }
 
     }

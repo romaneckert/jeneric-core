@@ -5,7 +5,6 @@ class Report {
     }
 
     init() {
-
         setInterval(this._log.bind(this), 3600);
     }
 

@@ -6,7 +6,7 @@ class Mongoose {
 
         this.instance = mongoose;
 
-        this._config = {
+        this.config = {
             connection: {
                 useNewUrlParser: true,
                 reconnectTries: Number.MAX_VALUE,
@@ -14,7 +14,7 @@ class Mongoose {
             }
         };
 
-        objectUtil.merge(this._config, config);
+        objectUtil.merge(this.config, config);
     }
 
     init() {
@@ -30,12 +30,12 @@ class Mongoose {
             this.logger.notice('connected to mongodb');
         });
 
-        if ('string' !== typeof this._config.url || 0 === this._config.url.length) {
+        if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
             this.logger.error('missing uri for mongodb');
             return;
         }
 
-        mongoose.connect(this._config.url, this._config.connection);
+        mongoose.connect(this.config.url, this.config.connection);
     }
 }
 

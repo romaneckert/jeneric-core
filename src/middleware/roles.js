@@ -11,9 +11,10 @@ class Roles {
         objectUtil.merge(this.config, config);
 
         this._roles = {};
+    }
 
-        this._initRoles(this.config.routes);
-
+    init() {
+        this._initRoles(this.module.server.routes);
     }
 
     _initRoles(routes) {
