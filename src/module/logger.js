@@ -7,7 +7,7 @@ const fs = require('../util/fs');
 class Logger {
     constructor(config) {
 
-        this._config = {
+        this.config = {
             directory: 'var/logs',
             maxSizePerLogFile: 16 * 1024 * 1024, // in byte - default 16 mb
             maxLogRotationsPerType: 10,
@@ -63,7 +63,7 @@ class Logger {
         };
 
         // merge config
-        objectUtil.merge(this._config, config);
+        objectUtil.merge(this.config, config);
 
         this._logsToSaveQueue = [];
         this._history = [];
@@ -143,7 +143,7 @@ class Logger {
                 && oldLog.message === log.message
                 && oldLog.meta === log.meta
                 && oldLog.type === log.type
-                && log.date - oldLog.date < this._config.duplicateTime
+                && log.date - oldLog.date < this.config.duplicateTime
             ) {
                 return true;
             }
@@ -173,7 +173,7 @@ class Logger {
             this._rotateLogFile(logFile);
 
             let output = '[' + this._dateStringFromDate(log.date) + '] ';
-            output += '[' + this._config.levels[log.code].name + '] ';
+            output += '[' + this.config.levels[log.code].name + '] ';
             output += '[' + log.type + '/' + log.name + '] ';
             output += '[' + log.message + ']';
             if (log.meta.length > 0) output += ' [' + log.meta + ']';
@@ -189,9 +189,9 @@ class Logger {
 
         let fileSize = fs.statSync(pathToLogFile).size;
 
-        if (fileSize < this._config.maxSizePerLogFile) return false;
+        if (fileSize < this.config.maxSizePerLogFile) return false;
 
-        for (let i = this._config.maxLogRotationsPerType - 1; i >= 0; i--) {
+        for (let i = this.config.maxLogRotationsPerType - 1; i >= 0; i--) {
 
             let pathToArchivedLogFile = pathToLogFile + '.' + i;
 
@@ -199,7 +199,7 @@ class Logger {
             if (!fs.existsSync(pathToArchivedLogFile)) continue;
 
             // unlink last log file
-            if (this._config.maxLogRotationsPerType - 1 === i) {
+            if (this.config.maxLogRotationsPerType - 1 === i) {
                 fs.unlinkSync(pathToArchivedLogFile);
                 continue;
             }
@@ -215,9 +215,9 @@ class Logger {
 
         return path.join(
             path.dirname(process.mainModule.filename),
-            this._config.directory,
+            this.config.directory,
             namespaces.join('/'),
-            this._config.levels[code].name + '.log'
+            this.config.levels[code].name + '.log'
         );
     }
 
@@ -225,7 +225,7 @@ class Logger {
     _writeToConsole(log) {
 
         // disabled, if config console disabled
-        if (!this._config.levels[log.code].console) {
+        if (!this.config.levels[log.code].console) {
             return;
         }
 
@@ -236,7 +236,7 @@ class Logger {
 
         let consoleOutput = '';
 
-        consoleOutput += `[${this._config.levels[log.code].name}] `;
+        consoleOutput += `[${this.config.levels[log.code].name}] `;
         consoleOutput += log.message + ' ';
         consoleOutput += '[' + log.type + '/' + log.name + '] ';
 
@@ -248,14 +248,14 @@ class Logger {
             consoleOutput += '[' + log.stack + ']';
         }
 
-        console.log(this._config.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
+        console.log(this.config.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
 
     }
 
     _addToHistory(log) {
 
         // remove older entries if log history greater then max histroy length
-        while (this._history.length > this._config.maxHistoryLength) this._history.pop();
+        while (this._history.length > this.config.maxHistoryLength) this._history.pop();
 
         // add current log to history
         this._history.push(log);

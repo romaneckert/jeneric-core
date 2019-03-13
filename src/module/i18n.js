@@ -7,12 +7,12 @@ class I18n {
 
     constructor(config) {
 
-        this._config = {
+        this.config = {
             locales: ['en'],
             defaultLocale: 'en'
         };
 
-        objectUtil.merge(this._config, config);
+        objectUtil.merge(this.config, config);
 
         this._catalog = {};
     }
@@ -33,7 +33,7 @@ class I18n {
 
                 if ('.json' !== fileDetails.ext) continue;
 
-                if (-1 === this._config.locales.indexOf(fileDetails.name)) continue;
+                if (-1 === this.config.locales.indexOf(fileDetails.name)) continue;
 
                 let fileContent = fs.readFileSync(path.join(pathToLocales, filename));
 
@@ -48,7 +48,7 @@ class I18n {
     }
 
     get defaultLocale() {
-        return this._config.defaultLocale;
+        return this.config.defaultLocale;
     }
 
     get catalog() {
@@ -56,13 +56,13 @@ class I18n {
     }
 
     get locales() {
-        return this._config.locales;
+        return this.config.locales;
     }
 
     translate(locale, key, ...args) {
 
-        if (-1 === this._config.locales.indexOf(locale)) {
-            locale = this._config.defaultLocale;
+        if (-1 === this.config.locales.indexOf(locale)) {
+            locale = this.config.defaultLocale;
         }
 
         if (0 < key.replace(/[a-zA-Z0-9._]/g, '').length) {
@@ -86,15 +86,15 @@ class I18n {
 
         // if translation not found from fallback, try to get from default locale
         try {
-            translation = key.split('.').reduce((o, i) => o[i], this._catalog[this._config.defaultLocale]);
+            translation = key.split('.').reduce((o, i) => o[i], this._catalog[this.config.defaultLocale]);
         } catch (err) { }
 
         if ('string' === typeof translation) {
-            this.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this._config.defaultLocale}`);
+            this.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);
             return util.format(translation, ...args);
         }
 
-        this.logger.warning(`the translation key '${key}' could not be found for the default locale ${this._config.defaultLocale}`);
+        this.logger.warning(`the translation key '${key}' could not be found for the default locale ${this.config.defaultLocale}`);
 
         return key;
 

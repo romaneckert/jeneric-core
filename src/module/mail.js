@@ -41,12 +41,13 @@ class Mail {
 
     }
 
-    async render(path, opt, res) {
+    async render(path, options, res) {
 
-        opt.baseUrl = this.container.env.baseUrl;
+        // set base url
+        if ('string' !== typeof options.baseUrl || options.baseUrl.length === 0) options.baseUrl = this.container.env.baseUrl;
 
         return new Promise(resolve => {
-            res.render(path, opt, (err, html) => {
+            res.render(path, options, (err, html) => {
                 if (err) throw err;
                 resolve(html);
             });
