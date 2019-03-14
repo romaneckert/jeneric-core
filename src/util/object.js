@@ -1,13 +1,13 @@
 class Object {
-    merge(obj1, obj2) {
-        for (let key in obj2) {
-            if ('object' === typeof obj1[key] && 'object' === typeof obj2[key]) {
-                obj1[key] = this.merge(obj1[key], obj2[key]);
+    merge(object1, object2) {
+        for (let key in object2) {
+            if ('object' === typeof object1[key] && 'object' === typeof object2[key]) {
+                object1[key] = this.merge(object1[key], object2[key]);
             } else {
-                obj1[key] = obj2[key];
+                object1[key] = object2[key];
             }
         }
-        return obj1;
+        return object1;
     }
 }
 
