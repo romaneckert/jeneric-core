@@ -1,6 +1,4 @@
 const path = require('path');
-const fs = require('../util/fs');
-const objectUtil = require('../util/object');
 const util = require('util');
 
 class I18n {
@@ -12,20 +10,20 @@ class I18n {
             defaultLocale: 'en'
         };
 
-        objectUtil.merge(this.config, config);
+        jeneric.util.object.merge(this.config, config);
 
         this._catalog = {};
     }
 
     init() {
 
-        for (let directory of this.container.config.directories) {
+        for (let directory of jeneric.config.directories) {
 
             let pathToLocales = path.join(directory, 'view/locale');
 
-            if (!fs.isDirectorySync(pathToLocales)) continue;
+            if (!jeneric.util.fs.isDirectorySync(pathToLocales)) continue;
 
-            let files = fs.readdirSync(pathToLocales);
+            let files = jeneric.util.fs.readdirSync(pathToLocales);
 
             for (let filename of files) {
 
@@ -35,7 +33,7 @@ class I18n {
 
                 if (-1 === this.config.locales.indexOf(fileDetails.name)) continue;
 
-                let fileContent = fs.readFileSync(path.join(pathToLocales, filename));
+                let fileContent = jeneric.util.fs.readFileSync(path.join(pathToLocales, filename));
 
                 if (undefined === this._catalog[fileDetails.name]) {
                     this._catalog[fileDetails.name] = {};

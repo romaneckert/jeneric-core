@@ -1,8 +1,4 @@
 const path = require('path');
-const errorUtil = require('../util/error');
-const objectUtil = require('../util/object');
-const stringUtil = require('../util/string');
-const fs = require('../util/fs');
 
 class Logger {
     constructor(config) {
@@ -63,10 +59,67 @@ class Logger {
         };
 
         // merge config
-        objectUtil.merge(this.config, config);
+        jeneric.util.object.merge(this.config, config);
 
         this._logsToSaveQueue = [];
         this._history = [];
+    }
+
+    emergency(message, meta, stack) {
+
+        let type = 'undefined'; // TODO: get from call stack
+        let name = 'undefined'; // TODO: get fron call stack
+
+        this.log(message, meta, type, name, stack, 0);
+    }
+
+    alert(message, meta, stack) {
+        let type = 'undefined'; // TODO: get from call stack
+        let name = 'undefined'; // TODO: get fron call stack
+
+        this.log(message, meta, type, name, stack, 1);
+    }
+
+    critical(message, meta, stack) {
+        let type = 'undefined'; // TODO: get from call stack
+        let name = 'undefined'; // TODO: get fron call stack
+
+        this.log(message, meta, type, name, stack, 2);
+    }
+
+    error(message, meta, stack) {
+        let type = 'undefined'; // TODO: get from call stack
+        let name = 'undefined'; // TODO: get fron call stack
+
+        this.log(message, meta, type, name, stack, 3);
+    }
+
+    warning(message, meta, stack) {
+        let type = 'undefined'; // TODO: get from call stack
+        let name = 'undefined'; // TODO: get fron call stack
+
+        this.log(message, meta, type, name, stack, 4);
+    }
+
+    notice(message, meta, stack) {
+        let type = 'undefined'; // TODO: get from call stack
+        let name = 'undefined'; // TODO: get fron call stack
+
+        this.log(message, meta, type, name, stack, 5);
+    }
+
+    info(message, meta, stack) {
+        let type = 'undefined'; // TODO: get from call stack
+        let name = 'undefined'; // TODO: get fron call stack
+
+        this.log(message, meta, type, name, stack, 6);
+    }
+
+    debug(message, meta, stack) {
+        let type = 'undefined'; // TODO: get from call stack
+        let name = 'undefined'; // TODO: get fron call stack
+
+        this.log(message, meta, type, name, stack, 7);
     }
 
     log(message, meta, type, name, stack, code) {
@@ -87,24 +140,24 @@ class Logger {
         let date = new Date();
 
         // cast to string
-        message = stringUtil.cast(message).trim();
+        message = jeneric.util.string.cast(message).trim();
 
         // remove line breaks from message
         message = message.replace(/(\r?\n|\r)/gm, ' ');
 
         // cast meta data like objects to string
-        meta = stringUtil.cast(meta);
+        meta = jeneric.util.string.cast(meta);
 
         // create call stack if not defined
         if ('object' !== typeof stack) {
-            stack = errorUtil.stack(new Error());
+            stack = jeneric.util.error.stack(new Error());
             stack.shift();
             stack.shift();
         }
         stack = this._stackToString(stack);
 
         // create log entity
-        let log = new this.model.log({
+        let log = new jeneric.model.log({
             code: code,
             date: date,
             message: message,
@@ -167,7 +220,7 @@ class Logger {
 
         for (let logFile of logFiles) {
             // check if log file exists and create if not
-            fs.ensureFileExists(logFile);
+            jeneric.util.fs.ensureFileExists(logFile);
 
             // check if log rotation is necessary
             this._rotateLogFile(logFile);
@@ -180,14 +233,14 @@ class Logger {
             output += ' [' + log.stack + ']';
 
             // write line to log file
-            fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
+            jeneric.util.fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
         }
 
     }
 
     _rotateLogFile(pathToLogFile) {
 
-        let fileSize = fs.statSync(pathToLogFile).size;
+        let fileSize = jeneric.util.fs.statSync(pathToLogFile).size;
 
         if (fileSize < this.config.maxSizePerLogFile) return false;
 
@@ -196,19 +249,19 @@ class Logger {
             let pathToArchivedLogFile = pathToLogFile + '.' + i;
 
             // check if archived file exists
-            if (!fs.existsSync(pathToArchivedLogFile)) continue;
+            if (!jeneric.util.fs.existsSync(pathToArchivedLogFile)) continue;
 
             // unlink last log file
             if (this.config.maxLogRotationsPerType - 1 === i) {
-                fs.unlinkSync(pathToArchivedLogFile);
+                jeneric.util.fs.unlinkSync(pathToArchivedLogFile);
                 continue;
             }
 
-            fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
+            jeneric.util.fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
         }
 
-        fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
-        fs.ensureFileExists(pathToLogFile);
+        jeneric.util.fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
+        jeneric.util.fs.ensureFileExists(pathToLogFile);
     }
 
     _getPathToLogFile(code, namespaces) {
@@ -244,7 +297,7 @@ class Logger {
 
         consoleOutput += `[pid:${process.pid}] `;
 
-        if (log.code < 4 && this.container.env.context !== 'production') {
+        if (log.code < 4 && jeneric.config.context !== 'production') {
             consoleOutput += '[' + log.stack + ']';
         }
 
@@ -271,9 +324,9 @@ class Logger {
 
         this._logsToSaveQueue.push(log);
 
-        if (this.module.mongoose && 1 === this.module.mongoose.instance.connection.readyState) {
+        if (jeneric.module.mongoose && 1 === jeneric.module.mongoose.instance.connection.readyState) {
 
-            this.model.log.insertMany(this._logsToSaveQueue, function (err) {
+            jeneric.model.log.insertMany(this._logsToSaveQueue, function (err) {
                 if (err) {
                     console.error(err);
                 }

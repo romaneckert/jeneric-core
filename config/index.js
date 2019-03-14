@@ -1,7 +1,5 @@
 module.exports = {
-    core: {
-        cluster: false
-    },
+    cluster: false,
     module: {
         server: {
             port: 3000,

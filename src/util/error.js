@@ -1,6 +1,6 @@
-module.exports = {
+class ErrorUtil {
 
-    stack: function (error) {
+    stack(error) {
 
         let stack = [];
 
@@ -64,3 +64,5 @@ module.exports = {
         return stack;
     }
 }
+
+module.exports = ErrorUtil;

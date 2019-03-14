@@ -8,7 +8,7 @@ class Roles {
             redirectPath: '/'
         };
 
-        objectUtil.merge(this.config, config);
+        jeneric.util.object.merge(this.config, config);
 
         this._roles = {};
     }

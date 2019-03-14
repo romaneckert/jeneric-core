@@ -1,15 +1,15 @@
-module.exports = {
+class StringUtil {
 
-    toSingle: function (string) {
+    toSingle(string) {
         if (string.indexOf('ies') === string.length - 3) return string.slice(0, -3) + 'y';
         if (string.indexOf('s') === string.length - 1) return string.slice(0, -1);
-    },
+    }
 
-    toMany: function (string) {
+    toMany(string) {
         return (string.indexOf('y') === string.length - 1) ? string.slice(0, -1) + 'ies' : string + 's';
-    },
+    }
 
-    cast: function (val) {
+    cast(val) {
 
         if (null === val) return '';
 
@@ -37,4 +37,8 @@ module.exports = {
 
         return String(val);
     }
-};
+}
+
+module.exports = StringUtil;
+
+

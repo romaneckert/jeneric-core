@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const objectUtil = require('../util/object');
 
 class Mongoose {
     constructor(config) {
@@ -14,7 +13,7 @@ class Mongoose {
             }
         };
 
-        objectUtil.merge(this.config, config);
+        jeneric.util.object.merge(this.config, config);
     }
 
     init() {

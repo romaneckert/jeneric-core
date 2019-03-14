@@ -1,16 +1,14 @@
 const path = require('path');
-const fs = require('../util/fs');
 
 class Asset {
 
-    constructor(config) {
-        this.config = config;
+    constructor() {
         this.pathToPublic = null;
     }
 
     init() {
         // set path to public folder of the current project
-        this.pathToPublic = path.join(this.container.config.directories.slice(-1).pop(), 'public');
+        this.pathToPublic = path.join(jeneric.config.directories.slice(-1).pop(), 'public');
     }
 
     asset(src, options) {

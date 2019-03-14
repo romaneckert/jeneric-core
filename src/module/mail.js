@@ -1,33 +1,34 @@
 const nodemailer = require('nodemailer');
-const objectUtil = require('../util/object');
 const url = require('url');
 const querystring = require('querystring');
 
 class Mail {
 
     constructor(config) {
-        this._config = {
+        this.config = {
             defaultFrom: 'default@mail',
             connectionTimeout: 2000
         };
 
-        objectUtil.merge(this._config, config);
+        jeneric.util.object.merge(this.config, config);
 
         this.transporter = null;
+    }
 
-        if ('string' !== typeof this._config.url || 0 === this._config.url.length) {
-            this.logger.error('missing url for mailer module');
+    init() {
+        if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
+            jeneric.logger.warning('missing config.url');
             return;
         }
 
-        let mailUrl = url.parse(this._config.url);
+        let mailUrl = url.parse(this.config.url);
 
         mailUrl.search = querystring.stringify({
-            connectionTimeout: this._config.connectionTimeout
+            connectionTimeout: this.config.connectionTimeout
         });
 
         this.transporter = nodemailer.createTransport(mailUrl.format(), {
-            from: this._config.defaultFrom
+            from: this.config.defaultFrom
         });
     }
 
