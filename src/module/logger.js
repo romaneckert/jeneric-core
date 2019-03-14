@@ -1,4 +1,5 @@
 const path = require('path');
+const stackTrace = require('stack-trace');
 
 class Logger {
     constructor(config) {
@@ -65,64 +66,43 @@ class Logger {
         this._history = [];
     }
 
-    emergency(message, meta, stack) {
-
-        let type = 'undefined'; // TODO: get from call stack
-        let name = 'undefined'; // TODO: get fron call stack
-
-        this.log(message, meta, type, name, stack, 0);
+    emergency(message, meta) {
+        this.log(message, meta, type, name, 0);
     }
 
-    alert(message, meta, stack) {
-        let type = 'undefined'; // TODO: get from call stack
-        let name = 'undefined'; // TODO: get fron call stack
-
-        this.log(message, meta, type, name, stack, 1);
+    alert(message, meta) {
+        this.log(message, meta, type, name, 1);
     }
 
-    critical(message, meta, stack) {
-        let type = 'undefined'; // TODO: get from call stack
-        let name = 'undefined'; // TODO: get fron call stack
-
-        this.log(message, meta, type, name, stack, 2);
+    critical(message, meta) {
+        this.log(message, meta, type, name, 2);
     }
 
-    error(message, meta, stack) {
-        let type = 'undefined'; // TODO: get from call stack
-        let name = 'undefined'; // TODO: get fron call stack
-
-        this.log(message, meta, type, name, stack, 3);
+    error(message, meta) {
+        this.log(message, meta, type, name, 3);
     }
 
-    warning(message, meta, stack) {
-        let type = 'undefined'; // TODO: get from call stack
-        let name = 'undefined'; // TODO: get fron call stack
-
-        this.log(message, meta, type, name, stack, 4);
+    warning(message, meta) {
+        this.log(message, meta, type, name, 4);
     }
 
-    notice(message, meta, stack) {
-        let type = 'undefined'; // TODO: get from call stack
-        let name = 'undefined'; // TODO: get fron call stack
-
+    notice(message, meta) {
         this.log(message, meta, type, name, stack, 5);
     }
 
     info(message, meta, stack) {
-        let type = 'undefined'; // TODO: get from call stack
-        let name = 'undefined'; // TODO: get fron call stack
-
         this.log(message, meta, type, name, stack, 6);
     }
 
     debug(message, meta, stack) {
-        let type = 'undefined'; // TODO: get from call stack
-        let name = 'undefined'; // TODO: get fron call stack
-
         this.log(message, meta, type, name, stack, 7);
     }
 
-    log(message, meta, type, name, stack, code) {
+    log(message, meta, type, name, code) {
+
+        var trace = stackTrace.parse(new Error());
+
+        console.log(trace);
 
         if ('number' !== typeof code) {
             code = 0;

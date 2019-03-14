@@ -1,5 +1,2 @@
 #!/usr/bin/env node
-
-const core = require('../index');
-
-core.init();
+require('../index').boot();
