@@ -9,7 +9,7 @@ class Report {
     }
 
     _log() {
-        this.logger.debug(`memory: ${this.getMemoryUsageInMB()} MB | requests per minute: ${this.getRequestsPerMinute()}`);
+        jeneric.logger.debug(`memory: ${this.getMemoryUsageInMB()} MB | requests per minute: ${this.getRequestsPerMinute()}`);
     }
 
     getMemoryUsageInMB() {
@@ -18,7 +18,7 @@ class Report {
 
     getRequestsPerMinute() {
 
-        let max = Math.ceil(Date.now() - this.container.env.startDate.getTime());
+        let max = Math.ceil(Date.now() - jeneric.config.startDate.getTime());
 
         if (max > 1000 * 60 * 60 * 24) max = 1000 * 60 * 60 * 24;
 

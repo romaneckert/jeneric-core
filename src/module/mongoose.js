@@ -18,19 +18,19 @@ class Mongoose {
 
     init() {
         mongoose.connection.on('error', (err) => {
-            this.logger.error(err);
+            jeneric.logger.error(err);
         });
 
         mongoose.connection.on('disconnected', (err) => {
-            this.logger.notice('disconnect from mongodb');
+            jeneric.logger.notice('disconnect from mongodb');
         });
 
         mongoose.connection.on('connected', (err, client) => {
-            this.logger.notice('connected to mongodb');
+            jeneric.logger.notice('connected to mongodb');
         });
 
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
-            this.logger.error('missing uri for mongodb');
+            jeneric.logger.error('missing uri for mongodb');
             return;
         }
 

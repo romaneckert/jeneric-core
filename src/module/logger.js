@@ -67,54 +67,56 @@ class Logger {
     }
 
     emergency(message, meta) {
-        this.log(message, meta, type, name, 0);
+        this.log(message, meta, 0);
     }
 
     alert(message, meta) {
-        this.log(message, meta, type, name, 1);
+        this.log(message, meta, 1);
     }
 
     critical(message, meta) {
-        this.log(message, meta, type, name, 2);
+        this.log(message, meta, 2);
     }
 
     error(message, meta) {
-        this.log(message, meta, type, name, 3);
+        this.log(message, meta, 3);
     }
 
     warning(message, meta) {
-        this.log(message, meta, type, name, 4);
+        this.log(message, meta, 4);
     }
 
     notice(message, meta) {
-        this.log(message, meta, type, name, stack, 5);
+        this.log(message, meta, 5);
     }
 
-    info(message, meta, stack) {
-        this.log(message, meta, type, name, stack, 6);
+    info(message, meta) {
+        this.log(message, meta, 6);
     }
 
-    debug(message, meta, stack) {
-        this.log(message, meta, type, name, stack, 7);
+    debug(message, meta) {
+        this.log(message, meta, 7);
     }
 
-    log(message, meta, type, name, code) {
+    log(message, meta, code) {
 
-        var trace = stackTrace.parse(new Error());
+        let stack = stackTrace.parse(new Error());
+        stack.shift();
 
-        console.log(trace);
+        let fileNameParts = stack[0].fileName.split('/').reverse();
 
-        if ('number' !== typeof code) {
-            code = 0;
+        let type = null;
+        let name = null;
+
+        if ('src' === fileNameParts[2]) {
+            type = fileNameParts[1];
+            name = fileNameParts[0].replace('.js', '');
         }
 
-        if ('string' !== typeof message) {
-            message = 'undefined';
-        }
-
-        // detect class definition
-        type = ('string' === typeof type) ? type : 'undefined';
-        name = ('string' === typeof name) ? name : 'undefined';
+        if ('number' !== typeof code) code = 0;
+        if ('string' !== typeof message) message = 'undefined';
+        if ('string' !== typeof type) type = 'undefined';
+        if ('string' !== typeof name) name = 'undefined';
 
         // create date for current log entry
         let date = new Date();
@@ -128,12 +130,6 @@ class Logger {
         // cast meta data like objects to string
         meta = jeneric.util.string.cast(meta);
 
-        // create call stack if not defined
-        if ('object' !== typeof stack) {
-            stack = jeneric.util.error.stack(new Error());
-            stack.shift();
-            stack.shift();
-        }
         stack = this._stackToString(stack);
 
         // create log entity
@@ -258,14 +254,10 @@ class Logger {
     _writeToConsole(log) {
 
         // disabled, if config console disabled
-        if (!this.config.levels[log.code].console) {
-            return;
-        }
+        if (!this.config.levels[log.code].console) return;
 
         // disabled, if log level less then notice and in mode production
-        if (log.code > 5 && this.container.env.context === 'production') {
-            return;
-        }
+        if (log.code > 5 && jeneric.config.context === 'production') return;
 
         let consoleOutput = '';
 
@@ -324,12 +316,13 @@ class Logger {
 
             let processParentDir = path.dirname(process.cwd());
 
-            if (entry.path.includes(processParentDir)) {
+            if (entry.fileName.includes(processParentDir)) {
 
-                let scriptPath = entry.path.replace(processParentDir, '');
+                let scriptPath = entry.fileName.replace(processParentDir, '');
 
-                outputs.push(entry.method + ' ' + scriptPath + ':' + entry.row);
+                outputs.push(scriptPath + ':' + entry.lineNumber + ':' + entry.columnNumber);
             }
+
         }
 
         return outputs.join(' <- ');

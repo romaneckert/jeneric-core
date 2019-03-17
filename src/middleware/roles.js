@@ -14,7 +14,7 @@ class Roles {
     }
 
     init() {
-        this._initRoles(this.module.server.routes);
+        this._initRoles(jeneric.module.server.routes);
     }
 
     _initRoles(routes) {

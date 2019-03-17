@@ -1,7 +1,6 @@
 const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
-const http = require('http');
 const https = require('https');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
@@ -43,12 +42,12 @@ class Server {
             let routeRoles = routes[routeNs].roles;
 
             if ('object' !== typeof handler || 'function' !== typeof handler.handle) {
-                this.logger.warning(`route ${routePath} has no handler. Please create a handler with method 'handle' in path: ${path.join('src/handler', currentNamespace.join('/'))}`);
+                jeneric.logger.warning(`route ${routePath} has no handler. Please create a handler with method 'handle' in path: ${path.join('src/handler', currentNamespace.join('/'))}`);
                 continue;
             }
 
             if ('object' !== typeof routeMethods) {
-                this.logger.warning(`route ${routePath} has no methods`);
+                jeneric.logger.warning(`route ${routePath} has no methods`);
                 continue;
             }
 
@@ -87,8 +86,8 @@ class Server {
     init() {
 
         // check certificates
-        if (!fs.existsSync(this._pathToKeyPem) || !fs.existsSync(this._pathToCertPem)) {
-            this.logger.error(`can not start server: .key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
+        if (!jeneric.util.fs.existsSync(this._pathToKeyPem) || !jeneric.util.fs.existsSync(this._pathToCertPem)) {
+            jeneric.logger.error(`can not start server: .key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
             return;
         }
 
@@ -135,7 +134,7 @@ class Server {
 
         server.listen(this.config.port);
 
-        this.logger.notice(`server started with port ${this.config.port}`);
+        jeneric.logger.notice(`server started with port ${this.config.port}`);
 
     }
 }
