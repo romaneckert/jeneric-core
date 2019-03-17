@@ -12,12 +12,12 @@ class Auth {
 
             let decoded = jwt.verify(req.cookies._t, jeneric.config.secret);
 
-            if ('object' === typeof decoded.data.user
-                && null !== decoded.data.user
-                && 'string' === typeof decoded.data.user.email
-                && 'object' === typeof decoded.data.user.roles) {
+            if ('object' === typeof decoded.user
+                && null !== decoded.user
+                && 'string' === typeof decoded.user.email
+                && 'object' === typeof decoded.user.roles) {
 
-                req.user = decoded.data.user;
+                req.user = decoded.user;
             }
 
         } catch (err) {
