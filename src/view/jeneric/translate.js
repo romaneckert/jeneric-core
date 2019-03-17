@@ -1,11 +1,11 @@
 class Translate {
 
-    constructor(res) {
-        this.res = res;
+    constructor(req) {
+        this.req = req;
     }
 
     render(message, ...args) {
-        return jeneric.module.i18n.translate(this.res.locale, message, ...args);
+        return jeneric.module.i18n.translate(this.req.locale, message, ...args);
     }
 
 }

@@ -52,7 +52,6 @@ class Server {
             }
 
             // register middlewares
-
             for (let m in this.config.middleware) {
 
                 let middlewareName = this.config.middleware[m];
