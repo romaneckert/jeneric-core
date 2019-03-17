@@ -16,9 +16,7 @@ class Locale {
             if ('string' === typeof browserLanguage) locale = browserLanguage;
         }
 
-        res.trans = res.locals.trans = function (message, ...args) {
-            return jeneric.module.i18n.translate(locale, message, ...args);
-        }
+        req.locale = locale;
 
         return next();
     }

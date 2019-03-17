@@ -7,7 +7,7 @@ module.exports = {
                 100: 'auth',
                 200: 'roles',
                 300: 'locale',
-                400: 'asset',
+                400: 'view',
                 1000: 'handler'
             }
         }

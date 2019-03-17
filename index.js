@@ -100,6 +100,11 @@ class Jeneric {
 
         }
 
+        // call start methods on modules
+        for (let ns in this.module) {
+            if ('function' === typeof this.module[ns].start) this.module[ns].start();
+        }
+
     }
 
     _instantiate(classes, config, instance) {

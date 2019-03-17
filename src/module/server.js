@@ -126,6 +126,10 @@ class Server {
         // add notFound middleware
         this._app.use(jeneric.middleware.notFound.handle.bind(jeneric.middleware.notFound));
 
+    }
+
+    start() {
+
         // start https server
         let server = https.createServer({
             key: jeneric.util.fs.readFileSync(this._pathToKeyPem),
@@ -133,9 +137,7 @@ class Server {
         }, this._app);
 
         server.listen(this.config.port);
-
         jeneric.logger.notice(`server started with port ${this.config.port}`);
-
     }
 }
 

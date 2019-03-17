@@ -21,6 +21,9 @@ class Mail {
             return;
         }
 
+    }
+
+    start() {
         let mailUrl = url.parse(this.config.url);
 
         mailUrl.search = querystring.stringify({

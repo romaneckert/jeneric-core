@@ -3,15 +3,10 @@ const path = require('path');
 class Asset {
 
     constructor() {
-        this.pathToPublic = null;
-    }
-
-    init() {
-        // set path to public folder of the current project
         this.pathToPublic = path.join(jeneric.config.directories.slice(-1).pop(), 'public');
     }
 
-    asset(src, options) {
+    render(src, options) {
 
         // init options object
         if ('object' !== typeof options) options = {};
