@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 class Auth {
 
-    handle(req, res, next) {
+    async handle(req, res, next) {
 
         try {
 
@@ -17,7 +17,9 @@ class Auth {
                 && 'string' === typeof decoded.user.email
                 && 'object' === typeof decoded.user.roles) {
 
-                req.user = decoded.user;
+                let user = await jeneric.model.user.findOne({ email: decoded.user.email });
+
+                req.user = res.user = res.locals.user = user;
             }
 
         } catch (err) {
