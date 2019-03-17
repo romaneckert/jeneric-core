@@ -100,8 +100,11 @@ class Logger {
 
     log(message, meta, code) {
 
+        // create stack
         let stack = stackTrace.parse(new Error());
-        stack.shift();
+
+        // remove logger entries from stack
+        stack = stack.filter(entry => entry.typeName !== 'Logger');
 
         let fileNameParts = stack[0].fileName.split('/').reverse();
 
@@ -109,8 +112,12 @@ class Logger {
         let name = null;
 
         if ('src' === fileNameParts[2]) {
-            type = fileNameParts[1];
-            name = fileNameParts[0].replace('.js', '');
+            type = fileNameParts[1].toLowerCase();
+            name = fileNameParts[0].replace('.js', '').toLowerCase();
+        }
+
+        if (null === type && 'string' === typeof stack[0].typeName) {
+            name = stack[0].typeName.toLowerCase();
         }
 
         if ('number' !== typeof code) code = 0;
@@ -186,30 +193,27 @@ class Logger {
         // write log entry in specific log file by type and by class type/name
         let logFiles = [
             this._getPathToLogFile(log.code, []),
+            this._getPathToLogFile(log.code, [log.type, log.name])
         ];
 
-        if (null !== log.type && null !== log.name) {
-            logFiles.push(
-                this._getPathToLogFile(log.code, [log.type, log.name])
-            );
-        }
+        let output = '[' + this._dateStringFromDate(log.date) + '] ';
+        output += '[' + this.config.levels[log.code].name + '] ';
+        output += '[' + log.type + '/' + log.name + '] ';
+        output += '[' + log.message + ']';
+        if (log.meta.length > 0) output += ' [' + log.meta + ']';
+        output += ' [' + log.stack + ']';
 
         for (let logFile of logFiles) {
+
             // check if log file exists and create if not
             jeneric.util.fs.ensureFileExists(logFile);
 
             // check if log rotation is necessary
             this._rotateLogFile(logFile);
 
-            let output = '[' + this._dateStringFromDate(log.date) + '] ';
-            output += '[' + this.config.levels[log.code].name + '] ';
-            output += '[' + log.type + '/' + log.name + '] ';
-            output += '[' + log.message + ']';
-            if (log.meta.length > 0) output += ' [' + log.meta + ']';
-            output += ' [' + log.stack + ']';
-
             // write line to log file
             jeneric.util.fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
+
         }
 
     }
