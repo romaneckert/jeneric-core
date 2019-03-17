@@ -1,10 +1,7 @@
 class Asset {
 
     handle(req, res, next) {
-        res.asset = res.locals.asset = function (src, opt) {
-            return this.module.asset.asset(src, opt);
-        }.bind(this);
-
+        res.asset = res.locals.asset = jeneric.module.asset.asset;
         return next();
     }
 

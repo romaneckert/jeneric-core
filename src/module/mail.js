@@ -45,7 +45,7 @@ class Mail {
     async render(path, options, res) {
 
         // set base url
-        if ('string' !== typeof options.baseUrl || options.baseUrl.length === 0) options.baseUrl = this.container.env.baseUrl;
+        if ('string' !== typeof options.baseUrl || options.baseUrl.length === 0) options.baseUrl = jeneric.config.baseUrl;
 
         return new Promise(resolve => {
             res.render(path, options, (err, html) => {

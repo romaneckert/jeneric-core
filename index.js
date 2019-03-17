@@ -86,6 +86,11 @@ class Jeneric {
             this.model[model] = (new this.class.model[model]()).model;
         }
 
+        // log informations about start process of core
+        if (!this.config.cluster || (cluster.worker && 1 === cluster.worker.id)) {
+            this.logger.log('application startet in context: "' + this.config.context + '"', null, 5, 'core', 'core');
+        }
+
         // call init methods on modules and middlewares
         for (let ns of ['module', 'middleware']) {
 
@@ -93,11 +98,6 @@ class Jeneric {
                 if ('function' === typeof this[ns][k].init) this[ns][k].init();
             }
 
-        }
-
-        // log informations about start process of core
-        if (!this.config.cluster || (cluster.worker && 1 === cluster.worker.id)) {
-            this.logger.info('application startet in context: "' + this.config.context + '"');
         }
 
     }

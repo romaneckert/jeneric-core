@@ -1,5 +1,3 @@
-const objectUtil = require('../util/object');
-
 class Roles {
 
     constructor(config) {

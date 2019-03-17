@@ -6,9 +6,11 @@ class Auth {
 
         try {
 
+            if ('string' !== typeof jeneric.config.secret) throw new Error('missing config.secret');
+
             if ('string' !== typeof req.cookies._t || req.cookies._t.length === 0) return next();
 
-            let decoded = jwt.verify(req.cookies._t, this.container.config.core.secret);
+            let decoded = jwt.verify(req.cookies._t, jeneric.config.secret);
 
             if ('object' === typeof decoded.data.user
                 && null !== decoded.data.user
@@ -19,7 +21,7 @@ class Auth {
             }
 
         } catch (err) {
-            this.logger.error('error in auth module', err);
+            jeneric.logger.error('error in auth module', err);
         }
 
         return next();

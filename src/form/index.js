@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const objectUtil = require('../util/object');
 
 class Form {
     constructor(schema, instance) {
@@ -35,7 +34,7 @@ class Form {
 
         // merge data to instance and generate errors
         if (null !== this.instance) {
-            objectUtil.merge(this.instance, data);
+            jeneric.util.object.merge(this.instance, data);
             instanceErrors = this._getErrors(this.instance);
         }
 
@@ -50,7 +49,7 @@ class Form {
         mongoose.deleteModel(randomModelName);
 
         // create errors
-        this.errors = objectUtil.merge(instanceErrors, instanceToValidateErrors);
+        this.errors = jeneric.util.object.merge(instanceErrors, instanceToValidateErrors);
 
         // set from to valid if errors empty
         if (0 === Object.keys(this.errors).length) {

@@ -36,7 +36,7 @@ class Server {
                 continue;
             }
 
-            let handler = currentNamespace.reduce((o, i) => o[i], this.container.handler);
+            let handler = currentNamespace.reduce((o, i) => o[i], jeneric.handler);
             let routePath = routes[routeNs].path;
             let routeMethods = routes[routeNs].methods;
             let routeRoles = routes[routeNs].roles;
@@ -61,7 +61,7 @@ class Server {
                     case 'roles':
                         if ('object' === typeof routeRoles) {
                             for (let method of routeMethods) {
-                                this._app[method](routePath, this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
+                                this._app[method](routePath, jeneric.middleware[middlewareName].handle.bind(jeneric.middleware[middlewareName]));
                             }
                         }
                         break;
@@ -71,7 +71,7 @@ class Server {
                         }
                         break;
                     default:
-                        this._app.use(routePath, this.container.middleware[middlewareName].handle.bind(this.container.middleware[middlewareName]));
+                        this._app.use(routePath, jeneric.middleware[middlewareName].handle.bind(jeneric.middleware[middlewareName]));
                         break;
                 }
             }
@@ -94,17 +94,17 @@ class Server {
         // register view paths
         let viewPaths = [];
 
-        for (let directory of this.container.config.directories) {
+        for (let directory of jeneric.config.directories) {
 
             let viewPath = path.join(directory, 'view/pug');
 
-            if (fs.isDirectorySync(viewPath)) {
+            if (jeneric.util.fs.isDirectorySync(viewPath)) {
                 viewPaths.push(viewPath);
             }
 
             let publicPath = path.join(directory, 'public');
 
-            if (fs.isDirectorySync(publicPath)) {
+            if (jeneric.util.fs.isDirectorySync(publicPath)) {
                 this._app.use(express.static(publicPath, { maxAge: '30 days' }));
             }
 
@@ -115,21 +115,21 @@ class Server {
         this._app.use(bodyParser.urlencoded({ extended: false }));
 
         // add access middleware
-        this._app.use(this.container.middleware.access.handle.bind(this.container.middleware.access));
+        this._app.use(jeneric.middleware.access.handle.bind(jeneric.middleware.access));
 
         // add custom middleware and routes
         this._addRoutes(this.config.routes, []);
 
         // add error middleware
-        this._app.use(this.container.middleware.error.handle.bind(this.container.middleware.error));
+        this._app.use(jeneric.middleware.error.handle.bind(jeneric.middleware.error));
 
         // add notFound middleware
-        this._app.use(this.container.middleware.notFound.handle.bind(this.container.middleware.notFound));
+        this._app.use(jeneric.middleware.notFound.handle.bind(jeneric.middleware.notFound));
 
         // start https server
         let server = https.createServer({
-            key: fs.readFileSync(this._pathToKeyPem),
-            cert: fs.readFileSync(this._pathToCertPem)
+            key: jeneric.util.fs.readFileSync(this._pathToKeyPem),
+            cert: jeneric.util.fs.readFileSync(this._pathToCertPem)
         }, this._app);
 
         server.listen(this.config.port);

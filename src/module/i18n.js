@@ -39,7 +39,7 @@ class I18n {
                     this._catalog[fileDetails.name] = {};
                 }
 
-                objectUtil.merge(this._catalog[fileDetails.name], JSON.parse(fileContent));
+                jeneric.util.object.merge(this._catalog[fileDetails.name], JSON.parse(fileContent));
 
             }
         }
@@ -64,7 +64,7 @@ class I18n {
         }
 
         if (0 < key.replace(/[a-zA-Z0-9._]/g, '').length) {
-            this.logger.warning(`the translation key '${key}' does not seem to be valid`);
+            jeneric.logger.warning(`the translation key '${key}' does not seem to be valid`);
             return key;
         }
 
@@ -88,11 +88,11 @@ class I18n {
         } catch (err) { }
 
         if ('string' === typeof translation) {
-            this.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);
+            jeneric.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);
             return util.format(translation, ...args);
         }
 
-        this.logger.warning(`the translation key '${key}' could not be found for the default locale ${this.config.defaultLocale}`);
+        jeneric.logger.warning(`the translation key '${key}' could not be found for the default locale ${this.config.defaultLocale}`);
 
         return key;
 

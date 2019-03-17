@@ -98,7 +98,7 @@ class Logger {
         this.log(message, meta, 7);
     }
 
-    log(message, meta, code) {
+    log(message, meta, code, type, name) {
 
         // create stack
         let stack = stackTrace.parse(new Error());
@@ -108,16 +108,12 @@ class Logger {
 
         let fileNameParts = stack[0].fileName.split('/').reverse();
 
-        let type = null;
-        let name = null;
-
-        if ('src' === fileNameParts[2]) {
+        if ('string' !== typeof type && 'src' === fileNameParts[2]) {
             type = fileNameParts[1].toLowerCase();
-            name = fileNameParts[0].replace('.js', '').toLowerCase();
         }
 
-        if (null === type && 'string' === typeof stack[0].typeName) {
-            name = stack[0].typeName.toLowerCase();
+        if ('string' !== typeof name && 'src' === fileNameParts[2]) {
+            name = fileNameParts[0].replace('.js', '').toLowerCase();
         }
 
         if ('number' !== typeof code) code = 0;
