@@ -7,4 +7,4 @@ mixin error(errors)
         ul.jeneric-errors
             each errors,key in attributes.errors
                 each error in errors
-                    li(class='jeneric-error jeneric-error-' + key)=trans(error.message)
+                    li(class='jeneric-error jeneric-error-' + key)=view.jeneric.translate(error.message)
