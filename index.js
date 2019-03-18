@@ -79,11 +79,8 @@ class Jeneric {
         process.on('uncaughtException', this.module.error.handleUncaughtException);
 
         // add model classes to container
-        for (let model in this.class.model) {
-
-            if ('index' === model) continue;
-
-            this.model[model] = (new this.class.model[model]()).model;
+        for (let ns in this.class.model) {
+            this.model[ns] = new this.class.model[ns]();
         }
 
         // log informations about start process of core

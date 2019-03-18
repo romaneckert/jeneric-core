@@ -1,11 +1,9 @@
-const Model = require('./index');
+const mongoose = require('mongoose');
 
-class Log extends Model {
+class Log {
     constructor() {
 
-        super();
-
-        this._schema = {
+        let schema = new mongoose.Schema({
             code: {
                 type: Number,
                 required: true
@@ -33,7 +31,10 @@ class Log extends Model {
                 type: String,
                 required: true
             }
-        };
+        }, { versionKey: false });
+
+        return new mongoose.model(this.constructor.name, schema);
+
     }
 
 }
