@@ -106,14 +106,20 @@ class Logger {
         // remove logger entries from stack
         stack = stack.filter(entry => entry.typeName !== 'Logger');
 
-        let fileNameParts = stack[0].fileName.split('/').reverse();
+        let parts = stack[0].fileName.split('/src/');
 
-        if ('string' !== typeof type && 'src' === fileNameParts[2]) {
-            type = fileNameParts[1].toLowerCase();
-        }
+        if ('string' === typeof parts[1] && 0 < parts[1].length) {
+            parts = parts[1].split('/');
 
-        if ('string' !== typeof name && 'src' === fileNameParts[2]) {
-            name = fileNameParts[0].replace('.js', '').toLowerCase();
+            if ('string' === typeof parts[0] && 0 < parts[0].length && 'string' !== typeof type) type = parts[0].toLowerCase();
+
+            if (parts.length > 1 && 'string' === typeof parts[parts.length - 1] && 0 < parts[parts.length - 1].length && 'string' !== typeof name) {
+
+                parts.shift();
+
+                name = parts.join('/').replace('.js', '').toLowerCase();
+            }
+
         }
 
         if ('number' !== typeof code) code = 0;

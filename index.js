@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const cluster = require('cluster');
 const os = require('os');
 const path = require('path');
@@ -78,9 +79,9 @@ class Jeneric {
         // handle uncaught exceptions
         process.on('uncaughtException', this.module.error.handleUncaughtException);
 
-        // add model classes to container
-        for (let ns in this.class.model) {
-            this.model[ns] = new this.class.model[ns]();
+        // add schema classes to container
+        for (let ns in this.class.schema) {
+            this.model[ns] = mongoose.model(ns, new this.class.schema[ns]());
         }
 
         // log informations about start process of core
