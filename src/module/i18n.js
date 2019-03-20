@@ -57,7 +57,7 @@ class I18n {
         return this.config.locales;
     }
 
-    translate(locale, key, ...args) {
+    translate(locale, key, data) {
 
         if (-1 === this.config.locales.indexOf(locale)) {
             locale = this.config.defaultLocale;
@@ -76,7 +76,7 @@ class I18n {
         } catch (err) { }
 
         if ('string' === typeof translation) {
-            return util.format(translation, ...args);
+            return this._addData(locale, key, translation, data);
         }
 
         // if translation not found, try to get from fallback
@@ -89,12 +89,29 @@ class I18n {
 
         if ('string' === typeof translation) {
             jeneric.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);
-            return util.format(translation, ...args);
+
+            return this._addData(this.config.defaultLocale, key, translation, data);
         }
 
         jeneric.logger.warning(`the translation key '${key}' could not be found for the default locale ${this.config.defaultLocale}`);
 
         return key;
+
+    }
+
+    _addData(locale, key, value, data) {
+
+        return value.replace(/{{(.+?)}}/g, (match) => {
+
+            let property = match.replace('{{', '').replace('}}', '').trim();
+
+            if ('string' === typeof data[property]) return data[property];
+
+            jeneric.logger.warning(`the translation key '${key}' in locale ${locale} has no data for ${match}`);
+
+            return match;
+
+        });
 
     }
 }

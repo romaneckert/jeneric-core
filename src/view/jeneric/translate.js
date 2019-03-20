@@ -4,8 +4,8 @@ class Translate {
         this.req = req;
     }
 
-    render(message, ...args) {
-        return jeneric.module.i18n.translate(this.req.locale, message, ...args);
+    render(message, data) {
+        return jeneric.module.i18n.translate(this.req.locale, message, data);
     }
 
 }

@@ -24,30 +24,48 @@ class Server {
 
     }
 
-    _addRoutes(routes, namespace) {
+    _addRoutes(routes) {
 
-        for (let routeNs in routes) {
+        for (let routeName in routes) {
 
-            let currentNamespace = namespace.slice();
-            currentNamespace.push(routeNs);
+            // find handler from routeName
+            let route = routes[routeName];
+            let parts = routeName.split('_');
 
-            if ('string' !== typeof routes[routeNs].path) {
-                this._addRoutes(routes[routeNs], currentNamespace);
+            let handler = undefined;
+
+            try {
+                handler = parts.reduce((o, i) => o[i], jeneric.handler);
+            } catch (err) { }
+
+            if (undefined === handler) {
+                for (let k = 1; k <= parts.length; k++) {
+
+                    let firstParts = parts.slice(0);
+                    let lastParts = firstParts.splice(-k, k);
+
+                    for (let l = 1; l < lastParts.length; l++) {
+                        lastParts[l] = lastParts[l].charAt(0).toUpperCase() + lastParts[l].slice(1);
+                    }
+
+                    firstParts.push(lastParts.join(''));
+
+                    try {
+                        handler = firstParts.reduce((o, i) => o[i], jeneric.handler);
+                    } catch (err) { }
+
+                    if ('object' === typeof handler) break;
+
+                }
+            }
+
+            if (null === handler || 'object' !== typeof handler || 'function' !== typeof handler.handle) {
+                jeneric.logger.warning(`route ${routeName} has no handler`);
                 continue;
             }
 
-            let handler = currentNamespace.reduce((o, i) => o[i], jeneric.handler);
-            let routePath = routes[routeNs].path;
-            let routeMethods = routes[routeNs].methods;
-            let routeRoles = routes[routeNs].roles;
-
-            if ('object' !== typeof handler || 'function' !== typeof handler.handle) {
-                jeneric.logger.warning(`route ${routePath} has no handler. Please create a handler with method 'handle' in path: ${path.join('src/handler', currentNamespace.join('/'))}`);
-                continue;
-            }
-
-            if ('object' !== typeof routeMethods) {
-                jeneric.logger.warning(`route ${routePath} has no methods`);
+            if ('object' !== typeof route.methods || null === route.methods) {
+                jeneric.logger.warning(`route ${routeName} has no methods`);
                 continue;
             }
 
@@ -58,19 +76,19 @@ class Server {
 
                 switch (middlewareName) {
                     case 'roles':
-                        if ('object' === typeof routeRoles) {
-                            for (let method of routeMethods) {
-                                this._app[method](routePath, jeneric.middleware[middlewareName].handle.bind(jeneric.middleware[middlewareName]));
+                        if ('object' === typeof route.roles) {
+                            for (let method of route.methods) {
+                                this._app[method](route.path, jeneric.middleware[middlewareName].handle.bind(jeneric.middleware[middlewareName]));
                             }
                         }
                         break;
                     case 'handler':
-                        for (let method of routeMethods) {
-                            this._app[method](routePath, handler.handle.bind(handler));
+                        for (let method of route.methods) {
+                            this._app[method](route.path, handler.handle.bind(handler));
                         }
                         break;
                     default:
-                        this._app.use(routePath, jeneric.middleware[middlewareName].handle.bind(jeneric.middleware[middlewareName]));
+                        this._app.use(route.path, jeneric.middleware[middlewareName].handle.bind(jeneric.middleware[middlewareName]));
                         break;
                 }
             }
