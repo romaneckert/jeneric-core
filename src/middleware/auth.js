@@ -1,26 +1,31 @@
-const jwt = require('jsonwebtoken');
-
 class Auth {
+
+    constructor() {
+        if ('string' !== typeof jeneric.config.secret || 0 === jeneric.config.secret.length) throw new Error('missing config.secret or config.secret is empty');
+    }
 
     async handle(req, res, next) {
 
         try {
 
-            if ('string' !== typeof jeneric.config.secret) throw new Error('missing config.secret');
+            let user = null;
 
-            if ('string' !== typeof req.cookies._t || req.cookies._t.length === 0) return next();
-
-            let decoded = jwt.verify(req.cookies._t, jeneric.config.secret);
-
-            if ('object' === typeof decoded.user
-                && null !== decoded.user
-                && 'string' === typeof decoded.user.email
-                && 'object' === typeof decoded.user.roles) {
-
-                let user = await jeneric.model.user.findOne({ email: decoded.user.email });
-
-                req.user = res.user = res.locals.user = user;
+            // try to get user from token
+            if ('string' === typeof req.cookies._t && 0 !== req.cookies._t.length) {
+                user = await jeneric.module.auth.getUserFromToken(req.cookies._t);
             }
+
+            // refresh token
+            if (null !== user) {
+
+                // generate token
+                let token = jeneric.module.auth.generateToken(user);
+
+                // add token to response
+                jeneric.module.auth.addTokenToResponse(token, res);
+            }
+
+            req.user = res.user = res.locals.user = user;
 
         } catch (err) {
             jeneric.logger.error('error in auth module', err);

@@ -45,7 +45,7 @@ class Roles {
         if ('object' !== typeof routeRoles) throw new Error('route has no roles');
 
         // check if user has authentificated
-        if ('object' !== typeof req.user || 'object' !== typeof req.user.roles) return res.redirect(this.config.redirectPath);
+        if ('object' !== typeof req.user || null === req.user || 'object' !== typeof req.user.roles) return res.redirect(this.config.redirectPath);
 
         // check if one role in user roles match route roles
         for (let role of req.user.roles) {

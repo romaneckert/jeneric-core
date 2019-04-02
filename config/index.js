@@ -1,5 +1,6 @@
 module.exports = {
     cluster: false,
+    tokenExpiresIn: 28800,
     module: {
         server: {
             port: 3000,

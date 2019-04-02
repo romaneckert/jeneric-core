@@ -13,9 +13,7 @@ class StringUtil {
 
         if (null === val) return '';
 
-        if (val instanceof Error) return String(val);
-
-        if (val instanceof ReferenceError) return String(val);
+        if (val instanceof Error || val instanceof TypeError || val instanceof ReferenceError) return String(val);
 
         if ('object' === typeof val) {
             let cache = [];
