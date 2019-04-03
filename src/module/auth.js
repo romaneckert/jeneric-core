@@ -3,21 +3,29 @@ const jwt = require('jsonwebtoken');
 module.exports = class Auth {
 
     constructor() {
+        // check if config.secret set
         if ('string' !== typeof jeneric.config.secret || 0 === jeneric.config.secret.length) throw new Error('missing config.secret or config.secret is empty');
+
+        // check if config.tokenExpiresIn set
         if ('number' !== typeof jeneric.config.tokenExpiresIn || 0 === jeneric.config.tokenExpiresIn) throw new Error('missing config.tokenExpires or config.tokenExpires is 0');
+
+        // define token cookie name
+        this.tokenCookieName = '_t';
     }
 
-    generateToken(user) {
+    signIn(req, res, user) {
 
-        // validate user data in token
-        if ('object' !== typeof user || null === user
-            || 'string' !== typeof user.email || 0 === user.email.length
-            || 'object' !== typeof user.roles || 0 === user.roles.length) {
+        // validate user
+        if ('object' !== typeof user || null === user) return false;
 
-            return null;
-        }
+        // validate user email
+        if ('string' !== typeof user.email || 0 === user.email.length) return false;
 
-        return jwt.sign(
+        // validate user roles
+        if ('object' !== typeof user.roles || 0 === user.roles.length) return false;
+
+        // generate json web token
+        let token = jwt.sign(
             {
                 user: {
                     email: user.email,
@@ -30,39 +38,58 @@ module.exports = class Auth {
             }
         );
 
-    }
-
-    addTokenToResponse(token, res) {
-
-        if ('string' !== typeof token || 0 === token.length) return;
-
-        res.cookie('_t', token, {
+        // add json web token cookie
+        res.cookie(this.tokenCookieName, token, {
             expires: new Date(Date.now() + jeneric.config.tokenExpiresIn * 1000),
             httpOnly: true,
             sameSite: 'Strict',
             secure: true
         });
+
+        // add user to req and res
+        req.user = res.user = res.locals.user = user;
+
+        return true;
+
     }
 
-    async getUserFromToken(token) {
-        try {
-            let decoded = jwt.verify(token, jeneric.config.secret);
+    signOut(req, res) {
 
-            // validate user data in token
-            if ('object' !== typeof decoded.user || null === decoded.user
-                || 'string' !== typeof decoded.user.email || 0 === decoded.user.email.length
-                || 'object' !== typeof decoded.user.roles || 0 === decoded.user.roles.length) {
+        // remove user from request and response
+        req.user = res.user = res.locals.user = null;
 
-                return null;
-            }
+        // clear token cookie
+        res.clearCookie(this.tokenCookieName);
+    }
 
-            let user = await jeneric.model.user.findOne({ email: decoded.user.email });
+    async verify(req, res) {
 
-            return user;
+        // validate req
+        if ('object' !== typeof req || null === req) return null;
 
-        } catch (e) { }
+        // validate cookies
+        if ('object' !== typeof req.cookies || null === req.cookies) return null;
 
-        return null;
+        // validate json web token cookie
+        if ('string' !== typeof req.cookies[this.tokenCookieName] || 0 === req.cookies[this.tokenCookieName].lenth) return null;
+
+        // verify token
+        let data = jwt.verify(req.cookies._t, jeneric.config.secret);
+
+        // validate user data
+        if ('object' !== typeof data.user || null === data.user) return null;
+
+        // validate user email
+        if ('string' !== typeof data.user.email || 0 === data.user.email.length) return null;
+
+        // validate user roles
+        if ('object' !== typeof data.user.roles || 0 === data.user.roles.length) return null;
+
+        // get user from db
+        let user = await jeneric.model.user.findOne({ email: data.user.email });
+
+        // sign in user to refresh the json web token
+        this.signIn(req, res, user);
 
     }
 
