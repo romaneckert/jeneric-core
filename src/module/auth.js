@@ -86,7 +86,11 @@ module.exports = class Auth {
         if ('object' !== typeof data.user.roles || 0 === data.user.roles.length) return null;
 
         // get user from db
-        let user = await jeneric.model.user.findOne({ email: data.user.email });
+        let user = null;
+
+        try {
+            user = await jeneric.model.user.findOne({ email: data.user.email });
+        } catch (e) { }
 
         // sign in user to refresh the json web token
         this.signIn(req, res, user);
