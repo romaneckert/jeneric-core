@@ -90,7 +90,9 @@ module.exports = class Auth {
 
         try {
             user = await jeneric.model.user.findOne({ email: data.user.email });
-        } catch (e) { }
+        } catch (e) {
+            user = null;
+        }
 
         // sign in user to refresh the json web token
         this.signIn(req, res, user);

@@ -1,6 +1,9 @@
 const path = require('path');
-const util = require('util');
 
+/**
+ * I18n module for translation
+ * @param {object} config
+ */
 class I18n {
 
     constructor(config) {
@@ -45,6 +48,10 @@ class I18n {
         }
     }
 
+    /**
+     * default locale, example: en_US
+     * @type {string}
+     */
     get defaultLocale() {
         return this.config.defaultLocale;
     }
@@ -57,6 +64,15 @@ class I18n {
         return this.config.locales;
     }
 
+    /**
+     * method to translate
+     *
+     * @param {string} locale example: en_US
+     * @param {string} key example: jeneric.title
+     * @param {object} data example: {}
+     *
+     * @returns {string} translated key or key if translation not exist
+     */
     translate(locale, key, data) {
 
         if (-1 === this.config.locales.indexOf(locale)) {
@@ -73,7 +89,9 @@ class I18n {
         // get translation for correct locale
         try {
             translation = key.split('.').reduce((o, i) => o[i], this._catalog[locale]);
-        } catch (err) { }
+        } catch (err) {
+            translation = null;
+        }
 
         if ('string' === typeof translation) {
             return this._addData(locale, key, translation, data);
@@ -85,7 +103,9 @@ class I18n {
         // if translation not found from fallback, try to get from default locale
         try {
             translation = key.split('.').reduce((o, i) => o[i], this._catalog[this.config.defaultLocale]);
-        } catch (err) { }
+        } catch (err) {
+            translation = null;
+        }
 
         if ('string' === typeof translation) {
             jeneric.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);

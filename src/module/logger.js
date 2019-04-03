@@ -172,8 +172,6 @@ class Logger {
 
     _isDublicated(log) {
 
-        let k = 0;
-
         for (let oldLog of this._history) {
 
             if (
