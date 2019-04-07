@@ -8,7 +8,7 @@ const object = new (require('./src/util/object'))();
 class Jeneric {
     constructor() {
 
-        if ('Object' === typeof global.jeneric) throw Error('global.jeneric already defined');
+        if ('object' === typeof global.jeneric) throw Error('global.jeneric already defined');
 
         this.class = {};
         this.model = {};

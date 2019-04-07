@@ -24,8 +24,8 @@ class Mongoose {
         }
 
         mongoose.connection.on('error', (err) => jeneric.logger.error(err));
-        mongoose.connection.on('disconnected', jeneric.logger.notice('disconnect from mongodb'));
-        mongoose.connection.on('connected', jeneric.logger.notice('connected to mongodb'));
+        mongoose.connection.on('disconnected', () => jeneric.logger.notice('disconnect from mongodb'));
+        mongoose.connection.on('connected', () => jeneric.logger.notice('connected to mongodb'));
     }
 
     start() {
