@@ -31,6 +31,7 @@ class Report {
     }
 
     addRequest(url) {
+        // TODO: use url parameter
         this._requests.push(new Date());
     }
 }

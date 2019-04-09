@@ -1,16 +1,26 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
+/**
+ * @global
+ * @example
+ * jeneric.module.auth
+ * @param {Object} config - config object
+ * @param {string} [config.tokenCookieName=_t] - token cookie name
+ * @class jeneric.module.auth
+ * @alias jeneric.module.auth
+ */
 module.exports = class Auth {
 
-    constructor() {
-        // check if config.secret set
-        if ('string' !== typeof jeneric.config.secret || 0 === jeneric.config.secret.length) throw new Error('missing config.secret or config.secret is empty');
+    constructor(config) {
 
-        // check if config.tokenExpiresIn set
-        if ('number' !== typeof jeneric.config.tokenExpiresIn || 0 === jeneric.config.tokenExpiresIn) throw new Error('missing config.tokenExpires or config.tokenExpires is 0');
+        this.config = {
+            tokenCookieName: '_t',
+            secret: crypto.randomBytes(32).toString('hex'),
+            tokenExpiresIn: 3600
+        };
 
-        // define token cookie name
-        this.tokenCookieName = '_t';
+        jeneric.util.object.merge(this.config, config);
     }
 
     signIn(req, res, user) {
@@ -62,6 +72,14 @@ module.exports = class Auth {
         res.clearCookie(this.tokenCookieName);
     }
 
+    /**
+     * @description Verify the json web token in the cookie of the request.
+     * @example
+     * jeneric.module.auth.verify(req,res);
+     * @param {Object} req - The Request object.
+     * @param {Object} res - The Response object.
+     * @returns {Object} The user which was verified.
+     */
     async verify(req, res) {
 
         // validate req
@@ -96,6 +114,8 @@ module.exports = class Auth {
 
         // sign in user to refresh the json web token
         this.signIn(req, res, user);
+
+        return user;
 
     }
 

@@ -1,15 +1,21 @@
 # Jeneric Core
 
-experimental node js framework
+node js framework
+
+status: alpha
 
 ## Links
 
 https://mongoosejs.com/docs/advanced_schemas.html
 
-## Tests
+## npm scripts
 
-npm run test-development
-npm run test-production
+### run tests
+npm run test:dev
+npm run test:prod
+
+### generate documentation
+npm run docs:build
 
 ## TODOs
 

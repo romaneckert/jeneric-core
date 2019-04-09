@@ -1,10 +1,11 @@
 const path = require('path');
 
 /**
- * I18n module for translation
  * @param {object} config
+ * @class i18n
+ * @alias jeneric.module.i18n
  */
-class I18n {
+module.exports = class I18n {
 
     constructor(config) {
 
@@ -49,13 +50,23 @@ class I18n {
     }
 
     /**
-     * default locale, example: en_US
+     * @description Return the default locale
+     * @example
+     * jeneric.module.i18n.defaultLocale
      * @type {string}
+     * @returns {string} Return the default locale.
      */
     get defaultLocale() {
         return this.config.defaultLocale;
     }
 
+    /**
+     * @description Return the translation catalog
+     * @example
+     * jeneric.module.i18n.catalog
+     * @type {string}
+     * @returns {string} Return the default locale.
+     */
     get catalog() {
         return this._catalog;
     }
@@ -65,20 +76,21 @@ class I18n {
     }
 
     /**
-     * method to translate
+     * @description This is a method to get the translation for a key.
      *
-     * @param {string} locale example: en_US
-     * @param {string} key example: jeneric.title
-     * @param {object} data example: {}
+     * @param {string} [locale=en_US] - The locale in which the key have to be translated.
+     * @param {string} [key=translation.key] - The translation key.
+     * @param {Object} [data={}] - Additional data which have to be inserted in the translation.
      *
-     * @returns {string} translated key or key if translation not exist
+     * @example Translation
+     * @returns {string} The translated key or key if translation not exist.
      */
     translate(locale, key, data) {
 
-        if (-1 === this.config.locales.indexOf(locale)) {
-            locale = this.config.defaultLocale;
-        }
+        // check if locale is in the list of predefined locales, if not fall back to default locale
+        if (-1 === this.config.locales.indexOf(locale)) locale = this.config.defaultLocale;
 
+        // check if the key is valid
         if (0 < key.replace(/[a-zA-Z0-9._]/g, '').length) {
             jeneric.logger.warning(`the translation key '${key}' does not seem to be valid`);
             return key;
@@ -135,5 +147,3 @@ class I18n {
 
     }
 }
-
-module.exports = I18n;

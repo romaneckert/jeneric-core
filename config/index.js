@@ -1,7 +1,9 @@
 module.exports = {
     cluster: false,
-    tokenExpiresIn: 28800,
     module: {
+        auth: {
+            tokenExpiresIn: 86400
+        },
         server: {
             port: 3000,
             middleware: {

@@ -36,7 +36,9 @@ class Server {
 
             try {
                 handler = parts.reduce((o, i) => o[i], jeneric.handler);
-            } catch (err) { }
+            } catch (err) {
+                handler = undefined;
+            }
 
             if (undefined === handler) {
                 for (let k = 1; k <= parts.length; k++) {
@@ -52,7 +54,9 @@ class Server {
 
                     try {
                         handler = firstParts.reduce((o, i) => o[i], jeneric.handler);
-                    } catch (err) { }
+                    } catch (err) {
+                        handler = undefined;
+                    }
 
                     if ('object' === typeof handler) break;
 
@@ -102,12 +106,6 @@ class Server {
 
     init() {
 
-        // check certificates
-        if (!jeneric.util.fs.existsSync(this._pathToKeyPem) || !jeneric.util.fs.existsSync(this._pathToCertPem)) {
-            jeneric.logger.error(`can not start server: .key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
-            return;
-        }
-
         // register view paths
         let viewPaths = [];
 
@@ -146,6 +144,12 @@ class Server {
     }
 
     start() {
+
+        // check certificates
+        if (!jeneric.util.fs.existsSync(this._pathToKeyPem) || !jeneric.util.fs.existsSync(this._pathToCertPem)) {
+            jeneric.logger.warning(`can not start server: .key and .pem files missing`, [this._pathToKeyPem, this._pathToCertPem]);
+            return;
+        }
 
         // start https server
         let server = https.createServer({

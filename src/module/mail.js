@@ -15,15 +15,13 @@ class Mail {
         this.transporter = null;
     }
 
-    init() {
+    start() {
+
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
             jeneric.logger.warning('missing config.url');
             return;
         }
 
-    }
-
-    start() {
         let mailUrl = url.parse(this.config.url);
 
         mailUrl.search = querystring.stringify({

@@ -4,9 +4,10 @@
     "description": "jeneric core",
     "main": "index.js",
     "scripts": {
-        "test-development": "export NODE_ENV=development && node test/development.js",
-        "test-production": "export NODE_ENV=production && node test/production.js",
-        "docs:build": "documentation build src/** -f html -o docs"
+        "start": "export NODE_ENV=development && node test/test.js",
+        "test:dev": "export NODE_ENV=development && node test/test.js",
+        "test:prod": "export NODE_ENV=production && node test/test.js",
+        "docs:build": "./node_modules/documentation/bin/documentation.js build src/** -f html -o docs"
     },
     "author": "Roman Eckert",
     "license": "MIT",
@@ -15,7 +16,6 @@
         "body-parser": "1.18.3",
         "compression": "1.7.4",
         "cookie-parser": "1.4.4",
-        "eslint": "5.16.0",
         "express": "4.16.4",
         "helmet": "3.16.0",
         "jsonwebtoken": "8.5.1",
@@ -23,5 +23,10 @@
         "nodemailer": "6.1.0",
         "pug": "2.0.3",
         "stack-trace": "0.0.10"
+    },
+    "devDependencies": {
+        "documentation": "9.3.1",
+        "eslint": "5.16.0",
+        "eslint-plugin-jsdoc": "4.8.3"
     }
 }
