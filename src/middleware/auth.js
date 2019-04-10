@@ -1,8 +1,10 @@
+const jeneric = require('../../index');
+
 class Auth {
 
     async handle(req, res, next) {
 
-        //await jeneric.module.auth.verify(req, res);
+        await jeneric.module.auth.verify(req, res);
 
         return next();
     }
