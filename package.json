@@ -4,7 +4,7 @@
     "description": "jeneric core",
     "main": "index.js",
     "scripts": {
-        "install": "node bin/install.js ./src",
+        "install": "node bin/install.js ./",
         "start": "export NODE_ENV=development && node test/test.js",
         "test:dev": "export NODE_ENV=development && node test/test.js",
         "test:prod": "export NODE_ENV=production && node test/test.js",
@@ -21,6 +21,7 @@
         "helmet": "3.16.0",
         "jsonwebtoken": "8.5.1",
         "mongoose": "5.4.22",
+        "node-global": "1.0.0",
         "nodemailer": "6.1.0",
         "pug": "2.0.3",
         "stack-trace": "0.0.10"
