@@ -4,6 +4,7 @@
     "description": "jeneric core",
     "main": "index.js",
     "scripts": {
+        "install": "node bin/install.js ./src",
         "start": "export NODE_ENV=development && node test/test.js",
         "test:dev": "export NODE_ENV=development && node test/test.js",
         "test:prod": "export NODE_ENV=production && node test/test.js",

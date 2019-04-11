@@ -1,13 +1,6 @@
 #!/usr/bin/env node
-const Jeneric = require('../index');
+const jeneric = require('@jeneric');
 
-class Test extends Jeneric {
-    constructor() {
-        super();
-    }
-}
-
-let test = new Test();
 test.boot();
 
 
