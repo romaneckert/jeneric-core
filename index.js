@@ -84,12 +84,12 @@ class Jeneric {
             this.model[ns] = mongoose.model(ns, new this.class.schema[ns]());
         }
 
-        // log informations about start process of core
+        // log information about start process of core
         if (!this.config.cluster || (cluster.worker && 1 === cluster.worker.id)) {
             this.logger.log('application startet in context: "' + this.config.context + '"', null, 5, 'core', 'core');
         }
 
-        // call init methods on modules and middlewares
+        // call init methods on modules and middleware
         for (let ns of ['module', 'middleware']) {
 
             for (let k in this[ns]) {

@@ -2,33 +2,60 @@
 const fs = require('../src/util/fs');
 const path = require('path');
 
-// get args
-const args = process.argv.slice(2);
+class Install {
 
-// detect path to node_modules
-const pathToNodeModules = path.join(process.cwd(), 'node_modules');
+    constructor() {
+        // get args
+        this.args = process.argv.slice(2);
 
-// check if node_modules directory exists
-if(!fs.existsSync(pathToNodeModules)) {
-    console.error(`can not find path to node_modules ${pathToNodeModules}`);
-}
+        if(-1 === this.args.indexOf('./')) {
+            this.args.push('./')
+        }
 
-// detect path to @jeneric/app folder
-const pathToApp = path.join(pathToNodeModules, '@jeneric/app');
+        // detect path to root
+        this.pathToRoot = process.cwd();
 
-// remove app folder
-fs.removeSync(pathToApp);
+        // detect path to node_modules
+        this.pathToNodeModules = path.join(this.pathToRoot, 'node_modules');
 
-// create app folder
-fs.ensureDirExists(pathToApp);
+        // check if node_modules directory exists
+        if (!fs.existsSync(this.pathToNodeModules)) throw new Error(`can not find path to node_modules: ${this.pathToNodeModules}`);
 
-for(let arg of args) {
-    if (!fs.lstatSync(arg).isDirectory()) throw new Error(`${arg} is not a directory`);
+        // detect path to @jeneric/app folder
+        this.pathToApp = path.join(this.pathToNodeModules, '@jeneric/app');
 
-    let pathToSrc = path.join(arg, 'src');
+        // remove app folder @jeneric/app
+        fs.removeSync(this.pathToApp);
 
-    if(fs.lstatSync(pathToSrc).isDirectory()) {
-        
+        // create app folder @jeneric/app
+        fs.ensureDirExists(this.pathToApp);
+
+        for (let arg of this.args) {
+            if (!fs.lstatSync(arg).isDirectory()) throw new Error(`${arg} is not a directory`);
+
+            for(let pathToDir of ['src', 'view']) {
+
+                let src = path.join(this.pathToRoot, arg, pathToDir);
+                let dest = path.join(this.pathToApp, pathToDir);
+
+                fs.symlinkOnlyFilesSync(src, dest);
+
+            }
+
+        }
     }
-
 }
+
+new Install();
+
+
+
+
+
+
+
+
+
+
+
+

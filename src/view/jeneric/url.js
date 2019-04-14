@@ -1,6 +1,4 @@
-const path = require('path');
-
-class Uri {
+module.exports = class Uri {
 
     render(routeName, obj) {
 
@@ -19,5 +17,3 @@ class Uri {
     }
 
 }
-
-module.exports = Uri;
