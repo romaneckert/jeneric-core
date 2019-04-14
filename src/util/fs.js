@@ -33,7 +33,7 @@ fs.copySync = (src, dest) => {
     }
 
     return true;
-}
+};
 
 fs.ensureFileExists = function (filePath) {
     if (this.existsSync(filePath)) return true;
@@ -49,7 +49,7 @@ fs.ensureFileExists = function (filePath) {
     }
 
     return true;
-}
+};
 
 fs.ensureDirExists = function (directoryPath) {
     if (this.existsSync(directoryPath)) return true;
@@ -65,7 +65,7 @@ fs.ensureDirExists = function (directoryPath) {
     }
 
     return true;
-}
+};
 
 fs.creationDate = function (directory) {
 
@@ -74,7 +74,7 @@ fs.creationDate = function (directory) {
     }
 
     return this.lstatSync(directory).ctime;
-}
+};
 
 fs.isFileSync = function (directory) {
 
@@ -83,7 +83,7 @@ fs.isFileSync = function (directory) {
     }
 
     return this.lstatSync(directory).isFile();
-}
+};
 
 fs.isDirectorySync = function (directory) {
 
@@ -118,4 +118,6 @@ fs.removeSync = function (directory) {
 
     return true;
 
-}
+};
+
+module.exports = fs;
