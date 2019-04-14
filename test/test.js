@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-const jeneric = require('@jeneric');
+const jeneric = require('@jeneric/app');
 
-test.boot();
-
-
+jeneric.boot();

@@ -8,10 +8,6 @@ class Install {
         // get args
         this.args = process.argv.slice(2);
 
-        if(-1 === this.args.indexOf('./')) {
-            this.args.push('./')
-        }
-
         // detect path to root
         this.pathToRoot = process.cwd();
 
@@ -30,20 +26,66 @@ class Install {
         // create app folder @jeneric/app
         fs.ensureDirExists(this.pathToApp);
 
+        // loop over all modules and install
         for (let arg of this.args) {
-            if (!fs.lstatSync(arg).isDirectory()) throw new Error(`${arg} is not a directory`);
 
-            for(let pathToDir of ['src', 'view']) {
+            let pathToModule = path.join(this.pathToRoot, 'node_modules', arg);
 
-                let src = path.join(this.pathToRoot, arg, pathToDir);
-                let dest = path.join(this.pathToApp, pathToDir);
-
-                fs.symlinkOnlyFilesSync(src, dest);
-
-            }
+            this.install(pathToModule);
 
         }
+
+        this.install(this.pathToRoot);
     }
+
+    install(pathToModule) {
+
+        if (!fs.lstatSync(pathToModule).isDirectory() && !fs.lstatSync(pathToModule).isSymbolicLink()) throw new Error(`${pathToModule} is not a directory`);
+
+        console.log(`${pathToModule}`);
+
+        for(let pathToDir of ['config', 'src', 'view']) {
+
+            let src = path.join(pathToModule, pathToDir);
+            let dest = path.join(this.pathToApp, pathToDir);
+
+            this.symlinkOnlyFilesSync(src, dest);
+
+        }
+
+        console.log('--------------------');
+    }
+
+    symlinkOnlyFilesSync(src,dest) {
+
+        // check if source exists
+        if (!fs.existsSync(src)) return false;
+
+        let stats = fs.statSync(src);
+
+        if (stats.isDirectory()) {
+            try {
+                fs.mkdirSync(dest);
+            } catch (err) {
+                if ('EEXIST' !== err.code) throw err;
+            }
+
+            let files = fs.readdirSync(src);
+
+            for (let file of files) {
+                if (!this.symlinkOnlyFilesSync(path.join(src, file), path.join(dest, file))) return false;
+            }
+
+        } else {
+            if(fs.existsSync(dest)) {
+                fs.removeSync(dest);
+                console.log(`overwrite: ${dest}`);
+            }
+            fs.symlinkSync(src, dest);
+        }
+
+        return true;
+    };
 }
 
 new Install();

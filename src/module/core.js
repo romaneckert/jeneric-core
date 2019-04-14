@@ -2,25 +2,12 @@ const mongoose = require('mongoose');
 const cluster = require('cluster');
 const os = require('os');
 const path = require('path');
-const fs = new (require('./src/util/fs'))();
-const object = new (require('./src/util/object'))();
+const fs = require('@jeneric/app/src/util/fs');
+const object = require('@jeneric/app/src/util/object');
 
 class Jeneric {
-    constructor() {
 
-        if ('object' === typeof global.jeneric) throw Error('global.jeneric already defined');
-
-        this.class = {};
-        this.model = {};
-
-        global.jeneric = this;
-
-    }
-
-    boot(...directories) {
-
-        // add current directory
-        directories.unshift(__dirname);
+    boot() {
 
         // init default config
         this.config = require('./config');

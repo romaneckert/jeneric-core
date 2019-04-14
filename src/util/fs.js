@@ -33,36 +33,6 @@ fs.copySync = (src, dest) => {
     return true;
 };
 
-fs.symlinkOnlyFilesSync = (src,dest) => {
-
-    // check if source exists
-    if (!fs.existsSync(src)) return false;
-
-    // check if destination exists
-    if (fs.existsSync(dest)) return false;
-
-    let stats = fs.statSync(src);
-
-    if (stats.isDirectory()) {
-        try {
-            fs.mkdirSync(dest);
-        } catch (err) {
-            if ('EEXIST' !== err.code) throw err;
-        }
-
-        let files = fs.readdirSync(src);
-
-        for (let file of files) {
-            if (!fs.symlinkOnlyFilesSync(path.join(src, file), path.join(dest, file))) return false;
-        }
-
-    } else {
-        fs.symlinkSync(src, dest);
-    }
-
-    return true;
-};
-
 fs.ensureFileExists = function (filePath) {
     if (fs.existsSync(filePath)) return true;
 
@@ -113,22 +83,25 @@ fs.creationDate = function (directory) {
  */
 fs.removeSync = function (directory) {
 
-    if (fs.lstatSync(directory).isFile()) {
-        fs.unlinkSync(directory);
-        return true;
+    let stats = null;
+
+    // check if directory is a symlink or broken symlink
+    try {
+        stats = fs.lstatSync(directory);
+    } catch(err) {
+        stats = null;
     }
 
-    if (fs.lstatSync(directory).isSymbolicLink()) {
-        fs.unlinkSync(directory);
-        return true;
-    }
+    if(null === stats) return true;
 
-    if (fs.lstatSync(directory).isDirectory()) {
+    if (stats.isDirectory()) {
         for (let file of fs.readdirSync(directory)) {
             fs.removeSync(path.join(directory, file));
         }
 
         fs.rmdirSync(directory);
+    } else {
+        fs.unlinkSync(directory);
     }
 
     return true;
