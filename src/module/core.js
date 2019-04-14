@@ -4,33 +4,19 @@ const os = require('os');
 const path = require('path');
 const fs = require('@jeneric/app/src/util/fs');
 const object = require('@jeneric/app/src/util/object');
+const config = require('@jeneric/app/config');
 
 class Jeneric {
 
     boot() {
 
-        // init default config
-        this.config = require('./config');
-
-        // init config.startDate
-        if (undefined !== this.config.startDate) throw new Error('config.startDate already defined');
-
-        this.config.startDate = new Date();
-
-        // init config.context
-        if (undefined !== this.config.context) throw new Error('config.context already defined');
-
-        this.config.context = 'production';
+        // add additional information to config
+        config.startDate = new Date();
+        config.context = 'production';
 
         if ('string' === typeof process.env.NODE_ENV) {
-            this.config.context = process.env.NODE_ENV;
+            config.context = process.env.NODE_ENV;
         }
-
-        // init config.directories
-        if (undefined !== this.config.directories) throw new Error('config.directories already defined');
-
-        this.config.directories = directories;
-
 
         // loop over all directories
         for (let directory of directories) {
