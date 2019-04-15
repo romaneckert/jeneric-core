@@ -113,4 +113,25 @@ module.exports = class Jeneric {
         return obj;
     }
 
+    _instantiate(classes, config, instance) {
+
+        if ('object' !== typeof instance) instance = {};
+
+        for (let namespace in classes) {
+
+            if ('object' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
+                instance[namespace] = this._instantiate(classes[namespace], config[namespace]);
+            } else if ('function' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
+                instance[namespace] = new classes[namespace](config[namespace]);
+            } else if ('object' === typeof classes[namespace]) {
+                instance[namespace] = this._instantiate(classes[namespace], {});
+            } else if ('function' === typeof classes[namespace]) {
+                instance[namespace] = new classes[namespace]();
+            }
+
+        }
+
+        return instance;
+    }
+
 };
