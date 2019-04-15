@@ -1,4 +1,4 @@
-class Object {
+module.exports = {
     merge(object1, object2) {
         for (let key in object2) {
             if ('object' === typeof object1[key] && 'object' === typeof object2[key]) {
@@ -9,6 +9,4 @@ class Object {
         }
         return object1;
     }
-}
-
-module.exports = Object;
+};

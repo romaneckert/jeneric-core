@@ -1,69 +1,14 @@
 const path = require('path');
 const stackTrace = require('stack-trace');
+const util = require('@jeneric/app/src/util');
+const config = require('@jeneric/app/config');
+const Log = require('@jeneric/app/src/model/log');
 
 class Logger {
-    constructor(config) {
-
-        this.config = {
-            directory: 'var/logs',
-            maxSizePerLogFile: 16 * 1024 * 1024, // in byte - default 16 mb
-            maxLogRotationsPerType: 10,
-            maxHistoryLength: 1000,
-            duplicateTime: 10000,
-            levels: {
-                0: {
-                    name: 'emergency',
-                    console: true,
-                    color: "\x1b[31m"
-                },
-                1: {
-                    name: 'alert',
-                    console: true,
-                    color: "\x1b[31m"
-                },
-                2: {
-                    name: 'critical',
-                    console: true,
-                    color: "\x1b[31m"
-                },
-                3: {
-                    name: 'error',
-                    console: true,
-                    color: "\x1b[31m"
-                },
-                4: {
-                    name: 'warning',
-                    console: true,
-                    color: "\x1b[33m"
-                },
-                5: {
-                    name: 'notice',
-                    console: true,
-                    color: "\x1b[34m"
-                },
-                6: {
-                    name: 'info',
-                    console: true,
-                    color: "\x1b[34m"
-                },
-                7: {
-                    name: 'debug',
-                    console: true,
-                    color: "\x1b[37m"
-                },
-                8: {
-                    name: 'observe',
-                    console: false,
-                    color: "\x1b[37m"
-                }
-            }
-        };
-
-        // merge config
-        jeneric.util.object.merge(this.config, config);
-
+    constructor() {
         this._logsToSaveQueue = [];
         this._history = [];
+        this._mongoose = require('@jeneric/app/src/module/mongoose');
     }
 
     emergency(message, meta) {
@@ -131,18 +76,18 @@ class Logger {
         let date = new Date();
 
         // cast to string
-        message = jeneric.util.string.cast(message).trim();
+        message = util.string.cast(message).trim();
 
         // remove line breaks from message
         message = message.replace(/(\r?\n|\r)/gm, ' ');
 
         // cast meta data like objects to string
-        meta = jeneric.util.string.cast(meta);
+        meta = util.string.cast(meta);
 
         stack = this._stackToString(stack);
 
         // create log entity
-        let log = new jeneric.model.log({
+        let log = new Log({
             code: code,
             date: date,
             message: message,
@@ -179,7 +124,7 @@ class Logger {
                 && oldLog.message === log.message
                 && oldLog.meta === log.meta
                 && oldLog.type === log.type
-                && log.date - oldLog.date < this.config.duplicateTime
+                && log.date - oldLog.date < config.module.logger.duplicateTime
             ) {
                 return true;
             }
@@ -197,7 +142,7 @@ class Logger {
         ];
 
         let output = '[' + this._dateStringFromDate(log.date) + '] ';
-        output += '[' + this.config.levels[log.code].name + '] ';
+        output += '[' + config.module.logger.levels[log.code].name + '] ';
         output += '[' + log.type + '/' + log.name + '] ';
         output += '[' + log.message + ']';
         if (log.meta.length > 0) output += ' [' + log.meta + ']';
@@ -206,13 +151,13 @@ class Logger {
         for (let logFile of logFiles) {
 
             // check if log file exists and create if not
-            jeneric.util.fs.ensureFileExists(logFile);
+            util.fs.ensureFileExists(logFile);
 
             // check if log rotation is necessary
             this._rotateLogFile(logFile);
 
             // write line to log file
-            jeneric.util.fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
+            util.fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
 
         }
 
@@ -220,37 +165,37 @@ class Logger {
 
     _rotateLogFile(pathToLogFile) {
 
-        let fileSize = jeneric.util.fs.statSync(pathToLogFile).size;
+        let fileSize = util.fs.statSync(pathToLogFile).size;
 
-        if (fileSize < this.config.maxSizePerLogFile) return false;
+        if (fileSize < config.module.logger.maxSizePerLogFile) return false;
 
-        for (let i = this.config.maxLogRotationsPerType - 1; i >= 0; i--) {
+        for (let i = config.module.logger.maxLogRotationsPerType - 1; i >= 0; i--) {
 
             let pathToArchivedLogFile = pathToLogFile + '.' + i;
 
             // check if archived file exists
-            if (!jeneric.util.fs.existsSync(pathToArchivedLogFile)) continue;
+            if (!util.fs.existsSync(pathToArchivedLogFile)) continue;
 
             // unlink last log file
-            if (this.config.maxLogRotationsPerType - 1 === i) {
-                jeneric.util.fs.unlinkSync(pathToArchivedLogFile);
+            if (config.module.logger.maxLogRotationsPerType - 1 === i) {
+                util.fs.unlinkSync(pathToArchivedLogFile);
                 continue;
             }
 
-            jeneric.util.fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
+            util.fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
         }
 
-        jeneric.util.fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
-        jeneric.util.fs.ensureFileExists(pathToLogFile);
+        util.fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
+        util.fs.ensureFileExists(pathToLogFile);
     }
 
     _getPathToLogFile(code, namespaces) {
 
         return path.join(
             path.dirname(process.mainModule.filename),
-            this.config.directory,
+            config.module.logger.directory,
             namespaces.join('/'),
-            this.config.levels[code].name + '.log'
+            config.module.logger.levels[code].name + '.log'
         );
     }
 
@@ -258,14 +203,14 @@ class Logger {
     _writeToConsole(log) {
 
         // disabled, if config console disabled
-        if (!this.config.levels[log.code].console) return;
+        if (!config.module.logger.levels[log.code].console) return;
 
         // disabled, if log level less then notice and in mode production
-        if (log.code > 5 && jeneric.config.context === 'production') return;
+        if (log.code > 5 && config.module.core.context === 'production') return;
 
         let consoleOutput = '';
 
-        consoleOutput += `[${this.config.levels[log.code].name}] `;
+        consoleOutput += `[${config.module.logger.levels[log.code].name}] `;
         consoleOutput += log.message + ' ';
         consoleOutput += '[' + log.type + '/' + log.name + '] ';
 
@@ -277,14 +222,14 @@ class Logger {
             consoleOutput += '[' + log.stack + ']';
         }
 
-        console.log(this.config.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
+        console.log(config.module.logger.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
 
     }
 
     _addToHistory(log) {
 
         // remove older entries if log history greater then max history length
-        while (this._history.length > this.config.maxHistoryLength) this._history.pop();
+        while (this._history.length > config.module.logger.maxHistoryLength) this._history.pop();
 
         // add current log to history
         this._history.push(log);
@@ -300,9 +245,9 @@ class Logger {
 
         this._logsToSaveQueue.push(log);
 
-        if (jeneric.module.mongoose && 1 === jeneric.module.mongoose.instance.connection.readyState) {
+        if (mongoose && 1 === mongoose.instance.connection.readyState) {
 
-            jeneric.model.log.insertMany(this._logsToSaveQueue, function (err) {
+            log.insertMany(this._logsToSaveQueue, function (err) {
                 if (err) {
                     console.error(err);
                 }
@@ -348,4 +293,4 @@ class Logger {
     }
 }
 
-module.exports = Logger;
+module.exports = new Logger();

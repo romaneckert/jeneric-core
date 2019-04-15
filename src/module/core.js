@@ -1,138 +1,79 @@
-const mongoose = require('mongoose');
 const cluster = require('cluster');
 const os = require('os');
-const path = require('path');
-const fs = require('@jeneric/app/src/util/fs');
-const object = require('@jeneric/app/src/util/object');
+const nodePath = require('path');
+const util = require('@jeneric/app/src/util');
 const config = require('@jeneric/app/config');
+const logger = require('@jeneric/app/src/module/logger');
+const error = require('@jeneric/app/src/module/error');
 
 class Jeneric {
 
     boot() {
 
         // add additional information to config
-        config.startDate = new Date();
-        config.context = 'production';
+        config.module.core.startDate = new Date();
+        config.module.core.context = 'production';
+        config.module.core.rootPath = nodePath.join(process.cwd(), 'node_modules/@jeneric/app');
 
+        // check if config.appRoot exists
+        if(!util.fs.isDirectorySync(config.module.core.rootPath)) {
+            throw new Error(`application root ${config.module.core.rootPath} does not exists`);
+        }
+
+        // set context
         if ('string' === typeof process.env.NODE_ENV) {
-            config.context = process.env.NODE_ENV;
+            config.module.core.context = process.env.NODE_ENV;
         }
 
-        // loop over all directories
-        for (let directory of directories) {
+        // init modules
+        this.initModule(nodePath.join(config.module.core.rootPath, 'src/module'));
 
-            let pathToConfig = path.join(directory, 'config/index.js');
-
-            // load config and merge config from all directories
-            if (fs.isFileSync(pathToConfig)) object.merge(this.config, require(pathToConfig));
-
-            // autoload all classes from src folders of given directories
-            object.merge(this.class, this._autoload(path.join(directory, 'src')));
+        // log information about start process of core
+        if (!config.module.core.cluster || (cluster.worker && 1 === cluster.worker.id)) {
+            logger.log('application startet in context: "' + config.module.core.context + '"', null, 5, 'core', 'core');
         }
+
+        // start modules
+        this.startModule(nodePath.join(config.module.core.rootPath, 'src/module'));
 
         // create process for each cpu
-        if (cluster.isMaster && true === this.config.cluster) {
-            for (var i = 0; i < os.cpus().length; i++) cluster.fork();
+        if (cluster.isMaster && true === config.module.core.cluster) {
+            for (let i = 0; i < os.cpus().length; i++) cluster.fork();
             return;
         }
 
-        // instantiate some classes
-        let classesToInstantiate = {
-            util: this.class.util,
-            module: this.class.module,
-            middleware: this.class.middleware,
-            handler: this.class.handler
-        };
-
-        this._instantiate(classesToInstantiate, this.config, this);
-
-        // add logger to this
-        this.logger = this.module.logger;
-
         // handle uncaught exceptions
-        process.on('uncaughtException', this.module.error.handleUncaughtException);
+        process.on('uncaughtException', error.handleUncaughtException);
 
-        // add schema classes to container
-        for (let ns in this.class.schema) {
-            this.model[ns] = mongoose.model(ns, new this.class.schema[ns]());
-        }
+    }
 
-        // log information about start process of core
-        if (!this.config.cluster || (cluster.worker && 1 === cluster.worker.id)) {
-            this.logger.log('application startet in context: "' + this.config.context + '"', null, 5, 'core', 'core');
-        }
+    initModule(path) {
 
-        // call init methods on modules and middleware
-        for (let ns of ['module', 'middleware']) {
+        for(let file of util.fs.readdirSync(path)) {
 
-            for (let k in this[ns]) {
-                if ('function' === typeof this[ns][k].init) this[ns][k].init();
+            if(util.fs.isDirectorySync(file)) {
+                this.initModule(file);
+            } else {
+                let module = require(nodePath.join(path, file));
+
+                if ('function' === typeof module.init) module.init();
             }
-
-        }
-
-        // call start methods on modules
-        for (let ns in this.module) {
-            if ('function' === typeof this.module[ns].start) this.module[ns].start();
         }
 
     }
 
-    _instantiate(classes, config, instance) {
+    startModule(path) {
+        for(let file of util.fs.readdirSync(path)) {
+            if(util.fs.isDirectorySync(file)) {
+                this.startModule(file);
+            } else {
+                let module = require(nodePath.join(path, file));
 
-        if ('object' !== typeof instance) instance = {};
-
-        for (let namespace in classes) {
-
-            if ('object' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
-                instance[namespace] = this._instantiate(classes[namespace], config[namespace]);
-            } else if ('function' === typeof classes[namespace] && 'object' === typeof config[namespace]) {
-                instance[namespace] = new classes[namespace](config[namespace]);
-            } else if ('object' === typeof classes[namespace]) {
-                instance[namespace] = this._instantiate(classes[namespace], {});
-            } else if ('function' === typeof classes[namespace]) {
-                instance[namespace] = new classes[namespace]();
+                if ('function' === typeof module.start) module.start();
             }
-
         }
-
-        return instance;
     }
 
-    _autoload(directory) {
-        let obj = {};
-
-        if (fs.isDirectorySync(directory)) {
-
-            for (let dirName of fs.readdirSync(directory)) {
-                let result = this._autoload(path.join(directory, dirName));
-
-                if ('function' === typeof result) {
-                    let key = dirName.split('.')[0];
-                    let parts = key.split('-');
-
-                    for (let p in parts) {
-                        if (0 == p) {
-                            continue;
-                        }
-                        parts[p] = parts[p].charAt(0).toUpperCase() + parts[p].slice(1)
-                    }
-
-                    obj[parts.join('')] = result;
-                } else if ('object' === typeof result && null !== result) {
-                    obj[dirName] = result;
-                }
-            }
-
-        } else if (fs.isFileSync(directory)) {
-
-            if ('.js' === path.extname(directory)) return require(directory);
-
-            return null;
-        }
-
-        return obj;
-    }
 }
 
 module.exports = new Jeneric();

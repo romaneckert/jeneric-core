@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require('../src/util/fs');
+const object = require('../src/util/object');
 const path = require('path');
 
 class Install {
@@ -26,6 +27,9 @@ class Install {
         // create app folder @jeneric/app
         fs.ensureDirExists(this.pathToApp);
 
+        // add config
+        this.config = {};
+
         // loop over all modules and install
         for (let arg of this.args) {
 
@@ -36,15 +40,52 @@ class Install {
         }
 
         this.install(this.pathToRoot);
+
+        this.writeCustomConfig();
+        this.writeJeneric();
+    }
+
+    writeCustomConfig() {
+
+        let pathToConfig = path.join(this.pathToApp, '/config/index.js');
+        let fileContent = 'module.exports = ' + JSON.stringify(this.config, null, 4);
+
+        fs.ensureFileExists(pathToConfig);
+        fs.appendFileSync(pathToConfig, fileContent);
+
+    }
+
+    writeJeneric() {
+
     }
 
     install(pathToModule) {
-
-        if (!fs.lstatSync(pathToModule).isDirectory() && !fs.lstatSync(pathToModule).isSymbolicLink()) throw new Error(`${pathToModule} is not a directory`);
-
         console.log(`${pathToModule}`);
+        this.checkPath(pathToModule);
+        this.symlink(pathToModule);
+        this.addConfig(pathToModule);
+        console.log('--------------------');
+    }
 
-        for(let pathToDir of ['config', 'src', 'view']) {
+    checkPath(pathToModule) {
+        // check if pathToModule is a directory
+        let stats = null;
+
+        try {
+            stats = fs.lstatSync(pathToModule);
+        } catch(err) {
+            stats = null;
+        }
+
+        if(null === stats || !(stats.isDirectory() || stats.isSymbolicLink())) {
+            throw new Error(`${pathToModule} is not a directory`);
+        }
+    }
+
+    symlink(pathToModule) {
+
+        // symlink all files in src and view
+        for(let pathToDir of ['public', 'src', 'view']) {
 
             let src = path.join(pathToModule, pathToDir);
             let dest = path.join(this.pathToApp, pathToDir);
@@ -53,7 +94,31 @@ class Install {
 
         }
 
-        console.log('--------------------');
+    }
+
+    addConfig(pathToModule) {
+
+        // check path to config
+        let pathToConfig = path.join(pathToModule, 'config/index.js');
+
+        // check if pathToModule is a directory
+        let stats = null;
+
+        try {
+            stats = fs.lstatSync(pathToConfig);
+        } catch(err) {
+            stats = null;
+        }
+
+        if(null === stats || !stats.isFile()) {
+            return false;
+        }
+
+        let config = require(pathToConfig);
+
+        object.merge(this.config, config);
+
+        return true;
     }
 
     symlinkOnlyFilesSync(src,dest) {
@@ -85,7 +150,7 @@ class Install {
         }
 
         return true;
-    };
+    }
 }
 
 new Install();

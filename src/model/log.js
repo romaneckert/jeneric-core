@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 class Log {
     constructor() {
 
-        return new mongoose.Schema({
+        const schema = new mongoose.Schema({
             code: {
                 type: Number,
                 required: true
@@ -33,8 +33,10 @@ class Log {
             }
         }, { versionKey: false });
 
+        return mongoose.model(this.constructor.name, schema);
+
     }
 
 }
 
-module.exports = Log;
+module.exports = new Log();

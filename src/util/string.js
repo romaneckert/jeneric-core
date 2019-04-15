@@ -1,13 +1,13 @@
-class StringUtil {
+module.exports = {
 
     toSingle(string) {
         if (string.indexOf('ies') === string.length - 3) return string.slice(0, -3) + 'y';
         if (string.indexOf('s') === string.length - 1) return string.slice(0, -1);
-    }
+    },
 
     toMany(string) {
         return (string.indexOf('y') === string.length - 1) ? string.slice(0, -1) + 'ies' : string + 's';
-    }
+    },
 
     cast(val) {
 
@@ -35,8 +35,6 @@ class StringUtil {
 
         return String(val);
     }
-}
-
-module.exports = StringUtil;
+};
 
 

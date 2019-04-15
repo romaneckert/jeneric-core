@@ -1,8 +1,71 @@
 'use strict';
 
-const path = require('path');
-
+const nodePath = require('path');
 const fs = require('fs');
+
+/**
+ * @description Check if a path is a directory or a symlink, which links to a directory.
+ * @example
+ * fs.isDirectory(path)
+ * @param {string} path - Path of the directory.
+ * @returns {boolean} - Returns true if directoryPath is a directory or a symlink, which links to a directory.
+ */
+fs.isDirectorySync = (path) => {
+
+    let stats = null;
+
+    // check if directory is a symlink or broken symlink
+    try {
+        stats = fs.lstatSync(path);
+    } catch(err) {
+        stats = null;
+    }
+
+    if(null === stats) return false;
+
+    // return true if directory
+    if(stats.isDirectory()) return true;
+
+    // return true if symlink and symlink is dir
+    if(stats.isSymbolicLink()) {
+        try {
+            return fs.lstatSync(fs.readlinkSync(path)).isDirectory();
+        } catch(err) {
+            return false;
+        }
+    }
+
+    return false;
+
+};
+
+fs.isFile = (path) => {
+    let stats = null;
+
+    // check if directory is a symlink or broken symlink
+    try {
+        stats = fs.lstatSync(path);
+    } catch(err) {
+        stats = null;
+    }
+
+    if(null === stats) return false;
+
+    // return true if directory
+    if(stats.isFile()) return true;
+
+    // return true if symlink and symlink is dir
+    if(stats.isSymbolicLink()) {
+        try {
+            return fs.lstatSync(fs.readlinkSync(path)).isFile();
+        } catch(err) {
+            return false;
+        }
+    }
+
+    return false;
+
+};
 
 fs.copySync = (src, dest) => {
     // check if source exists
@@ -23,7 +86,7 @@ fs.copySync = (src, dest) => {
         let files = fs.readdirSync(src);
 
         for (let file of files) {
-            if (!fs.copySync(path.join(src, file), path.join(dest, file))) return false;
+            if (!fs.copySync(nodePath.join(src, file), nodePath.join(dest, file))) return false;
         }
 
     } else {
@@ -33,13 +96,13 @@ fs.copySync = (src, dest) => {
     return true;
 };
 
-fs.ensureFileExists = function (filePath) {
-    if (fs.existsSync(filePath)) return true;
+fs.ensureFileExists = function (path) {
+    if (fs.existsSync(path)) return true;
 
-    fs.ensureDirExists(path.dirname(filePath));
+    fs.ensureDirExists(nodePath.dirname(path));
 
     try {
-        fs.writeFileSync(filePath, '');
+        fs.writeFileSync(path, '');
     } catch (err) {
         if ('EEXIST' !== err.code) {
             throw err;
@@ -49,13 +112,13 @@ fs.ensureFileExists = function (filePath) {
     return true;
 };
 
-fs.ensureDirExists = function (directoryPath) {
-    if (fs.existsSync(directoryPath)) return true;
+fs.ensureDirExists = function (path) {
+    if (fs.existsSync(path)) return true;
 
-    fs.ensureDirExists(path.dirname(directoryPath));
+    fs.ensureDirExists(nodePath.dirname(path));
 
     try {
-        fs.mkdirSync(directoryPath);
+        fs.mkdirSync(path);
     } catch (err) {
         if ('EEXIST' !== err.code) {
             throw err;
@@ -65,29 +128,29 @@ fs.ensureDirExists = function (directoryPath) {
     return true;
 };
 
-fs.creationDate = function (directory) {
+fs.creationDate = function (path) {
 
-    if (!fs.existsSync(directory)) {
+    if (!fs.existsSync(path)) {
         return false;
     }
 
-    return fs.lstatSync(directory).ctime;
+    return fs.lstatSync(path).ctime;
 };
 
 /**
  * @description Remove synchronous a file or directory.
  * @example
  * fs.removeSync('./path')
- * @param {string} directory - Path to directory.
+ * @param {string} path - Path to directory.
  * @returns {boolean} - True if done.
  */
-fs.removeSync = function (directory) {
+fs.removeSync = function (path) {
 
     let stats = null;
 
     // check if directory is a symlink or broken symlink
     try {
-        stats = fs.lstatSync(directory);
+        stats = fs.lstatSync(path);
     } catch(err) {
         stats = null;
     }
@@ -95,13 +158,13 @@ fs.removeSync = function (directory) {
     if(null === stats) return true;
 
     if (stats.isDirectory()) {
-        for (let file of fs.readdirSync(directory)) {
-            fs.removeSync(path.join(directory, file));
+        for (let file of fs.readdirSync(path)) {
+            fs.removeSync(nodePath.join(path, file));
         }
 
-        fs.rmdirSync(directory);
+        fs.rmdirSync(path);
     } else {
-        fs.unlinkSync(directory);
+        fs.unlinkSync(path);
     }
 
     return true;

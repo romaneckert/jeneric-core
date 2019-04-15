@@ -1,9 +1,13 @@
+const logger = require('@jeneric/app/src/module/logger');
+
 class Error {
 
     handleUncaughtException(error) {
 
         try {
-            jeneric.module.logger.log(error.message, error, this.classDefinition, jeneric.util.error.stack(error), 0);
+            logger.error(error.message);
+            // TODO: optimize
+            //logger.error(error.message, error, this.classDefinition, jeneric.util.error.stack(error), 0);
         } catch (err) {
             throw error;
         }
@@ -13,4 +17,4 @@ class Error {
 
 }
 
-module.exports = Error;
+module.exports = new Error();
