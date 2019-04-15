@@ -21,7 +21,7 @@ module.exports = class Auth {
             tokenExpiresIn: 3600
         };
 
-        jeneric.util.object.merge(this.config, config);
+        app.util.object.merge(this.config, config);
     }
 
     signIn(req, res, user) {

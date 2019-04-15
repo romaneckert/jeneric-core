@@ -57,24 +57,36 @@ class Install {
 
     writeJeneric() {
 
-        let pathToModules = path.join(this.pathToApp, './src/module');
-
-        if (!fs.isDirectorySync(pathToModules)) throw new Error(`${pathToModules} does not exists.`);
+        let nameSpaces = ['module', 'util'];
 
         let fileContent = `const app = new (require('./src/module/core.js'))();\n`;
-        fileContent += `app.module = {\n`;
 
-        for (let fileName of fs.readdirSync(pathToModules)) {
+        for(let ns of nameSpaces) {
 
-            if('core.js' === fileName) continue;
+            let pathToNs = path.join(this.pathToApp, `./src/${ns}`);
 
-            fileContent += `    ${fs.fileNameToClassName(fileName)}: new (require('./${path.join('src/module', fileName)}'))(),\n`;
+            if (!fs.isDirectorySync(pathToNs)) throw new Error(`${pathToNs} does not exists.`);
 
+            fileContent += `app.${ns} = {\n`;
+
+            for (let fileName of fs.readdirSync(pathToNs)) {
+
+                if('module' === ns && ('core.js' === fileName || 'logger.js' === fileName)) continue;
+
+                if('util' === ns) {
+                    fileContent += `    ${fs.fileNameToClassName(fileName)}: require('./${path.join(`src/${ns}`, fileName)}'),\n`;
+                } else {
+                    fileContent += `    ${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;
+                }
+
+            }
+
+            fileContent += `};\n`;
         }
 
-        fileContent += `};`;
+        fileContent += `app.logger = require('./src/module/logger');\n`;
 
-        fileContent += `module.exports = app`;
+        fileContent += `module.exports = app;`;
 
         let filePath = path.join(this.pathToApp, 'index.js');
 
