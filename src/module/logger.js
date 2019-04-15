@@ -1,10 +1,7 @@
 const path = require('path');
 const stackTrace = require('stack-trace');
-const util = require('@jeneric/app/src/util');
-const config = require('@jeneric/app/config');
-const Log = require('@jeneric/app/src/model/log');
 
-class Logger {
+module.exports = class Logger {
     constructor() {
         this._logsToSaveQueue = [];
         this._history = [];
@@ -291,6 +288,4 @@ class Logger {
     get history() {
         return this._history;
     }
-}
-
-module.exports = new Logger();
+};

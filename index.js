@@ -1,4 +1,6 @@
 #!/usr/bin/env node
-const jeneric = require('@jeneric/app/src/module/core');
+const app = require('@jeneric/app');
 
-jeneric.boot();
+app.boot();
+
+console.log(app.module.logger);

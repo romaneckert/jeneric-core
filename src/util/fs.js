@@ -39,7 +39,7 @@ fs.isDirectorySync = (path) => {
 
 };
 
-fs.isFile = (path) => {
+fs.isFileSync = (path) => {
     let stats = null;
 
     // check if directory is a symlink or broken symlink

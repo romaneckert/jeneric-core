@@ -56,7 +56,7 @@ class Install {
     }
 
     writeJeneric() {
-
+        fs.renameSync(path.join(this.pathToApp, 'src/module/app.js'), path.join(this.pathToApp, 'index.js'));
     }
 
     install(pathToModule) {
