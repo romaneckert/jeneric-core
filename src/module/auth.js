@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const app = require('@jeneric/app');
 
 /**
  * @global

@@ -56,7 +56,31 @@ class Install {
     }
 
     writeJeneric() {
-        fs.renameSync(path.join(this.pathToApp, 'src/module/app.js'), path.join(this.pathToApp, 'index.js'));
+
+        let pathToModules = path.join(this.pathToApp, './src/module');
+
+        if (!fs.isDirectorySync(pathToModules)) throw new Error(`${pathToModules} does not exists.`);
+
+        let fileContent = `const app = new (require('./src/module/core.js'))();\n`;
+        fileContent += `app.module = {\n`;
+
+        for (let fileName of fs.readdirSync(pathToModules)) {
+
+            if('core.js' === fileName) continue;
+
+            fileContent += `    ${fs.fileNameToClassName(fileName)}: new (require('./${path.join('src/module', fileName)}'))(),\n`;
+
+        }
+
+        fileContent += `};`;
+
+        fileContent += `module.exports = app`;
+
+        let filePath = path.join(this.pathToApp, 'index.js');
+
+        fs.ensureFileExists(filePath);
+
+        fs.appendFileSync(filePath, fileContent);
     }
 
     install(pathToModule) {

@@ -3,6 +3,21 @@
 const nodePath = require('path');
 const fs = require('fs');
 
+// TODO: optimize
+fs.fileNameToClassName = (fileName) => {
+    let key = fileName.split('.')[0];
+    let parts = key.split('-');
+
+    for (let p in parts) {
+        if (0 == p) {
+            continue;
+        }
+        parts[p] = parts[p].charAt(0).toUpperCase() + parts[p].slice(1)
+    }
+
+    return parts.join('');
+};
+
 /**
  * @description Check if a path is a directory or a symlink, which links to a directory.
  * @example
