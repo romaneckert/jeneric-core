@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-class Log {
+module.exports = class Log {
     constructor() {
 
         const schema = new mongoose.Schema({
@@ -31,12 +31,10 @@ class Log {
                 type: String,
                 required: true
             }
-        }, { versionKey: false });
+        }, {versionKey: false});
 
         return mongoose.model(this.constructor.name, schema);
 
     }
 
-}
-
-module.exports = new Log();
+};

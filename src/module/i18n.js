@@ -7,15 +7,7 @@ const path = require('path');
  */
 module.exports = class I18n {
 
-    constructor(config) {
-
-        this.config = {
-            locales: ['en'],
-            defaultLocale: 'en'
-        };
-
-        jeneric.util.object.merge(this.config, config);
-
+    constructor() {
         this._catalog = {};
     }
 

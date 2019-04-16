@@ -1,10 +1,20 @@
+const crypto = require('crypto');
+
 module.exports = {
+    app: {
+        secret: crypto.randomBytes(32).toString('hex')
+    },
     module: {
         auth: {
-            tokenExpiresIn: 86400
+            tokenExpiresIn: 86400,
+            tokenCookieName: '_t',
         },
         core: {
             cluster: false
+        },
+        i18n: {
+            locales: ['en'],
+            defaultLocale: 'en'
         },
         logger: {
             directory: 'var/logs',
@@ -59,6 +69,10 @@ module.exports = {
                     color: "\x1b[37m"
                 }
             }
+        },
+        mail: {
+            defaultFrom: 'default@mail',
+            connectionTimeout: 2000
         },
         mongoose: {
             connection: {

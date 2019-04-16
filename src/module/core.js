@@ -24,16 +24,23 @@ module.exports = class Core {
         }
 
         this.module = {};
+        this.logger = null;
+    }
+
+    init() {
+        throw new Error('this init() function should be overwritten');
     }
 
     boot() {
+
+        this.init();
 
         // init modules
         this._initModule(path.join(this.config.module.core.rootPath, 'src/module'));
 
         // log information about start process of core
         if (!this.config.module.core.cluster || (cluster.worker && 1 === cluster.worker.id)) {
-            this.module.logger.log('application startet in context: "' + this.config.module.core.context + '"', null, 5, 'core', 'core');
+            this.logger.log('application startet in context: "' + this.config.module.core.context + '"', null, 5, 'core', 'core');
         }
 
         // start modules

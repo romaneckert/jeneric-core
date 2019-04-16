@@ -1,11 +1,11 @@
 const path = require('path');
 const stackTrace = require('stack-trace');
+const app = require('@jeneric/app');
 
 module.exports = class Logger {
     constructor() {
         this._logsToSaveQueue = [];
         this._history = [];
-        this._mongoose = require('@jeneric/app/src/module/mongoose');
     }
 
     emergency(message, meta) {
@@ -73,18 +73,18 @@ module.exports = class Logger {
         let date = new Date();
 
         // cast to string
-        message = util.string.cast(message).trim();
+        message = app.util.string.cast(message).trim();
 
         // remove line breaks from message
         message = message.replace(/(\r?\n|\r)/gm, ' ');
 
         // cast meta data like objects to string
-        meta = util.string.cast(meta);
+        meta = app.util.string.cast(meta);
 
         stack = this._stackToString(stack);
 
         // create log entity
-        let log = new Log({
+        let log = new app.model.log({
             code: code,
             date: date,
             message: message,
@@ -121,7 +121,7 @@ module.exports = class Logger {
                 && oldLog.message === log.message
                 && oldLog.meta === log.meta
                 && oldLog.type === log.type
-                && log.date - oldLog.date < config.module.logger.duplicateTime
+                && log.date - oldLog.date < app.config.module.logger.duplicateTime
             ) {
                 return true;
             }
@@ -132,6 +132,8 @@ module.exports = class Logger {
 
     _writeToLogFiles(log) {
 
+        console.log(log);
+
         // write log entry in specific log file by type and by class type/name
         let logFiles = [
             this._getPathToLogFile(log.code, []),
@@ -139,7 +141,7 @@ module.exports = class Logger {
         ];
 
         let output = '[' + this._dateStringFromDate(log.date) + '] ';
-        output += '[' + config.module.logger.levels[log.code].name + '] ';
+        output += '[' + app.config.module.logger.levels[log.code].name + '] ';
         output += '[' + log.type + '/' + log.name + '] ';
         output += '[' + log.message + ']';
         if (log.meta.length > 0) output += ' [' + log.meta + ']';
@@ -148,13 +150,13 @@ module.exports = class Logger {
         for (let logFile of logFiles) {
 
             // check if log file exists and create if not
-            util.fs.ensureFileExists(logFile);
+            app.util.fs.ensureFileExists(logFile);
 
             // check if log rotation is necessary
             this._rotateLogFile(logFile);
 
             // write line to log file
-            util.fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
+            app.util.fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
 
         }
 
@@ -162,37 +164,37 @@ module.exports = class Logger {
 
     _rotateLogFile(pathToLogFile) {
 
-        let fileSize = util.fs.statSync(pathToLogFile).size;
+        let fileSize = app.util.fs.statSync(pathToLogFile).size;
 
-        if (fileSize < config.module.logger.maxSizePerLogFile) return false;
+        if (fileSize < app.config.module.logger.maxSizePerLogFile) return false;
 
-        for (let i = config.module.logger.maxLogRotationsPerType - 1; i >= 0; i--) {
+        for (let i = app.config.module.logger.maxLogRotationsPerType - 1; i >= 0; i--) {
 
             let pathToArchivedLogFile = pathToLogFile + '.' + i;
 
             // check if archived file exists
-            if (!util.fs.existsSync(pathToArchivedLogFile)) continue;
+            if (!app.util.fs.existsSync(pathToArchivedLogFile)) continue;
 
             // unlink last log file
-            if (config.module.logger.maxLogRotationsPerType - 1 === i) {
-                util.fs.unlinkSync(pathToArchivedLogFile);
+            if (app.config.module.logger.maxLogRotationsPerType - 1 === i) {
+                app.util.fs.unlinkSync(pathToArchivedLogFile);
                 continue;
             }
 
-            util.fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
+            app.util.fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
         }
 
-        util.fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
-        util.fs.ensureFileExists(pathToLogFile);
+        app.util.fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
+        app.util.fs.ensureFileExists(pathToLogFile);
     }
 
     _getPathToLogFile(code, namespaces) {
 
         return path.join(
             path.dirname(process.mainModule.filename),
-            config.module.logger.directory,
+            app.config.module.logger.directory,
             namespaces.join('/'),
-            config.module.logger.levels[code].name + '.log'
+            app.config.module.logger.levels[code].name + '.log'
         );
     }
 
@@ -200,14 +202,14 @@ module.exports = class Logger {
     _writeToConsole(log) {
 
         // disabled, if config console disabled
-        if (!config.module.logger.levels[log.code].console) return;
+        if (!app.config.module.logger.levels[log.code].console) return;
 
         // disabled, if log level less then notice and in mode production
-        if (log.code > 5 && config.module.core.context === 'production') return;
+        if (log.code > 5 && app.config.module.core.context === 'production') return;
 
         let consoleOutput = '';
 
-        consoleOutput += `[${config.module.logger.levels[log.code].name}] `;
+        consoleOutput += `[${app.config.module.logger.levels[log.code].name}] `;
         consoleOutput += log.message + ' ';
         consoleOutput += '[' + log.type + '/' + log.name + '] ';
 
@@ -215,18 +217,18 @@ module.exports = class Logger {
 
         consoleOutput += `[pid:${process.pid}] `;
 
-        if (log.code < 4 && jeneric.config.context !== 'production') {
+        if (log.code < 4 && app.config.app.context !== 'production') {
             consoleOutput += '[' + log.stack + ']';
         }
 
-        console.log(config.module.logger.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
+        console.log(app.module.logger.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
 
     }
 
     _addToHistory(log) {
 
         // remove older entries if log history greater then max history length
-        while (this._history.length > config.module.logger.maxHistoryLength) this._history.pop();
+        while (this._history.length > app.config.module.logger.maxHistoryLength) this._history.pop();
 
         // add current log to history
         this._history.push(log);
@@ -242,7 +244,7 @@ module.exports = class Logger {
 
         this._logsToSaveQueue.push(log);
 
-        if (mongoose && 1 === mongoose.instance.connection.readyState) {
+        if (app.module.mongoose && 1 === app.module.mongoose.instance.connection.readyState) {
 
             log.insertMany(this._logsToSaveQueue, function (err) {
                 if (err) {

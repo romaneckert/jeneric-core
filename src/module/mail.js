@@ -4,14 +4,7 @@ const querystring = require('querystring');
 
 class Mail {
 
-    constructor(config) {
-        this.config = {
-            defaultFrom: 'default@mail',
-            connectionTimeout: 2000
-        };
-
-        jeneric.util.object.merge(this.config, config);
-
+    constructor() {
         this.transporter = null;
     }
 

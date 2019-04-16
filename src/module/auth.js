@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const app = require('@jeneric/app');
 
 /**
@@ -12,17 +11,6 @@ const app = require('@jeneric/app');
  * @alias jeneric.module.auth
  */
 module.exports = class Auth {
-
-    constructor(config) {
-
-        this.config = {
-            tokenCookieName: '_t',
-            secret: crypto.randomBytes(32).toString('hex'),
-            tokenExpiresIn: 3600
-        };
-
-        app.util.object.merge(this.config, config);
-    }
 
     signIn(req, res, user) {
 

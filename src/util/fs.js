@@ -21,11 +21,11 @@ fs.fileNameToClassName = (fileName) => {
 /**
  * @description Check if a path is a directory or a symlink, which links to a directory.
  * @example
- * fs.isDirectory(path)
+ * fs.isDirectorySync(path)
  * @param {string} path - Path of the directory.
  * @returns {boolean} - Returns true if directoryPath is a directory or a symlink, which links to a directory.
  */
-fs.isDirectorySync = (path) => {
+fs.isDirectorySync = function(path) {
 
     let stats = null;
 

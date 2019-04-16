@@ -57,36 +57,44 @@ class Install {
 
     writeJeneric() {
 
-        let nameSpaces = ['module', 'util'];
+        let tab = '    ';
+        let nameSpaces = ['util', 'module', 'model'];
 
-        let fileContent = `const app = new (require('./src/module/core.js'))();\n`;
+        let fileContent = "const Core = require('./src/module/core.js');\n";
+        fileContent += "class App extends Core {\n";
+        fileContent += `${tab}init() {\n`;
 
         for(let ns of nameSpaces) {
 
-            let pathToNs = path.join(this.pathToApp, `./src/${ns}`);
+            let pathToNs = path.join(this.pathToApp, './src/', ns);
 
-            if (!fs.isDirectorySync(pathToNs)) throw new Error(`${pathToNs} does not exists.`);
+            if (!fs.isDirectorySync(pathToNs)) {
+                throw new Error(`${pathToNs} does not exists.`);
+            }
 
-            fileContent += `app.${ns} = {\n`;
+            fileContent += `${tab}${tab}this.${ns} = {\n`;
 
             for (let fileName of fs.readdirSync(pathToNs)) {
 
                 if('module' === ns && ('core.js' === fileName || 'logger.js' === fileName)) continue;
 
-                if('util' === ns) {
-                    fileContent += `    ${fs.fileNameToClassName(fileName)}: require('./${path.join(`src/${ns}`, fileName)}'),\n`;
+                if('util' === ns || 'model' === ns) {
+                    fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: require('./${path.join(`src/${ns}`, fileName)}'),\n`;
                 } else {
-                    fileContent += `    ${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;
+                    fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;
                 }
 
             }
 
-            fileContent += `};\n`;
+            fileContent += `${tab}${tab}};\n`;
         }
 
-        fileContent += `app.logger = require('./src/module/logger');\n`;
+        fileContent += `${tab}${tab}this.logger = new (require('./src/module/logger.js'))();\n`;
 
-        fileContent += `module.exports = app;`;
+        fileContent += `${tab}}\n`;
+        fileContent += "}\n";
+
+        fileContent += "module.exports = new App();";
 
         let filePath = path.join(this.pathToApp, 'index.js');
 
@@ -137,16 +145,7 @@ class Install {
         // check path to config
         let pathToConfig = path.join(pathToModule, 'config/index.js');
 
-        // check if pathToModule is a directory
-        let stats = null;
-
-        try {
-            stats = fs.lstatSync(pathToConfig);
-        } catch(err) {
-            stats = null;
-        }
-
-        if(null === stats || !stats.isFile()) {
+        if(!fs.isFileSync(pathToConfig)) {
             return false;
         }
 
