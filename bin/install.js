@@ -47,6 +47,10 @@ class Install {
 
     writeCustomConfig() {
 
+        this.config.app.buildDate = new Date();
+
+        this.config.app.path = this.pathToApp;
+
         let pathToConfig = path.join(this.pathToApp, '/config/index.js');
         let fileContent = 'module.exports = ' + JSON.stringify(this.config, null, 4);
 
@@ -147,7 +151,7 @@ class Install {
     symlink(pathToModule) {
 
         // symlink all files in src and view
-        for(let pathToDir of ['public', 'src', 'view']) {
+        for(let pathToDir of ['public', 'src', 'view', 'locale']) {
 
             let src = path.join(pathToModule, pathToDir);
             let dest = path.join(this.pathToApp, pathToDir);

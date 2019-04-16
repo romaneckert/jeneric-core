@@ -65,7 +65,7 @@ module.exports = {
         }
     },
     mail: {
-        defaultFrom: 'default@mail',
+        defaultFrom: 'default@jeneric',
         connectionTimeout: 2000
     },
     mongoose: {

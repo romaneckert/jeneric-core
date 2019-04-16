@@ -1,4 +1,5 @@
 const path = require('path');
+const app = require('@jeneric/app');
 
 /**
  * @param {object} config
@@ -8,10 +9,15 @@ const path = require('path');
 class I18n {
 
     constructor() {
+        this.config = app.config.i18n;
         this._catalog = {};
     }
 
     init() {
+
+        this._buildCatalog(path.join(app.config.app.path, 'locale'), this._catalog);
+
+        return;
 
         for (let directory of jeneric.config.directories) {
 
@@ -39,6 +45,21 @@ class I18n {
 
             }
         }
+    }
+
+    _buildCatalog(pathToLocales, catalog) {
+
+        console.log(pathToLocales);
+
+        if(app.util.fs.isDirectorySync(pathToLocales)) {
+            for(let dir of app.util.fs.readdirSync(pathToLocales)) {
+
+                catalog[dir] 
+
+                this._buildCatalog(dir);
+            }
+        }
+
     }
 
     /**

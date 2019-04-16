@@ -81,7 +81,7 @@ class Auth {
     /**
      * @description Verify the json web token in the cookie of the request.
      * @example
-     * jeneric.module.auth.verify(req,res);
+     * app.module.auth.verify(req,res);
      * @param {Object} req - The Request object.
      * @param {Object} res - The Response object.
      * @returns {Object} The user which was verified.

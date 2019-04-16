@@ -6,22 +6,20 @@ const fs = require('@jeneric/app/src/util/fs');
 class Core {
 
     constructor() {
-        this.config = require('@jeneric/app/config');
-
-        this.config.app.startDate = new Date();
+        let config = require('@jeneric/app/config');
 
         if ('string' === typeof process.env.NODE_ENV) {
-            this.config.app.context = process.env.NODE_ENV;
+            config.app.context = process.env.NODE_ENV;
         } else {
-            this.config.app.context = 'production';
+            config.app.context = 'production';
         }
-
-        this.config.app.rootPath = path.join(process.cwd(), 'node_modules/@jeneric/app');
 
         // check if config.appRoot exists
-        if(!fs.isDirectorySync(this.config.app.rootPath)) {
-            throw new Error(`application root ${this.config.app.rootPath} does not exists`);
+        if(!fs.isDirectorySync(config.app.path)) {
+            throw new Error(`application root ${config.app.path} does not exists`);
         }
+
+        this.config = config;
 
         this.module = {};
         this.logger = null;
@@ -36,7 +34,7 @@ class Core {
         this.init();
 
         // init modules
-        this._initModule(path.join(this.config.app.rootPath, 'src/module'));
+        this._initModule();
 
         // log information about start process of core
         if (!this.config.app.cluster || (cluster.worker && 1 === cluster.worker.id)) {
@@ -44,7 +42,7 @@ class Core {
         }
 
         // start modules
-        this._startModule(path.join(this.config.app.rootPath, 'src/module'));
+        this._startModule();
 
         // create process for each cpu
         if (cluster.isMaster && true === this.config.app.cluster) {
@@ -57,30 +55,23 @@ class Core {
 
     }
 
-    _initModule(pathToModule) {
+    _initModule() {
 
-        for(let file of fs.readdirSync(pathToModule)) {
+        for(let m in this.module) {
+            let module = this.module[m];
 
-            if(fs.isDirectorySync(file)) {
-                this._initModule(file);
-            } else {
-                let module = require(path.join(pathToModule, file));
+            if ('function' === typeof module.init) module.init();
 
-                if ('function' === typeof module.init) module.init();
-            }
         }
 
     }
 
-    _startModule(pathToModule) {
-        for(let file of fs.readdirSync(pathToModule)) {
-            if(fs.isDirectorySync(file)) {
-                this._startModule(file);
-            } else {
-                let module = require(path.join(pathToModule, file));
+    _startModule() {
+        for(let m in this.module) {
+            let module = this.module[m];
 
-                if ('function' === typeof module.start) module.start();
-            }
+            if ('function' === typeof module.start) module.start();
+
         }
     }
 
