@@ -42,7 +42,7 @@ class Install {
         this.install(this.pathToRoot);
 
         this.writeCustomConfig();
-        this.writeJeneric();
+        this.writeAppFile();
     }
 
     writeCustomConfig() {
@@ -55,16 +55,15 @@ class Install {
 
     }
 
-    writeJeneric() {
+    writeAppFile() {
 
         let tab = '    ';
-        let nameSpaces = ['util', 'module', 'model'];
 
         let fileContent = "const Core = require('./src/module/core.js');\n";
         fileContent += "class App extends Core {\n";
         fileContent += `${tab}init() {\n`;
 
-        for(let ns of nameSpaces) {
+        for(let ns of ['util', 'model']) {
 
             let pathToNs = path.join(this.pathToApp, './src/', ns);
 
@@ -75,8 +74,6 @@ class Install {
             fileContent += `${tab}${tab}this.${ns} = {\n`;
 
             for (let fileName of fs.readdirSync(pathToNs)) {
-
-                if('module' === ns && ('core.js' === fileName || 'logger.js' === fileName)) continue;
 
                 if('util' === ns) {
                     fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: require('./${path.join(`src/${ns}`, fileName)}'),\n`;
@@ -90,6 +87,27 @@ class Install {
         }
 
         fileContent += `${tab}${tab}this.logger = new (require('./src/module/logger.js'))();\n`;
+
+        for(let ns of ['module']) {
+
+            let pathToNs = path.join(this.pathToApp, './src/', ns);
+
+            if (!fs.isDirectorySync(pathToNs)) {
+                throw new Error(`${pathToNs} does not exists.`);
+            }
+
+            fileContent += `${tab}${tab}this.${ns} = {\n`;
+
+            for (let fileName of fs.readdirSync(pathToNs)) {
+
+                if('module' === ns && ('core.js' === fileName || 'logger.js' === fileName)) continue;
+
+                fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;
+
+            }
+
+            fileContent += `${tab}${tab}};\n`;
+        }
 
         fileContent += `${tab}}\n`;
         fileContent += "}\n";

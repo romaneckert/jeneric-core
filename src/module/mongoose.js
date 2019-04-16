@@ -3,14 +3,13 @@ const app = require('@jeneric/app');
 class Mongoose {
     constructor() {
         this.instance = require('mongoose');
-        this.logger = require('@jeneric/app/src/module/logger');
         this.config = app.config.mongoose;
     }
 
     init() {
-        this.instance.connection.on('error', (err) => this.logger.error(err));
-        this.instance.connection.on('disconnected', () => this.logger.notice('disconnect from mongodb'));
-        this.instance.connection.on('connected', () => this.logger.notice('connected to mongodb'));
+        this.instance.connection.on('error', (err) => app.logger.error(err));
+        this.instance.connection.on('disconnected', () => app.logger.notice('disconnect from mongodb'));
+        this.instance.connection.on('connected', () => app.logger.notice('connected to mongodb'));
     }
 
     start() {

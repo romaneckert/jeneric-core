@@ -1,13 +1,10 @@
-const crypto = require('crypto');
-
 module.exports = {
     app: {
-        cluster: false,
-        secret: crypto.randomBytes(32).toString('hex')
+        cluster: false
     },
     auth: {
-        tokenExpiresIn: 86400,
-        tokenCookieName: '_t',
+        tokenExpiresIn: 600,
+        tokenCookieName: '_t'
     },
     i18n: {
         locales: ['en'],
