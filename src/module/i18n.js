@@ -5,7 +5,7 @@ const path = require('path');
  * @class i18n
  * @alias jeneric.module.i18n
  */
-module.exports = class I18n {
+class I18n {
 
     constructor() {
         this._catalog = {};
@@ -139,3 +139,5 @@ module.exports = class I18n {
 
     }
 }
+
+module.exports = I18n;

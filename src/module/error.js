@@ -1,4 +1,4 @@
-module.exports = class Error {
+class Error {
 
     handleUncaughtException(error) {
 
@@ -13,4 +13,6 @@ module.exports = class Error {
         process.exit(1);
     }
 
-};
+}
+
+module.exports = Error;

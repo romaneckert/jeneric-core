@@ -1,8 +1,10 @@
-module.exports = class Mongoose {
+const app = require('@jeneric/app');
+
+class Mongoose {
     constructor() {
         this.instance = require('mongoose');
         this.logger = require('@jeneric/app/src/module/logger');
-        this.config = require('@jeneric/app/config').module.mongoose;
+        this.config = app.config.mongoose;
     }
 
     init() {
@@ -25,4 +27,6 @@ module.exports = class Mongoose {
 
         this.instance.connect(this.config.url, this.config.connection);
     }
-};
+}
+
+module.exports = Mongoose;

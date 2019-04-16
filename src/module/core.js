@@ -3,24 +3,24 @@ const os = require('os');
 const path = require('path');
 const fs = require('@jeneric/app/src/util/fs');
 
-module.exports = class Core {
+class Core {
 
     constructor() {
         this.config = require('@jeneric/app/config');
 
-        this.config.module.core.startDate = new Date();
+        this.config.app.startDate = new Date();
 
         if ('string' === typeof process.env.NODE_ENV) {
-            this.config.module.core.context = process.env.NODE_ENV;
+            this.config.app.context = process.env.NODE_ENV;
         } else {
-            this.config.module.core.context = 'production';
+            this.config.app.context = 'production';
         }
 
-        this.config.module.core.rootPath = path.join(process.cwd(), 'node_modules/@jeneric/app');
+        this.config.app.rootPath = path.join(process.cwd(), 'node_modules/@jeneric/app');
 
         // check if config.appRoot exists
-        if(!fs.isDirectorySync(this.config.module.core.rootPath)) {
-            throw new Error(`application root ${this.config.module.core.rootPath} does not exists`);
+        if(!fs.isDirectorySync(this.config.app.rootPath)) {
+            throw new Error(`application root ${this.config.app.rootPath} does not exists`);
         }
 
         this.module = {};
@@ -36,18 +36,18 @@ module.exports = class Core {
         this.init();
 
         // init modules
-        this._initModule(path.join(this.config.module.core.rootPath, 'src/module'));
+        this._initModule(path.join(this.config.app.rootPath, 'src/module'));
 
         // log information about start process of core
-        if (!this.config.module.core.cluster || (cluster.worker && 1 === cluster.worker.id)) {
-            this.logger.log('application startet in context: "' + this.config.module.core.context + '"', null, 5, 'core', 'core');
+        if (!this.config.app.cluster || (cluster.worker && 1 === cluster.worker.id)) {
+            this.logger.log('application startet in context: "' + this.config.app.context + '"', null, 5, 'core', 'core');
         }
 
         // start modules
-        this._startModule(path.join(this.config.module.core.rootPath, 'src/module'));
+        this._startModule(path.join(this.config.app.rootPath, 'src/module'));
 
         // create process for each cpu
-        if (cluster.isMaster && true === this.config.module.core.cluster) {
+        if (cluster.isMaster && true === this.config.app.cluster) {
             for (let i = 0; i < os.cpus().length; i++) cluster.fork();
             return;
         }
@@ -84,4 +84,6 @@ module.exports = class Core {
         }
     }
 
-};
+}
+
+module.exports = Core;

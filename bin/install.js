@@ -78,7 +78,7 @@ class Install {
 
                 if('module' === ns && ('core.js' === fileName || 'logger.js' === fileName)) continue;
 
-                if('util' === ns || 'model' === ns) {
+                if('util' === ns) {
                     fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: require('./${path.join(`src/${ns}`, fileName)}'),\n`;
                 } else {
                     fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;

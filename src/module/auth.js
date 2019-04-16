@@ -10,7 +10,13 @@ const app = require('@jeneric/app');
  * @class jeneric.module.auth
  * @alias jeneric.module.auth
  */
-module.exports = class Auth {
+class Auth {
+
+    constructor() {
+        if(app.config.app.secret) {
+
+        }
+    }
 
     signIn(req, res, user) {
 
@@ -31,7 +37,7 @@ module.exports = class Auth {
                     roles: user.roles
                 }
             },
-            jeneric.config.secret,
+            app.config.app.secret,
             {
                 expiresIn: jeneric.config.tokenExpiresIn
             }
@@ -109,3 +115,5 @@ module.exports = class Auth {
     }
 
 }
+
+module.exports = Auth;

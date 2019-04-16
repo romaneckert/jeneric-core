@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-module.exports = class Log {
+class Log {
     constructor() {
 
         const schema = new mongoose.Schema({
@@ -37,4 +37,6 @@ module.exports = class Log {
 
     }
 
-};
+}
+
+module.exports = Log;

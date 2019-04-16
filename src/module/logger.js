@@ -2,9 +2,46 @@ const path = require('path');
 const stackTrace = require('stack-trace');
 const app = require('@jeneric/app');
 
-module.exports = class Logger {
+class Logger {
     constructor() {
+
+        // load config
+        this.config = app.config.logger;
+
+        // validate config.duplicateTime
+        if ('number' !== typeof this.config.duplicateTime || 0 === this.config.duplicateTime) {
+            throw new Error('config.logger.duplicateTime not valid');
+        }
+
+        // validate config.levels
+        if ('object' !== typeof this.config.levels || 0 === this.config.levels.length) {
+            throw new Error('config.logger.levels not valid');
+        }
+
+        // validate config.directory
+        if ('string' !== typeof this.config.directory || 0 === this.config.directory.length) {
+            throw new Error('config.logger.directory not valid');
+        }
+
+        // validate config.maxSizePerLogFile
+        if ('number' !== typeof this.config.maxSizePerLogFile || 0 === this.config.maxSizePerLogFile) {
+            throw new Error('config.logger.maxSizePerLogFile not valid');
+        }
+
+        // validate config.maxLogRotationsPerType
+        if ('number' !== typeof this.config.maxLogRotationsPerType || 0 === this.config.maxLogRotationsPerType) {
+            throw new Error('config.logger.maxLogRotationsPerType not valid');
+        }
+
+        // validate config.maxHistoryLength
+        if ('number' !== typeof this.config.maxHistoryLength || 0 === this.config.maxHistoryLength) {
+            throw new Error('config.logger.maxHistoryLength not valid');
+        }
+
+        // init logs to save queue
         this._logsToSaveQueue = [];
+
+        // init history queue
         this._history = [];
     }
 
@@ -121,7 +158,7 @@ module.exports = class Logger {
                 && oldLog.message === log.message
                 && oldLog.meta === log.meta
                 && oldLog.type === log.type
-                && log.date - oldLog.date < app.config.module.logger.duplicateTime
+                && log.date - oldLog.date < this.config.duplicateTime
             ) {
                 return true;
             }
@@ -132,8 +169,6 @@ module.exports = class Logger {
 
     _writeToLogFiles(log) {
 
-        console.log(log);
-
         // write log entry in specific log file by type and by class type/name
         let logFiles = [
             this._getPathToLogFile(log.code, []),
@@ -141,7 +176,7 @@ module.exports = class Logger {
         ];
 
         let output = '[' + this._dateStringFromDate(log.date) + '] ';
-        output += '[' + app.config.module.logger.levels[log.code].name + '] ';
+        output += '[' + this.config.levels[log.code].name + '] ';
         output += '[' + log.type + '/' + log.name + '] ';
         output += '[' + log.message + ']';
         if (log.meta.length > 0) output += ' [' + log.meta + ']';
@@ -166,9 +201,9 @@ module.exports = class Logger {
 
         let fileSize = app.util.fs.statSync(pathToLogFile).size;
 
-        if (fileSize < app.config.module.logger.maxSizePerLogFile) return false;
+        if (fileSize < this.config.maxSizePerLogFile) return false;
 
-        for (let i = app.config.module.logger.maxLogRotationsPerType - 1; i >= 0; i--) {
+        for (let i = this.config.maxLogRotationsPerType - 1; i >= 0; i--) {
 
             let pathToArchivedLogFile = pathToLogFile + '.' + i;
 
@@ -176,7 +211,7 @@ module.exports = class Logger {
             if (!app.util.fs.existsSync(pathToArchivedLogFile)) continue;
 
             // unlink last log file
-            if (app.config.module.logger.maxLogRotationsPerType - 1 === i) {
+            if (this.config.maxLogRotationsPerType - 1 === i) {
                 app.util.fs.unlinkSync(pathToArchivedLogFile);
                 continue;
             }
@@ -191,10 +226,10 @@ module.exports = class Logger {
     _getPathToLogFile(code, namespaces) {
 
         return path.join(
-            path.dirname(process.mainModule.filename),
-            app.config.module.logger.directory,
+            process.cwd(),
+            this.config.directory,
             namespaces.join('/'),
-            app.config.module.logger.levels[code].name + '.log'
+            this.config.levels[code].name + '.log'
         );
     }
 
@@ -202,14 +237,14 @@ module.exports = class Logger {
     _writeToConsole(log) {
 
         // disabled, if config console disabled
-        if (!app.config.module.logger.levels[log.code].console) return;
+        if (!this.config.levels[log.code].console) return;
 
         // disabled, if log level less then notice and in mode production
-        if (log.code > 5 && app.config.module.core.context === 'production') return;
+        if (log.code > 5 && app.config.app.context === 'production') return;
 
         let consoleOutput = '';
 
-        consoleOutput += `[${app.config.module.logger.levels[log.code].name}] `;
+        consoleOutput += `[${this.config.levels[log.code].name}] `;
         consoleOutput += log.message + ' ';
         consoleOutput += '[' + log.type + '/' + log.name + '] ';
 
@@ -221,14 +256,14 @@ module.exports = class Logger {
             consoleOutput += '[' + log.stack + ']';
         }
 
-        console.log(app.module.logger.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
+        console.log(this.config.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
 
     }
 
     _addToHistory(log) {
 
         // remove older entries if log history greater then max history length
-        while (this._history.length > app.config.module.logger.maxHistoryLength) this._history.pop();
+        while (this._history.length > this.config.maxHistoryLength) this._history.pop();
 
         // add current log to history
         this._history.push(log);
@@ -290,4 +325,6 @@ module.exports = class Logger {
     get history() {
         return this._history;
     }
-};
+}
+
+module.exports = Logger;
