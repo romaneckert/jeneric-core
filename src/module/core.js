@@ -1,6 +1,5 @@
 const cluster = require('cluster');
 const os = require('os');
-const path = require('path');
 const fs = require('@jeneric/app/src/util/fs');
 
 class Core {
@@ -34,15 +33,12 @@ class Core {
         this.init();
 
         // init modules
-        this._initModule();
+        this.initModules();
 
         // log information about start process of core
         if (!this.config.app.cluster || (cluster.worker && 1 === cluster.worker.id)) {
             this.logger.log('application startet in context: "' + this.config.app.context + '"', null, 5, 'core', 'core');
         }
-
-        // start modules
-        this._startModule();
 
         // create process for each cpu
         if (cluster.isMaster && true === this.config.app.cluster) {
@@ -55,7 +51,7 @@ class Core {
 
     }
 
-    _initModule() {
+    initModules() {
 
         for(let m in this.module) {
             let module = this.module[m];
@@ -64,15 +60,6 @@ class Core {
 
         }
 
-    }
-
-    _startModule() {
-        for(let m in this.module) {
-            let module = this.module[m];
-
-            if ('function' === typeof module.start) module.start();
-
-        }
     }
 
 }

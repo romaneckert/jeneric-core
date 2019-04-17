@@ -1,10 +1,12 @@
+const app = require('@jeneric/app');
+
 class View {
 
     handle(req, res, next) {
 
         let view = {};
 
-        this._instantiate(req, jeneric.class.view, view)
+        this._instantiate(req, app.class.view, view)
 
         res.locals.view = view;
 
@@ -21,7 +23,7 @@ class View {
                 let instance = new cls(req);
 
                 if ('function' !== typeof instance.render) {
-                    jeneric.logger.error(`${ns} has no render methode`)
+                    app.logger.error(`${ns} has no render methode`)
                     continue;
                 }
 

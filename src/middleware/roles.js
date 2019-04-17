@@ -1,3 +1,7 @@
+const app = require('@jeneric/app');
+
+//TODO: Refactor to auth module
+
 class Roles {
 
     constructor(config) {
@@ -6,7 +10,7 @@ class Roles {
             redirectPath: '/'
         };
 
-        jeneric.util.object.merge(this.config, config);
+        app.util.object.merge(this.config, config);
 
         this._roles = {};
     }

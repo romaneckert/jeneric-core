@@ -4,7 +4,7 @@ class Report {
         this._requests = [];
     }
 
-    start() {
+    init() {
         //setInterval(this._log.bind(this), 3600);
     }
 

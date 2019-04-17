@@ -1,4 +1,3 @@
-const path = require('path');
 const app = require('@jeneric/app');
 
 /**
@@ -10,55 +9,7 @@ class I18n {
 
     constructor() {
         this.config = app.config.i18n;
-        this._catalog = {};
-    }
-
-    init() {
-
-        this._buildCatalog(path.join(app.config.app.path, 'locale'), this._catalog);
-
-        return;
-
-        for (let directory of jeneric.config.directories) {
-
-            let pathToLocales = path.join(directory, 'view/locale');
-
-            if (!jeneric.util.fs.isDirectorySync(pathToLocales)) continue;
-
-            let files = jeneric.util.fs.readdirSync(pathToLocales);
-
-            for (let filename of files) {
-
-                let fileDetails = path.parse(filename);
-
-                if ('.json' !== fileDetails.ext) continue;
-
-                if (-1 === this.config.locales.indexOf(fileDetails.name)) continue;
-
-                let fileContent = jeneric.util.fs.readFileSync(path.join(pathToLocales, filename));
-
-                if (undefined === this._catalog[fileDetails.name]) {
-                    this._catalog[fileDetails.name] = {};
-                }
-
-                jeneric.util.object.merge(this._catalog[fileDetails.name], JSON.parse(fileContent));
-
-            }
-        }
-    }
-
-    _buildCatalog(pathToLocales, catalog) {
-
-        console.log(pathToLocales);
-
-        if(app.util.fs.isDirectorySync(pathToLocales)) {
-            for(let dir of app.util.fs.readdirSync(pathToLocales)) {
-
-                catalog[dir] 
-
-                this._buildCatalog(dir);
-            }
-        }
+        this.catalog = require('@jeneric/app/locale');
 
     }
 
@@ -71,17 +22,6 @@ class I18n {
      */
     get defaultLocale() {
         return this.config.defaultLocale;
-    }
-
-    /**
-     * @description Return the translation catalog
-     * @example
-     * jeneric.module.i18n.catalog
-     * @type {string}
-     * @returns {string} Return the default locale.
-     */
-    get catalog() {
-        return this._catalog;
     }
 
     get locales() {
@@ -105,7 +45,7 @@ class I18n {
 
         // check if the key is valid
         if (0 < key.replace(/[a-zA-Z0-9._]/g, '').length) {
-            jeneric.logger.warning(`the translation key '${key}' does not seem to be valid`);
+            app.logger.warning(`the translation key '${key}' does not seem to be valid`);
             return key;
         }
 
@@ -113,7 +53,7 @@ class I18n {
 
         // get translation for correct locale
         try {
-            translation = key.split('.').reduce((o, i) => o[i], this._catalog[locale]);
+            translation = key.split('.').reduce((o, i) => o[i], this.catalog[locale]);
         } catch (err) {
             translation = null;
         }
@@ -127,18 +67,18 @@ class I18n {
 
         // if translation not found from fallback, try to get from default locale
         try {
-            translation = key.split('.').reduce((o, i) => o[i], this._catalog[this.config.defaultLocale]);
+            translation = key.split('.').reduce((o, i) => o[i], this.catalog[this.config.defaultLocale]);
         } catch (err) {
             translation = null;
         }
 
         if ('string' === typeof translation) {
-            jeneric.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);
+            app.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);
 
             return this._addData(this.config.defaultLocale, key, translation, data);
         }
 
-        jeneric.logger.warning(`the translation key '${key}' could not be found for the default locale ${this.config.defaultLocale}`);
+        app.logger.warning(`the translation key '${key}' could not be found for the default locale ${this.config.defaultLocale}`);
 
         return key;
 
@@ -152,7 +92,7 @@ class I18n {
 
             if ('string' === typeof data[property]) return data[property];
 
-            jeneric.logger.warning(`the translation key '${key}' in locale ${locale} has no data for ${match}`);
+            app.logger.warning(`the translation key '${key}' in locale ${locale} has no data for ${match}`);
 
             return match;
 

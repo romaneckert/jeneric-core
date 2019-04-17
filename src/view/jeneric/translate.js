@@ -1,3 +1,5 @@
+const app = require('@jeneric/app');
+
 class Translate {
 
     constructor(req) {
@@ -5,7 +7,7 @@ class Translate {
     }
 
     render(message, data) {
-        return jeneric.module.i18n.translate(this.req.locale, message, data);
+        return app.module.i18n.translate(this.req.locale, message, data);
     }
 
 }

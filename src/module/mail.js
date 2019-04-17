@@ -1,17 +1,19 @@
 const nodemailer = require('nodemailer');
 const url = require('url');
 const querystring = require('querystring');
+const app = require('@jeneric/app');
 
 class Mail {
 
     constructor() {
         this.transporter = null;
+        this.config = app.config.mail;
     }
 
-    start() {
+    init() {
 
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
-            jeneric.logger.warning('missing config.url');
+            app.logger.warning('missing config.mail.url');
             return;
         }
 
@@ -39,7 +41,7 @@ class Mail {
     async render(path, options, res) {
 
         // set base url
-        if ('string' !== typeof options.baseUrl || options.baseUrl.length === 0) options.baseUrl = jeneric.config.baseUrl;
+        if ('string' !== typeof options.baseUrl || options.baseUrl.length === 0) options.baseUrl = this.config.baseUrl;
 
         return new Promise(resolve => {
             res.render(path, options, (err, html) => {

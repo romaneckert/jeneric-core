@@ -1,8 +1,10 @@
+const app = require('@jeneric/app');
+
 class Access {
 
     handle(req, res, next) {
-        jeneric.logger.info(req.url);
-        jeneric.module.report.addRequest(req.url)
+        app.logger.info(req.url);
+        app.module.report.addRequest(req.url)
         return next();
     }
 

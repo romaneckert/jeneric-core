@@ -30,18 +30,24 @@ class Install {
         // add config
         this.config = {};
 
+        // add locale
+        this.locale = {};
+
+        this.modulePaths = [];
+
         // loop over all modules and install
         for (let arg of this.args) {
-
-            let pathToModule = path.join(this.pathToRoot, 'node_modules', arg);
-
-            this.install(pathToModule);
-
+            this.modulePaths.push(path.join(this.pathToRoot, 'node_modules', arg));
         }
 
-        this.install(this.pathToRoot);
+        this.modulePaths.push(this.pathToRoot);
+
+        for(let modulePath of this.modulePaths) {
+            this.install(modulePath);
+        }
 
         this.writeCustomConfig();
+        this.writeCustomLocale();
         this.writeAppFile();
     }
 
@@ -57,6 +63,13 @@ class Install {
         fs.ensureFileExists(pathToConfig);
         fs.appendFileSync(pathToConfig, fileContent);
 
+    }
+
+    writeCustomLocale() {
+        let pathToLocale = path.join(this.pathToApp, '/locale/index.js');
+        let fileContent = 'module.exports = ' + JSON.stringify(this.locale, null, 4);
+        fs.ensureFileExists(pathToLocale);
+        fs.appendFileSync(pathToLocale, fileContent);
     }
 
     writeAppFile() {
@@ -130,6 +143,7 @@ class Install {
         this.checkPath(pathToModule);
         this.symlink(pathToModule);
         this.addConfig(pathToModule);
+        this.addLocale(path.join(pathToModule, 'locale'), this.locale);
         console.log('--------------------');
     }
 
@@ -151,7 +165,7 @@ class Install {
     symlink(pathToModule) {
 
         // symlink all files in src and view
-        for(let pathToDir of ['public', 'src', 'view', 'locale']) {
+        for(let pathToDir of ['public', 'src', 'view']) {
 
             let src = path.join(pathToModule, pathToDir);
             let dest = path.join(this.pathToApp, pathToDir);
@@ -176,6 +190,30 @@ class Install {
         object.merge(this.config, config);
 
         return true;
+    }
+
+    addLocale(pathToLocale, locale) {
+
+        for(let fileName of fs.readdirSync(pathToLocale)) {
+
+            let filePath = path.join(pathToLocale, fileName);
+
+            if(fs.isDirectorySync(filePath)) {
+
+                if('object' !== typeof locale[fileName]) locale[fileName] = {};
+
+                this.addLocale(filePath, locale[fileName]);
+
+            } else if(fs.isFileSync(filePath)) {
+
+                let fileDetails = path.parse(fileName);
+
+                if ('.txt' !== fileDetails.ext) continue;
+
+                locale[fileDetails.name] = fs.readFileSync(filePath, 'utf8').trim();
+            }
+        }
+
     }
 
     symlinkOnlyFilesSync(src,dest) {
