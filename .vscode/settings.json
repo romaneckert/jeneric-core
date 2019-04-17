@@ -1,6 +1,0 @@
-{
-    "typescript.suggestionActions.enabled": false,
-    "javascript.suggestionActions.enabled": false,
-    "files.autoSave": "afterDelay",
-    "editor.formatOnSave": true
-}

@@ -56,11 +56,6 @@ module.exports = {
                 name: 'debug',
                 console: true,
                 color: "\x1b[37m"
-            },
-            8: {
-                name: 'observe',
-                console: false,
-                color: "\x1b[37m"
             }
         }
     },

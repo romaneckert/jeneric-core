@@ -141,7 +141,7 @@ class Install {
     install(pathToModule) {
         console.log(`${pathToModule}`);
         this.checkPath(pathToModule);
-        this.symlink(pathToModule);
+        this.copy(pathToModule);
         this.addConfig(pathToModule);
         this.addLocale(path.join(pathToModule, 'locale'), this.locale);
         console.log('--------------------');
@@ -162,7 +162,7 @@ class Install {
         }
     }
 
-    symlink(pathToModule) {
+    copy(pathToModule) {
 
         // symlink all files in src and view
         for(let pathToDir of ['public', 'src', 'view']) {
@@ -170,7 +170,7 @@ class Install {
             let src = path.join(pathToModule, pathToDir);
             let dest = path.join(this.pathToApp, pathToDir);
 
-            this.symlinkOnlyFilesSync(src, dest);
+            this.copyOnlyFilesSync(src, dest);
 
         }
 
@@ -216,7 +216,7 @@ class Install {
 
     }
 
-    symlinkOnlyFilesSync(src,dest) {
+    copyOnlyFilesSync(src,dest) {
 
         // check if source exists
         if (!fs.existsSync(src)) return false;
@@ -233,7 +233,7 @@ class Install {
             let files = fs.readdirSync(src);
 
             for (let file of files) {
-                if (!this.symlinkOnlyFilesSync(path.join(src, file), path.join(dest, file))) return false;
+                if (!this.copyOnlyFilesSync(path.join(src, file), path.join(dest, file))) return false;
             }
 
         } else {
@@ -241,7 +241,7 @@ class Install {
                 fs.removeSync(dest);
                 console.log(`overwrite: ${dest}`);
             }
-            fs.symlinkSync(src, dest);
+            fs.copyFileSync(src, dest);
         }
 
         return true;

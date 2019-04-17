@@ -30,25 +30,24 @@ class Core {
 
     boot() {
 
-        this.init();
-
-        // init modules
-        this.initModules();
-
-        // log information about start process of core
-        if (!this.config.app.cluster || (cluster.worker && 1 === cluster.worker.id)) {
-            this.logger.log('application startet in context: "' + this.config.app.context + '"', null, 5, 'core', 'core');
-        }
-
         // create process for each cpu
         if (cluster.isMaster && true === this.config.app.cluster) {
             for (let i = 0; i < os.cpus().length; i++) cluster.fork();
             return;
         }
 
+        this.init();
+
+        // init modules
+        this.initModules();
+
         // handle uncaught exceptions
         process.on('uncaughtException', this.module.error.handleUncaughtException);
 
+        // log information about start process of core
+        if (!this.config.app.cluster || (cluster.worker && 1 === cluster.worker.id)) {
+            this.logger.log('application startet in context: "' + this.config.app.context + '"', null, 5, 'core', 'core');
+        }
     }
 
     initModules() {

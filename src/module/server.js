@@ -1,5 +1,6 @@
 const path = require('path');
 const helmet = require('helmet');
+const http = require('http');
 const https = require('https');
 const compression = require('compression');
 const express = require('express');
@@ -30,7 +31,7 @@ class Server {
         let publicPath = path.join(app.config.app.path, 'public');
 
         if (app.util.fs.isDirectorySync(publicPath)) {
-            this._app.use(express.static(publicPath, { maxAge: '30 days' }));
+            this.express.use(express.static(publicPath, { maxAge: '30 days' }));
         }
 
         // add access middleware
@@ -40,16 +41,16 @@ class Server {
             notFound: new (require('@jeneric/app/src/middleware/not-found'))()
         };
 
-        this.express.use(middleware.access.handle.bind(middleware.access));
+        this.express.use(middleware.access.handle);
 
         // add custom middleware and routes
-        this._addRoutes(this.config.routes, []);
+        this.addRoutes(this.config.routes, []);
 
         // add error middleware
-        this.express.use(middleware.error.handle.bind(middleware.error));
+        this.express.use(middleware.error.handle);
 
         // add notFound middleware
-        this.express.use(middleware.notFound.handle.bind(middleware.notFound));
+        this.express.use(middleware.notFound.handle);
 
     }
 
@@ -57,13 +58,25 @@ class Server {
         return this.config.routes;
     }
 
-    _addRoutes(routes) {
+    addRoutes(routes) {
 
         for (let routeName in routes) {
 
-            // find handler from routeName
-            let route = routes[routeName];
-            let parts = routeName.split('_');
+            let routeConfig = routes[routeName];
+
+            // sanitize routeConfig
+            if('string' !== typeof routeConfig.path) routeConfig.path = '/' + routeName;
+            if('object' !== typeof routeConfig.methods) routeConfig.methods = ['get'];
+            if('object' !== typeof routeConfig.handler) {
+
+                let pathToHandler = path.join(app.config.app.path, 'src/handler', routeName);
+
+                let handler = require(pathToHandler);
+
+                console.log(handler);
+            }
+
+            return;
 
             let handler = undefined;
 
@@ -135,17 +148,23 @@ class Server {
 
     init() {
 
+        let server = null;
+
         // check certificates
         if (!app.util.fs.isFileSync(this.pathToKeyPem) || !app.util.fs.isFileSync(this.pathToCertPem)) {
             app.logger.warning(`can not start server: .key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
-            return;
+
+            server = this.express;
+
+        } else {
+            // start https server
+            server = https.createServer({
+                key: app.util.fs.readFileSync(this.pathToKeyPem),
+                cert: app.util.fs.readFileSync(this.pathToCertPem)
+            }, this.express);
         }
 
-        // start https server
-        https.createServer({
-            key: app.util.fs.readFileSync(this.pathToKeyPem),
-            cert: app.util.fs.readFileSync(this.pathToCertPem)
-        }, this.express).listen(this.config.port);
+        server.listen(this.config.port);
 
         app.logger.notice(`server started with port ${this.config.port}`);
     }
