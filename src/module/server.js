@@ -62,83 +62,48 @@ class Server {
 
         for (let routeName in routes) {
 
-            let routeConfig = routes[routeName];
+            let route = routes[routeName];
+            let handler = null;
 
             // sanitize routeConfig
-            if('string' !== typeof routeConfig.path) routeConfig.path = '/' + routeName;
-            if('object' !== typeof routeConfig.methods) routeConfig.methods = ['get'];
-            if('object' !== typeof routeConfig.handler) {
+            if('string' !== typeof route.path) route.path = '/' + routeName;
+            if('object' !== typeof route.methods) route.methods = ['get'];
 
+            if('object' !== typeof route.handler) {
                 let pathToHandler = path.join(app.config.app.path, 'src/handler', routeName);
-
-                let handler = require(pathToHandler);
-
-                console.log(handler);
+                handler = new (require(pathToHandler))();
+            } else{
+                handler = route.handler;
             }
 
-            return;
-
-            let handler = undefined;
-
-            try {
-                handler = parts.reduce((o, i) => o[i], jeneric.handler);
-            } catch (err) {
-                handler = undefined;
-            }
-
-            if (undefined === handler) {
-                for (let k = 1; k <= parts.length; k++) {
-
-                    let firstParts = parts.slice(0);
-                    let lastParts = firstParts.splice(-k, k);
-
-                    for (let l = 1; l < lastParts.length; l++) {
-                        lastParts[l] = lastParts[l].charAt(0).toUpperCase() + lastParts[l].slice(1);
-                    }
-
-                    firstParts.push(lastParts.join(''));
-
-                    try {
-                        handler = firstParts.reduce((o, i) => o[i], jeneric.handler);
-                    } catch (err) {
-                        handler = undefined;
-                    }
-
-                    if ('object' === typeof handler) break;
-
-                }
-            }
-
-            if (null === handler || 'object' !== typeof handler || 'function' !== typeof handler.handle) {
-                jeneric.logger.warning(`route ${routeName} has no handler`);
-                continue;
-            }
-
-            if ('object' !== typeof route.methods || null === route.methods) {
-                jeneric.logger.warning(`route ${routeName} has no methods`);
-                continue;
+            if('function' !== typeof handler.handle) {
+                throw new Error(`${routeName} has no valid handler`);
             }
 
             // register middlewares
             for (let m in this.config.middleware) {
 
                 let middlewareName = this.config.middleware[m];
+                let middleware = null;
 
                 switch (middlewareName) {
                     case 'roles':
+                        middleware = new (require(path.join(app.config.app.path, 'src/middleware', middlewareName)))();
+
                         if ('object' === typeof route.roles) {
                             for (let method of route.methods) {
-                                this._app[method](route.path, jeneric.middleware[middlewareName].handle.bind(jeneric.middleware[middlewareName]));
+                                this.express[method](route.path, middleware.handle);
                             }
                         }
                         break;
                     case 'handler':
                         for (let method of route.methods) {
-                            this._app[method](route.path, handler.handle.bind(handler));
+                            this.express[method](route.path, handler.handle);
                         }
                         break;
                     default:
-                        this._app.use(route.path, jeneric.middleware[middlewareName].handle.bind(jeneric.middleware[middlewareName]));
+                        middleware = new (require(path.join(app.config.app.path, 'src/middleware', middlewareName)))();
+                        this.express.use(route.path, middleware.handle);
                         break;
                 }
             }
