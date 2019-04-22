@@ -1,6 +1,6 @@
 {
     "name": "@jeneric/core",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "description": "jeneric core",
     "main": "index.js",
     "scripts": {
@@ -21,9 +21,8 @@
         "express": "4.16.4",
         "helmet": "3.16.0",
         "jsonwebtoken": "8.5.1",
-        "mongoose": "5.5.1",
-        "node-global": "1.0.0",
-        "nodemailer": "6.1.0",
+        "mongoose": "5.5.3",
+        "nodemailer": "6.1.1",
         "pug": "2.0.3",
         "stack-trace": "0.0.10"
     },
@@ -40,7 +39,7 @@
         "exec": "npm run install && node ."
     },
     "devDependencies": {
-        "documentation": "9.3.1",
+        "documentation": "10.0.0",
         "eslint": "5.16.0",
         "eslint-plugin-jsdoc": "4.8.3"
     }
