@@ -92,18 +92,18 @@ class Server {
 
                         if ('object' === typeof route.roles) {
                             for (let method of route.methods) {
-                                this.express[method](route.path, middleware.handle);
+                                this.express[method](route.path, middleware.handle.bind(middleware));
                             }
                         }
                         break;
                     case 'handler':
                         for (let method of route.methods) {
-                            this.express[method](route.path, handler.handle);
+                            this.express[method](route.path, handler.handle.bind(handler));
                         }
                         break;
                     default:
                         middleware = new (require(path.join(app.config.app.path, 'src/middleware', middlewareName)))();
-                        this.express.use(route.path, middleware.handle);
+                        this.express.use(route.path, middleware.handle.bind(middleware));
                         break;
                 }
             }

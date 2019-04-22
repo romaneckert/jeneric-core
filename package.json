@@ -29,14 +29,15 @@
     },
     "nodemonConfig": {
         "ignore": [
-            "public/*"
+            "public/*",
+            "node_modules/@jeneric/app"
         ],
         "delay": "100",
         "ignoreRoot": [
-            ".git",
-            "node_modules"
+            ".git"
         ],
-        "ext": "js,json,pug,css,js"
+        "ext": "js,json,pug,css,js",
+        "exec": "npm run install && node ."
     },
     "devDependencies": {
         "documentation": "9.3.1",

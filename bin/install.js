@@ -80,7 +80,7 @@ class Install {
         fileContent += "class App extends Core {\n";
         fileContent += `${tab}init() {\n`;
 
-        for(let ns of ['util', 'model']) {
+        for(let ns of ['util', 'model', 'view']) {
 
             let pathToNs = path.join(this.pathToApp, './src/', ns);
 
@@ -92,7 +92,7 @@ class Install {
 
             for (let fileName of fs.readdirSync(pathToNs)) {
 
-                if('util' === ns) {
+                if('util' === ns || 'view' === ns) {
                     fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: require('./${path.join(`src/${ns}`, fileName)}'),\n`;
                 } else {
                     fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;
