@@ -1,11 +1,10 @@
 {
     "name": "@jeneric/core",
-    "version": "2.0.6",
+    "version": "2.0.7",
     "description": "jeneric core",
     "main": "index.js",
     "scripts": {
-        "install": "node bin/install.js",
-        "start": "export NODE_ENV=development && node test/test.js",
+        "start": "node bin/install.js && node .",
         "test:dev": "export NODE_ENV=development && node test/test.js",
         "test:prod": "export NODE_ENV=production && node test/test.js",
         "docs:build": "./node_modules/documentation/bin/documentation.js build src/** -f html -o docs"
