@@ -27,6 +27,17 @@
         "pug": "2.0.3",
         "stack-trace": "0.0.10"
     },
+    "nodemonConfig": {
+        "ignore": [
+            "public/*"
+        ],
+        "delay": "100",
+        "ignoreRoot": [
+            ".git",
+            "node_modules"
+        ],
+        "ext": "js,json,pug,css,js"
+    },
     "devDependencies": {
         "documentation": "9.3.1",
         "eslint": "5.16.0",

@@ -5,6 +5,7 @@ const fs = require('@jeneric/app/src/util/fs');
 class Core {
 
     constructor() {
+
         let config = require('@jeneric/app/config');
 
         if ('string' === typeof process.env.NODE_ENV) {

@@ -139,12 +139,12 @@ class Install {
     }
 
     install(pathToModule) {
-        console.log(`${pathToModule}`);
+
         this.checkPath(pathToModule);
         this.copy(pathToModule);
         this.addConfig(pathToModule);
         this.addLocale(path.join(pathToModule, 'locale'), this.locale);
-        console.log('--------------------');
+        console.log(`install -> merge ${pathToModule}`);
     }
 
     checkPath(pathToModule) {
@@ -248,7 +248,7 @@ class Install {
     }
 }
 
-new Install();
+module.exports = new Install();
 
 
 
