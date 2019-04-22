@@ -35,7 +35,7 @@
             ".git"
         ],
         "ext": "js,json,pug,css,js",
-        "exec": "npm run install && node ."
+        "exec": "npm run start"
     },
     "devDependencies": {
         "documentation": "10.0.0",
