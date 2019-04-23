@@ -1,3 +1,5 @@
+const app = require('@jeneric/app');
+
 class Report {
 
     constructor() {
@@ -9,7 +11,7 @@ class Report {
     }
 
     _log() {
-        jeneric.logger.debug(`memory: ${this.getMemoryUsageInMB()} MB | requests per minute: ${this.getRequestsPerMinute()}`);
+        app.logger.debug(`memory: ${this.getMemoryUsageInMB()} MB | requests per minute: ${this.getRequestsPerMinute()}`);
     }
 
     getMemoryUsageInMB() {
@@ -18,7 +20,7 @@ class Report {
 
     getRequestsPerMinute() {
 
-        let max = Math.ceil(Date.now() - jeneric.config.startDate.getTime());
+        let max = Math.ceil(Date.now() - app.config.app.buildTime);
 
         if (max > 1000 * 60 * 60 * 24) max = 1000 * 60 * 60 * 24;
 

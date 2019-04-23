@@ -53,7 +53,7 @@ class Install {
 
     writeCustomConfig() {
 
-        this.config.app.buildDate = Date.now();
+        this.config.app.buildTime = Date.now();
 
         this.config.app.path = this.pathToApp;
 
