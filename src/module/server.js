@@ -117,7 +117,7 @@ class Server {
 
         // check certificates
         if (!app.util.fs.isFileSync(this.pathToKeyPem) || !app.util.fs.isFileSync(this.pathToCertPem)) {
-            app.logger.warning(`can not start server: .key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
+            app.logger.warning(`.key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
 
             server = this.express;
 

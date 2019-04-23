@@ -281,7 +281,7 @@ class Logger {
 
         if (app.module.mongoose && 1 === app.module.mongoose.instance.connection.readyState) {
 
-            log.insertMany(this._logsToSaveQueue, function (err) {
+            app.model.log.insertMany(this._logsToSaveQueue, function (err) {
                 if (err) {
                     console.error(err);
                 }

@@ -29,6 +29,16 @@ class Auth {
         }
     }
 
+    hashSync(password) {
+        let hmac = crypto.createHmac('sha512', this.config.secret);
+        hmac.update(password);
+        return hmac.digest('hex');
+    }
+
+    compareSync(password, hash) {
+
+    }
+
     signIn(req, res, user) {
 
         // validate user

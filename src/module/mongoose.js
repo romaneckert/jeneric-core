@@ -13,13 +13,13 @@ class Mongoose {
         this.instance.connection.on('connected', () => app.logger.notice('connected to mongodb'));
 
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
-            app.logger.warning('missing config.module.mongoose.url');
-            return
+            app.logger.warning('missing config.mongoose.url');
+            return;
         }
 
-        if ('string' !== typeof this.config.connection || 0 === this.config.connection.length) {
-            app.logger.warning('missing config.module.mongoose.connection');
-            return
+        if ('object' !== typeof this.config.connection || null === this.config.connection) {
+            app.logger.warning('missing config.mongoose.connection');
+            return;
         }
 
         this.instance.connect(this.config.url, this.config.connection);

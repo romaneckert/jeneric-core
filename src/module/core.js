@@ -8,6 +8,8 @@ class Core {
 
         let config = require('@jeneric/app/config');
 
+        console.log(config);
+
         if ('string' === typeof process.env.NODE_ENV) {
             config.app.context = process.env.NODE_ENV;
         } else {

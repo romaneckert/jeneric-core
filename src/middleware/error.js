@@ -5,7 +5,7 @@ class Error {
     handle(err, req, res, next) {
         app.logger.error(req.url + ' ' + err.message, err.stack);
         res.status(500);
-        return res.render('core/middleware/error');
+        return res.render('status-500');
     }
 
 }
