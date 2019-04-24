@@ -80,7 +80,7 @@ class Install {
         fileContent += "class App extends Core {\n";
         fileContent += `${tab}init() {\n`;
 
-        for(let ns of ['util', 'model', 'view']) {
+        for(let ns of ['util', 'model']) {
 
             let pathToNs = path.join(this.pathToApp, './src/', ns);
 
