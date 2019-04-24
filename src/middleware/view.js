@@ -5,26 +5,26 @@ class View {
 
     handle(req, res, next) {
 
-        let view = {};
-
-        this._instantiate(view, req, path.join(app.config.app.path, 'src/view'));
-
-        res.locals.view = view;
+        res.locals.view = this._instantiate(req, path.join(app.config.app.path, 'src/view'));
 
         return next();
     }
 
-    _instantiate(view, req, dir) {
+    _instantiate(req, dir) {
+
+        let view = {};
 
         if(app.util.fs.isDirectorySync(dir)) {
 
             for(let fileName of app.util.fs.readdirSync(dir)) {
-                this._instantiate(view, req, path.join(dir, fileName))
+
+                let ns = app.util.fs.fileNameToClassName(fileName);
+
+                view[ns] = this._instantiate(req, path.join(dir, fileName));
             }
 
 
         } else if(app.util.fs.isFileSync(dir)) {
-            let ns = app.util.fs.fileNameToClassName(path.basename(dir));
 
             let viewHelper = new (require(dir))(req);
 
@@ -32,9 +32,11 @@ class View {
                 throw new Error(`${dir} has no render method`);
             }
 
-            view[ns] = viewHelper.render.bind(viewHelper);
+            view = viewHelper.render.bind(viewHelper);
 
         }
+
+        return view;
 
     }
 
