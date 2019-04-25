@@ -49,6 +49,22 @@ class Core {
         if (!this.config.app.cluster || (cluster.worker && 1 === cluster.worker.id)) {
             this.logger.log('application startet in context: "' + this.config.app.context + '"', null, 5, 'core', 'core');
         }
+
+        // register set interval function to monitor blocking
+        let interval = 200;
+        let start = process.hrtime();
+        let threshold = 10;
+
+        setInterval(function () {
+            let delta = process.hrtime(start);
+            let nanosec = delta[0] * 1e9 + delta[1];
+            let ms = nanosec / 1e6;
+
+            if (ms - interval > threshold) {
+                this.logger.error('block error');
+            }
+            start = process.hrtime();
+        }, interval);
     }
 
     initModules() {

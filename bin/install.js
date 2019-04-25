@@ -92,7 +92,7 @@ class Install {
 
             for (let fileName of fs.readdirSync(pathToNs)) {
 
-                if('util' === ns || 'view' === ns) {
+                if('util' === ns) {
                     fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: require('./${path.join(`src/${ns}`, fileName)}'),\n`;
                 } else {
                     fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;

@@ -21,10 +21,7 @@ class Server {
 
         this.express.enable('strict routing');
         this.express.use(helmet());
-        this.express.set('view engine', 'pug');
         this.express.use(compression());
-
-        this.express.set('views', path.join(app.config.app.path, 'view'));
         this.express.use(cookieParser());
         this.express.use(bodyParser.urlencoded({ extended: false }));
 
@@ -112,6 +109,10 @@ class Server {
     }
 
     init() {
+
+        this.express.engine('pug', app.module.renderer.render);
+        this.express.set('views', path.join(app.config.app.path, 'view'));
+        this.express.set('view engine', 'pug');
 
         let server = null;
 
