@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "start": "node bin/install.js && node .",
+        "test": "node bin/install.js && mocha",
         "test:dev": "export NODE_ENV=development && node test/test.js",
         "test:prod": "export NODE_ENV=production && node test/test.js",
         "docs:build": "./node_modules/documentation/bin/documentation.js build src/** -f html -o docs"
@@ -40,6 +41,7 @@
     "devDependencies": {
         "documentation": "10.0.0",
         "eslint": "5.16.0",
-        "eslint-plugin-jsdoc": "4.8.3"
+        "eslint-plugin-jsdoc": "4.8.3",
+        "mocha": "6.1.4"
     }
 }

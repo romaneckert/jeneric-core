@@ -1,189 +1,65 @@
 'use strict';
 
-const nodePath = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 
-// TODO: optimize
-fs.fileNameToClassName = (fileName) => {
-    let key = fileName.split('.')[0];
-    let parts = key.split('-');
+fs.path = require('path');
+fs.constants = require('fs').constants;
 
-    for (let p in parts) {
-        if (0 == p) {
-            continue;
+fs.remove = async (path) => {
+
+    if (fs.isDirectory(path)) {
+
+        for (let file of await fs.readdir(path)) {
+            await fs.remove(fs.path.join(path, file));
         }
-        parts[p] = parts[p].charAt(0).toUpperCase() + parts[p].slice(1)
+
+        await fs.rmdir(path);
+    } else if(fs.isFile(path)) {
+        await fs.unlink(path);
     }
 
-    return parts.join('');
+    return true;
 };
 
-/**
- * @description Check if a path is a directory or a symlink, which links to a directory.
- * @example
- * fs.isDirectorySync(path)
- * @param {string} path - Path of the directory.
- * @returns {boolean} - Returns true if directoryPath is a directory or a symlink, which links to a directory.
- */
-fs.isDirectorySync = function(path) {
+fs.isFile = async(path) => {
+    try {
+        let stats = await fs.stat(path);
+        return stats.isFile();
+    } catch(err) {
+        return false;
+    }
+};
+
+fs.isDirectory = async(path) => {
 
     let stats = null;
 
-    // check if directory is a symlink or broken symlink
     try {
-        stats = fs.lstatSync(path);
+        stats = await fs.stat(path);
     } catch(err) {
-        stats = null;
-    }
-
-    if(null === stats) return false;
-
-    // return true if directory
-    if(stats.isDirectory()) return true;
-
-    // return true if symlink and symlink is dir
-    if(stats.isSymbolicLink()) {
-        try {
-            return fs.lstatSync(fs.readlinkSync(path)).isDirectory();
-        } catch(err) {
-            return false;
-        }
-    }
-
-    return false;
-
-};
-
-fs.isFileSync = (path) => {
-    let stats = null;
-
-    // check if directory is a symlink or broken symlink
-    try {
-        stats = fs.lstatSync(path);
-    } catch(err) {
-        stats = null;
-    }
-
-    if(null === stats) return false;
-
-    // return true if directory
-    if(stats.isFile()) return true;
-
-    // return true if symlink and symlink is dir
-    if(stats.isSymbolicLink()) {
-        try {
-            return fs.lstatSync(fs.readlinkSync(path)).isFile();
-        } catch(err) {
-            return false;
-        }
-    }
-
-    return false;
-
-};
-
-fs.copySync = (src, dest) => {
-    // check if source exists
-    if (!fs.existsSync(src)) return false;
-
-    // check if destination exists
-    if (fs.existsSync(dest)) return false;
-
-    let stats = fs.statSync(src);
-
-    if (stats.isDirectory()) {
-        try {
-            fs.mkdirSync(dest);
-        } catch (err) {
-            if ('EEXIST' !== err.code) throw err;
-        }
-
-        let files = fs.readdirSync(src);
-
-        for (let file of files) {
-            if (!fs.copySync(nodePath.join(src, file), nodePath.join(dest, file))) return false;
-        }
-
-    } else {
-        fs.copyFileSync(src, dest);
-    }
-
-    return true;
-};
-
-fs.ensureFileExists = function (path) {
-    if (fs.existsSync(path)) return true;
-
-    fs.ensureDirExists(nodePath.dirname(path));
-
-    try {
-        fs.writeFileSync(path, '');
-    } catch (err) {
-        if ('EEXIST' !== err.code) {
-            throw err;
-        }
-    }
-
-    return true;
-};
-
-fs.ensureDirExists = function (path) {
-    if (fs.existsSync(path)) return true;
-
-    fs.ensureDirExists(nodePath.dirname(path));
-
-    try {
-        fs.mkdirSync(path);
-    } catch (err) {
-        if ('EEXIST' !== err.code) {
-            throw err;
-        }
-    }
-
-    return true;
-};
-
-fs.creationDate = function (path) {
-
-    if (!fs.existsSync(path)) {
         return false;
     }
 
-    return fs.lstatSync(path).ctime;
+    if(stats.isDirectory()) return true;
+
+    if(stats.isSymbolicLink()) {
+        return await fs.isDirectory(await fs.readlink(path));
+    }
+
+    return false;
 };
 
-/**
- * @description Remove synchronous a file or directory.
- * @example
- * fs.removeSync('./path')
- * @param {string} path - Path to directory.
- * @returns {boolean} - True if done.
- */
-fs.removeSync = function (path) {
-
-    let stats = null;
-
-    // check if directory is a symlink or broken symlink
+fs.ensureDirExists = async (path) => {
     try {
-        stats = fs.lstatSync(path);
+        await fs.access(path, fs.constants.R_OK);
+        return true;
     } catch(err) {
-        stats = null;
+        await fs.ensureDirExists(fs.path.dirname(path))
     }
 
-    if(null === stats) return true;
-
-    if (stats.isDirectory()) {
-        for (let file of fs.readdirSync(path)) {
-            fs.removeSync(nodePath.join(path, file));
-        }
-
-        fs.rmdirSync(path);
-    } else {
-        fs.unlinkSync(path);
-    }
+    await fs.mkdir(path);
 
     return true;
-
 };
 
 module.exports = fs;

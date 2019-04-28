@@ -2,7 +2,7 @@ const cluster = require('cluster');
 const os = require('os');
 const fs = require('@jeneric/app/src/util/fs');
 
-class Core {
+class App {
 
     constructor() {
 
@@ -23,13 +23,6 @@ class Core {
 
         this.module = {};
         this.logger = null;
-    }
-
-    init() {
-        throw new Error('this init() function should be overwritten');
-    }
-
-    boot() {
 
         // create process for each cpu
         if (cluster.isMaster && true === this.config.app.cluster) {
@@ -37,10 +30,15 @@ class Core {
             return;
         }
 
-        this.init();
+        // init, insert by install script
 
         // init modules
-        this.initModules();
+        for(let m in this.module) {
+            let module = this.module[m];
+
+            if ('function' === typeof module.init) module.init();
+
+        }
 
         // handle uncaught exceptions
         process.on('uncaughtException', this.module.error.handleUncaughtException);
@@ -67,17 +65,6 @@ class Core {
         }, interval);
     }
 
-    initModules() {
-
-        for(let m in this.module) {
-            let module = this.module[m];
-
-            if ('function' === typeof module.init) module.init();
-
-        }
-
-    }
-
 }
 
-module.exports = Core;
+module.exports = new App();

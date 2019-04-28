@@ -299,7 +299,7 @@ class Logger {
 
             let processParentDir = path.dirname(process.cwd());
 
-            if (entry.fileName.includes(processParentDir)) {
+            if (null !== entry.fileName && entry.fileName.includes(processParentDir)) {
 
                 let scriptPath = entry.fileName.replace(processParentDir, '');
 

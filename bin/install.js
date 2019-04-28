@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 const fs = require('../src/util/fs');
 const object = require('../src/util/object');
-const path = require('path');
 
 class Install {
 
     constructor() {
+        this.install();
+    }
+
+    async install() {
         // get args
         this.args = process.argv.slice(2);
 
@@ -13,16 +16,16 @@ class Install {
         this.pathToRoot = process.cwd();
 
         // detect path to node_modules
-        this.pathToNodeModules = path.join(this.pathToRoot, 'node_modules');
+        this.pathToNodeModules = fs.path.join(this.pathToRoot, 'node_modules');
 
-        // check if node_modules directory exists
-        if (!fs.existsSync(this.pathToNodeModules)) throw new Error(`can not find path to node_modules: ${this.pathToNodeModules}`);
+        // check if node_modules writable
+        await fs.access(this.pathToNodeModules, fs.constants.R_OK | fs.constants.W_OK);
 
         // detect path to @jeneric/app folder
-        this.pathToApp = path.join(this.pathToNodeModules, '@jeneric/app');
+        this.pathToApp = fs.path.join(this.pathToNodeModules, '@jeneric/app');
 
-        // remove app folder @jeneric/app
-        fs.removeSync(this.pathToApp);
+        // remove app folder node_modules/@jeneric/app
+        await fs.remove(this.pathToApp);
 
         // create app folder @jeneric/app
         fs.ensureDirExists(this.pathToApp);
@@ -37,13 +40,17 @@ class Install {
 
         // loop over all modules and install
         for (let arg of this.args) {
-            this.modulePaths.push(path.join(this.pathToRoot, 'node_modules', arg));
+            this.modulePaths.push(fs.path.join(this.pathToRoot, 'node_modules', arg));
         }
 
         this.modulePaths.push(this.pathToRoot);
 
         for(let modulePath of this.modulePaths) {
-            this.install(modulePath);
+            this.checkPath(modulePath);
+            this.copy(modulePath);
+            this.addConfig(modulePath);
+            this.addLocale(fs.path.join(modulePath, 'locale'), this.locale);
+            console.log(`install -> merge ${modulePath}`);
         }
 
         this.writeCustomConfig();
@@ -57,7 +64,7 @@ class Install {
 
         this.config.app.path = this.pathToApp;
 
-        let pathToConfig = path.join(this.pathToApp, '/config/index.js');
+        let pathToConfig = fs.path.join(this.pathToApp, '/config/index.js');
         let fileContent = 'module.exports = ' + JSON.stringify(this.config, null, 4);
 
         fs.ensureFileExists(pathToConfig);
@@ -66,7 +73,7 @@ class Install {
     }
 
     writeCustomLocale() {
-        let pathToLocale = path.join(this.pathToApp, '/locale/index.js');
+        let pathToLocale = fs.path.join(this.pathToApp, '/locale/index.js');
         let fileContent = 'module.exports = ' + JSON.stringify(this.locale, null, 4);
         fs.ensureFileExists(pathToLocale);
         fs.appendFileSync(pathToLocale, fileContent);
@@ -76,9 +83,7 @@ class Install {
 
         let tab = '    ';
 
-        let fileContent = "const Core = require('./src/module/core.js');\n";
-        fileContent += "class App extends Core {\n";
-        fileContent += `${tab}init() {\n`;
+        let fileContent = '';
 
         for(let ns of ['util', 'model']) {
 
@@ -129,22 +134,11 @@ class Install {
         fileContent += `${tab}}\n`;
         fileContent += "}\n";
 
-        fileContent += "module.exports = new App();";
-
         let filePath = path.join(this.pathToApp, 'index.js');
 
         fs.ensureFileExists(filePath);
 
         fs.appendFileSync(filePath, fileContent);
-    }
-
-    install(pathToModule) {
-
-        this.checkPath(pathToModule);
-        this.copy(pathToModule);
-        this.addConfig(pathToModule);
-        this.addLocale(path.join(pathToModule, 'locale'), this.locale);
-        console.log(`install -> merge ${pathToModule}`);
     }
 
     checkPath(pathToModule) {
