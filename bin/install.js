@@ -2,6 +2,11 @@
 const fs = require('../src/util/fs');
 const object = require('../src/util/object');
 
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Application specific logging, throwing an error, or other logic here
+});
+
 class Install {
 
     constructor() {
@@ -19,7 +24,9 @@ class Install {
         this.pathToNodeModules = fs.path.join(this.pathToRoot, 'node_modules');
 
         // check if node_modules writable
-        await fs.access(this.pathToNodeModules, fs.constants.R_OK | fs.constants.W_OK);
+        if(!await fs.isWritable(this.pathToNodeModules)) {
+            throw new Error(`${this.pathToNodeModules} is not writable`);
+        }
 
         // detect path to @jeneric/app folder
         this.pathToApp = fs.path.join(this.pathToNodeModules, '@jeneric/app');
@@ -46,16 +53,29 @@ class Install {
         this.modulePaths.push(this.pathToRoot);
 
         for(let modulePath of this.modulePaths) {
-            this.checkPath(modulePath);
-            this.copy(modulePath);
-            this.addConfig(modulePath);
-            this.addLocale(fs.path.join(modulePath, 'locale'), this.locale);
+
+            // check if module path exists
+            if(!await fs.isDirectory(modulePath)) {
+                throw new Error(`${modulePath} is not a directory`);
+            }
+
+            // symlink all files in src and view
+            for(let pathToDir of ['public', 'src', 'view']) {
+
+                let src = fs.path.join(modulePath, pathToDir);
+                let dest = fs.path.join(this.pathToApp, pathToDir);
+
+                await this.copyOnlyFilesSync(src, dest);
+
+            }
+            //this.addConfig(modulePath);
+            //this.addLocale(fs.path.join(modulePath, 'locale'), this.locale);
             console.log(`install -> merge ${modulePath}`);
         }
 
-        this.writeCustomConfig();
-        this.writeCustomLocale();
-        this.writeAppFile();
+        //this.writeCustomConfig();
+        //this.writeCustomLocale();
+        //this.writeAppFile();
     }
 
     writeCustomConfig() {
@@ -141,32 +161,9 @@ class Install {
         fs.appendFileSync(filePath, fileContent);
     }
 
-    checkPath(pathToModule) {
-        // check if pathToModule is a directory
-        let stats = null;
+    async copy(pathToModule) {
 
-        try {
-            stats = fs.lstatSync(pathToModule);
-        } catch(err) {
-            stats = null;
-        }
 
-        if(null === stats || !(stats.isDirectory() || stats.isSymbolicLink())) {
-            throw new Error(`${pathToModule} is not a directory`);
-        }
-    }
-
-    copy(pathToModule) {
-
-        // symlink all files in src and view
-        for(let pathToDir of ['public', 'src', 'view']) {
-
-            let src = path.join(pathToModule, pathToDir);
-            let dest = path.join(this.pathToApp, pathToDir);
-
-            this.copyOnlyFilesSync(src, dest);
-
-        }
 
     }
 
@@ -210,32 +207,31 @@ class Install {
 
     }
 
-    copyOnlyFilesSync(src,dest) {
+    async copyOnlyFilesSync(src, dest) {
 
         // check if source exists
-        if (!fs.existsSync(src)) return false;
+        if(!await fs.isWritable(src)) return false;
 
-        let stats = fs.statSync(src);
+        if(await fs.isDirectory(src)) {
 
-        if (stats.isDirectory()) {
             try {
-                fs.mkdirSync(dest);
+                await fs.mkdir(dest);
             } catch (err) {
                 if ('EEXIST' !== err.code) throw err;
             }
 
-            let files = fs.readdirSync(src);
-
-            for (let file of files) {
-                if (!this.copyOnlyFilesSync(path.join(src, file), path.join(dest, file))) return false;
+            for (let file of await fs.readdir(src)) {
+                await this.copyOnlyFilesSync(fs.path.join(src, file), fs.path.join(dest, file));
             }
-
         } else {
-            if(fs.existsSync(dest)) {
-                fs.removeSync(dest);
+
+            if(await fs.isWritable(dest)) {
+                await fs.remove(dest);
                 console.log(`overwrite: ${dest}`);
             }
-            fs.copyFileSync(src, dest);
+
+            await fs.copyFile(src, dest);
+
         }
 
         return true;

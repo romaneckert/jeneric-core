@@ -7,27 +7,48 @@ fs.constants = require('fs').constants;
 
 fs.remove = async (path) => {
 
-    if (fs.isDirectory(path)) {
+    if(await fs.isFile(path)) {
+
+        try {
+            await fs.unlink(path);
+        } catch(err) {
+            console.log(err);
+        }
+
+    } else if (fs.isDirectory(path)) {
 
         for (let file of await fs.readdir(path)) {
             await fs.remove(fs.path.join(path, file));
         }
 
-        await fs.rmdir(path);
-    } else if(fs.isFile(path)) {
-        await fs.unlink(path);
+        try {
+            await fs.rmdir(path);
+        } catch(err) {
+            throw new Error('can not remove dir');
+        }
+
     }
 
     return true;
 };
 
 fs.isFile = async(path) => {
+
+    let stats = null;
+
     try {
-        let stats = await fs.stat(path);
-        return stats.isFile();
+        stats = await fs.stat(path);
     } catch(err) {
         return false;
     }
+
+    if(stats.isFile()) return true;
+
+    if(stats.isSymbolicLink()) {
+        return await fs.isFile(await fs.readlink(path));
+    }
+
+    return false;
 };
 
 fs.isDirectory = async(path) => {
@@ -60,6 +81,15 @@ fs.ensureDirExists = async (path) => {
     await fs.mkdir(path);
 
     return true;
+};
+
+fs.isWritable = async (path) => {
+    try {
+        await fs.access(path, fs.constants.R_OK | fs.constants.W_OK);
+        return true;
+    } catch(err) {
+        return false;
+    }
 };
 
 module.exports = fs;
