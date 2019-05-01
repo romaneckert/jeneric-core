@@ -68,17 +68,27 @@ class Install {
                 await this.copyOnlyFilesSync(src, dest);
 
             }
-            //this.addConfig(modulePath);
-            //this.addLocale(fs.path.join(modulePath, 'locale'), this.locale);
+
+            // merge config files
+            let pathToConfig = fs.path.join(modulePath, 'config/index.js');
+
+            if(await fs.isFile(pathToConfig)) {
+                let config = require(pathToConfig);
+                object.merge(this.config, config);
+            }
+
+            // merge locales
+            await this.addLocale(fs.path.join(modulePath, 'locale'), this.locale);
+
             console.log(`install -> merge ${modulePath}`);
         }
 
-        //this.writeCustomConfig();
-        //this.writeCustomLocale();
-        //this.writeAppFile();
+        await this.writeCustomConfig();
+        await this.writeCustomLocale();
+        await this.writeAppFile();
     }
 
-    writeCustomConfig() {
+    async writeCustomConfig() {
 
         this.config.app.buildTime = Date.now();
 
@@ -87,19 +97,23 @@ class Install {
         let pathToConfig = fs.path.join(this.pathToApp, '/config/index.js');
         let fileContent = 'module.exports = ' + JSON.stringify(this.config, null, 4);
 
-        fs.ensureFileExists(pathToConfig);
-        fs.appendFileSync(pathToConfig, fileContent);
+        await fs.ensureFileExists(pathToConfig);
+        await fs.appendFile(pathToConfig, fileContent);
 
     }
 
-    writeCustomLocale() {
+    async writeCustomLocale() {
         let pathToLocale = fs.path.join(this.pathToApp, '/locale/index.js');
         let fileContent = 'module.exports = ' + JSON.stringify(this.locale, null, 4);
-        fs.ensureFileExists(pathToLocale);
-        fs.appendFileSync(pathToLocale, fileContent);
+        await fs.ensureFileExists(pathToLocale);
+        await fs.appendFile(pathToLocale, fileContent);
     }
 
-    writeAppFile() {
+    async writeAppFile() {
+
+        let pathToAppModule = fs.path.join(this.pathToApp, './src/module/app.js');
+
+        let appFileContent = await fs.readFile(pathToAppModule, 'utf8');
 
         let tab = '    ';
 
@@ -107,20 +121,20 @@ class Install {
 
         for(let ns of ['util', 'model']) {
 
-            let pathToNs = path.join(this.pathToApp, './src/', ns);
+            let pathToNs = fs.path.join(this.pathToApp, './src/', ns);
 
-            if (!fs.isDirectorySync(pathToNs)) {
+            if (!await fs.isDirectory(pathToNs)) {
                 throw new Error(`${pathToNs} does not exists.`);
             }
 
             fileContent += `${tab}${tab}this.${ns} = {\n`;
 
-            for (let fileName of fs.readdirSync(pathToNs)) {
+            for (let fileName of await fs.readdir(pathToNs)) {
 
                 if('util' === ns) {
-                    fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: require('./${path.join(`src/${ns}`, fileName)}'),\n`;
+                    fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: require('./${fs.path.join(`src/${ns}`, fileName)}'),\n`;
                 } else {
-                    fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;
+                    fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${fs.path.join(`src/${ns}`, fileName)}'))(),\n`;
                 }
 
             }
@@ -132,76 +146,55 @@ class Install {
 
         for(let ns of ['module']) {
 
-            let pathToNs = path.join(this.pathToApp, './src/', ns);
+            let pathToNs = fs.path.join(this.pathToApp, './src/', ns);
 
-            if (!fs.isDirectorySync(pathToNs)) {
+            if (!await fs.isDirectory(pathToNs)) {
                 throw new Error(`${pathToNs} does not exists.`);
             }
 
             fileContent += `${tab}${tab}this.${ns} = {\n`;
 
-            for (let fileName of fs.readdirSync(pathToNs)) {
+            for (let fileName of await fs.readdir(pathToNs)) {
 
-                if('module' === ns && ('core.js' === fileName || 'logger.js' === fileName)) continue;
+                if('module' === ns && ('app.js' === fileName || 'logger.js' === fileName)) continue;
 
-                fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${path.join(`src/${ns}`, fileName)}'))(),\n`;
+                fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${fs.path.join(`src/${ns}`, fileName)}'))(),\n`;
 
             }
 
             fileContent += `${tab}${tab}};\n`;
         }
 
-        fileContent += `${tab}}\n`;
-        fileContent += "}\n";
+        appFileContent = appFileContent.replace('// placeholder for install script', fileContent);
 
-        let filePath = path.join(this.pathToApp, 'index.js');
+        let filePath = fs.path.join(this.pathToApp, 'index.js');
 
-        fs.ensureFileExists(filePath);
-
-        fs.appendFileSync(filePath, fileContent);
+        await fs.ensureFileExists(filePath);
+        await fs.appendFile(filePath, appFileContent);
     }
 
-    async copy(pathToModule) {
+    async addLocale(pathToLocale, locale) {
 
+        for(let fileName of await fs.readdir(pathToLocale)) {
 
+            let filePath = fs.path.join(pathToLocale, fileName);
 
-    }
-
-    addConfig(pathToModule) {
-
-        // check path to config
-        let pathToConfig = path.join(pathToModule, 'config/index.js');
-
-        if(!fs.isFileSync(pathToConfig)) {
-            return false;
-        }
-
-        let config = require(pathToConfig);
-
-        object.merge(this.config, config);
-
-        return true;
-    }
-
-    addLocale(pathToLocale, locale) {
-
-        for(let fileName of fs.readdirSync(pathToLocale)) {
-
-            let filePath = path.join(pathToLocale, fileName);
-
-            if(fs.isDirectorySync(filePath)) {
+            if(await fs.isDirectory(filePath)) {
 
                 if('object' !== typeof locale[fileName]) locale[fileName] = {};
 
-                this.addLocale(filePath, locale[fileName]);
+                await this.addLocale(filePath, locale[fileName]);
 
-            } else if(fs.isFileSync(filePath)) {
+            } else if(await fs.isFile(filePath)) {
 
-                let fileDetails = path.parse(fileName);
+                let fileDetails = fs.path.parse(fileName);
 
                 if ('.txt' !== fileDetails.ext) continue;
 
-                locale[fileDetails.name] = fs.readFileSync(filePath, 'utf8').trim();
+                let content = await fs.readFile(filePath, 'utf8');
+
+                locale[fileDetails.name] = content.trim();
+
             }
         }
 

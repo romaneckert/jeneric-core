@@ -1,30 +1,34 @@
-const fs = require('@jeneric/app/src/util/fs-promises');
 const assert = require('assert');
 const app = require('@jeneric/app');
+app.boot();
 
-describe('module', () => {
-    app.start();
-});
-
-/*
 describe('util', () => {
 
     describe('fs', () => {
 
+        it('create test directory', async () => {
+            await app.util.fs.ensureDirExists('./var/test');
+        });
+
+        it('ensure test file exists', async () => {
+            await app.util.fs.ensureFileExists('./var/test/test-file.txt');
+        });
+
         it('create test file', async () => {
-            await app.util.fs.appendFile('./var/test/fs.txt', 'test');
+            await app.util.fs.appendFile('./var/test/test-file.txt', 'test');
         });
 
         it('read test file', async () => {
-            let content = await fs.readFile('./var/test/fs.txt', 'utf8');
+            let content = await app.util.fs.readFile('./var/test/test-file.txt', 'utf8');
+            assert.strictEqual(content, 'test');
+        });
 
-            console.log(content);
-
-            //assert.strictEqual(content, 'test');
+        it('delete test directory', async () => {
+            await app.util.fs.remove('./var/test');
         });
     });
 
-});*/
+});
 
 
 

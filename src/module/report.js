@@ -6,7 +6,7 @@ class Report {
         this._requests = [];
     }
 
-    init() {
+    async init() {
         //setInterval(this._log.bind(this), 3600);
     }
 

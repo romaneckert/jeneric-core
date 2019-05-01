@@ -10,7 +10,7 @@ class Mail {
         this.config = app.config.mail;
     }
 
-    init() {
+    async init() {
 
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
             app.logger.warning('missing config.mail.url');

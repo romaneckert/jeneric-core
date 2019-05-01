@@ -6,7 +6,7 @@ class Mongoose {
         this.config = app.config.mongoose;
     }
 
-    init() {
+    async init() {
 
         this.instance.connection.on('error', (err) => app.logger.error(err));
         this.instance.connection.on('disconnected', () => app.logger.notice('disconnect from mongodb'));

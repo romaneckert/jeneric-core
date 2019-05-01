@@ -1,22 +1,15 @@
 const cluster = require('cluster');
 const os = require('os');
-const fs = require('@jeneric/app/src/util/fs');
+const config = require('@jeneric/app/config');
 
 class App {
 
     constructor() {
 
-        let config = require('@jeneric/app/config');
-
         if ('string' === typeof process.env.NODE_ENV) {
             config.app.context = process.env.NODE_ENV;
         } else {
             config.app.context = 'production';
-        }
-
-        // check if config.appRoot exists
-        if(!fs.isDirectorySync(config.app.path)) {
-            throw new Error(`application root ${config.app.path} does not exists`);
         }
 
         this.config = config;
@@ -30,13 +23,17 @@ class App {
             return;
         }
 
-        // init, insert by install script
+    }
+
+    async boot() {
+
+// placeholder for install script
 
         // init modules
         for(let m in this.module) {
             let module = this.module[m];
 
-            if ('function' === typeof module.init) module.init();
+            if ('function' === typeof module.init) await module.init();
 
         }
 

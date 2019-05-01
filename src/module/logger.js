@@ -79,6 +79,8 @@ class Logger {
 
     log(message, meta, code, type, name) {
 
+        return;
+
         // create stack
         let stack = stackTrace.parse(new Error());
 
@@ -197,9 +199,9 @@ class Logger {
 
     }
 
-    _rotateLogFile(pathToLogFile) {
+    async _rotateLogFile(pathToLogFile) {
 
-        let fileSize = app.util.fs.statSync(pathToLogFile).size;
+        let fileSize = await app.util.fs.stat(pathToLogFile).size;
 
         if (fileSize < this.config.maxSizePerLogFile) return false;
 

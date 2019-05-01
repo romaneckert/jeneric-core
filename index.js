@@ -1,2 +1,5 @@
 #!/usr/bin/env node
-require('@jeneric/app');
+const app = require('@jeneric/app');
+
+app.boot();
+

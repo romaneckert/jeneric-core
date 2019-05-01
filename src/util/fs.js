@@ -5,6 +5,22 @@ const fs = require('fs').promises;
 fs.path = require('path');
 fs.constants = require('fs').constants;
 
+// TODO: optimize
+fs.fileNameToClassName = (fileName) => {
+
+    let key = fileName.split('.')[0];
+    let parts = key.split('-');
+
+    for (let p in parts) {
+        if (0 == p) {
+            continue;
+        }
+        parts[p] = parts[p].charAt(0).toUpperCase() + parts[p].slice(1)
+    }
+
+    return parts.join('');
+};
+
 fs.remove = async (path) => {
 
     if(await fs.isFile(path)) {
@@ -15,7 +31,7 @@ fs.remove = async (path) => {
             console.log(err);
         }
 
-    } else if (fs.isDirectory(path)) {
+    } else if (await fs.isDirectory(path)) {
 
         for (let file of await fs.readdir(path)) {
             await fs.remove(fs.path.join(path, file));
@@ -79,6 +95,20 @@ fs.ensureDirExists = async (path) => {
     }
 
     await fs.mkdir(path);
+
+    return true;
+};
+
+fs.ensureFileExists = async (path) => {
+
+    try {
+        await fs.access(path, fs.constants.R_OK);
+        return true;
+    } catch(err) {
+        await fs.ensureDirExists(fs.path.dirname(path))
+    }
+
+    await fs.appendFile(path, '');
 
     return true;
 };

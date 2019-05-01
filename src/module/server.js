@@ -17,6 +17,10 @@ class Server {
         this.pathToKeyPem = path.join(app.config.app.path, 'config/key.pem');
         this.pathToCertPem = path.join(app.config.app.path, 'config/cert.pem');
 
+    }
+
+    async init() {
+
         this.express = express();
 
         this.express.enable('strict routing');
@@ -27,7 +31,7 @@ class Server {
 
         let publicPath = path.join(app.config.app.path, 'public');
 
-        if (app.util.fs.isDirectorySync(publicPath)) {
+        if (await app.util.fs.isDirectory(publicPath)) {
             this.express.use(express.static(publicPath, { maxAge: '30 days' }));
         }
 
@@ -49,10 +53,29 @@ class Server {
         // add notFound middleware
         this.express.use(middleware.notFound.handle);
 
-    }
+        this.express.engine('pug', app.module.renderer.render);
+        this.express.set('views', path.join(app.config.app.path, 'view'));
+        this.express.set('view engine', 'pug');
 
-    get routes() {
-        return this.config.routes;
+        let server = null;
+
+        // check certificates
+        if (!await app.util.fs.isFile(this.pathToKeyPem) || !await app.util.fs.isFile(this.pathToCertPem)) {
+            app.logger.warning(`.key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
+
+            server = this.express;
+
+        } else {
+            // start https server
+            server = https.createServer({
+                key: await app.util.fs.readFile(this.pathToKeyPem),
+                cert: await app.util.fs.readFile(this.pathToCertPem)
+            }, this.express);
+        }
+
+        server.listen(this.config.port);
+
+        app.logger.notice(`server started with port ${this.config.port}`);
     }
 
     addRoutes(routes) {
@@ -106,33 +129,6 @@ class Server {
             }
 
         }
-    }
-
-    init() {
-
-        this.express.engine('pug', app.module.renderer.render);
-        this.express.set('views', path.join(app.config.app.path, 'view'));
-        this.express.set('view engine', 'pug');
-
-        let server = null;
-
-        // check certificates
-        if (!app.util.fs.isFileSync(this.pathToKeyPem) || !app.util.fs.isFileSync(this.pathToCertPem)) {
-            app.logger.warning(`.key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
-
-            server = this.express;
-
-        } else {
-            // start https server
-            server = https.createServer({
-                key: app.util.fs.readFileSync(this.pathToKeyPem),
-                cert: app.util.fs.readFileSync(this.pathToCertPem)
-            }, this.express);
-        }
-
-        server.listen(this.config.port);
-
-        app.logger.notice(`server started with port ${this.config.port}`);
     }
 }
 
