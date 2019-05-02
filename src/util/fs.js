@@ -5,6 +5,13 @@ const fs = require('fs').promises;
 fs.path = require('path');
 fs.constants = require('fs').constants;
 
+/**
+ * @description Remove a file or directory.
+ * @example
+ * await app.util.fs.remove('./path')
+ * @param {string} path - Path to directory.
+ * @returns {boolean} - True if done.
+ */
 fs.remove = async (path) => {
 
     if(await fs.isFile(path)) {
@@ -21,15 +28,10 @@ fs.remove = async (path) => {
             await fs.remove(fs.path.join(path, file));
         }
 
-        try {
-            await fs.rmdir(path);
-        } catch(err) {
-            throw new Error('can not remove dir');
-        }
-
+        await fs.rmdir(path);
     }
 
-    return true;
+    return false;
 };
 
 fs.isFile = async(path) => {

@@ -9,8 +9,21 @@ describe('util', () => {
             await app.util.fs.ensureDirExists('./var/test');
         });
 
+        it('symlink', async () => {
+            await app.util.fs.symlink('./test', './var/test-symlink');
+        });
+
+        it('isDirectory', async () => {
+            assert.strictEqual(await app.util.fs.isDirectory('./var/test'), true);
+            assert.strictEqual(await app.util.fs.isDirectory('./var/test-symlink'), true);
+        });
+
         it('ensureFileExists', async () => {
             await app.util.fs.ensureFileExists('./var/test/test-file.txt');
+        });
+
+        it('isWritable', async () => {
+            await app.util.fs.isWritable('./var/test/test-file.txt');
         });
 
         it('appendFile', async () => {
@@ -23,7 +36,13 @@ describe('util', () => {
         });
 
         it('remove', async () => {
-            await app.util.fs.remove('./var/test');
+            assert.strictEqual(await app.util.fs.remove('./var/test-symlink'), true);
+            assert.strictEqual(await app.util.fs.remove('./var/test'), true);
+        });
+
+        it('isDirectory after remove', async () => {
+            assert.strictEqual(await app.util.fs.isDirectory('./var/test'), false);
+            assert.strictEqual(await app.util.fs.isDirectory('./var/test-symlink'), false);
         });
     });
 
