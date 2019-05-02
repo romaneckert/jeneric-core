@@ -24,6 +24,10 @@ class Mongoose {
 
         this.instance.connect(this.config.url, this.config.connection);
     }
+
+    async stop() {
+        this.instance.connection.close();
+    }
 }
 
 module.exports = Mongoose;

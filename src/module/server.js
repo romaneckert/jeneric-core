@@ -17,6 +17,8 @@ class Server {
         this.pathToKeyPem = path.join(app.config.app.path, 'config/key.pem');
         this.pathToCertPem = path.join(app.config.app.path, 'config/cert.pem');
 
+        this.server = null;
+
     }
 
     async init() {
@@ -62,9 +64,7 @@ class Server {
         // check certificates
         if (!await app.util.fs.isFile(this.pathToKeyPem) || !await app.util.fs.isFile(this.pathToCertPem)) {
             app.logger.warning(`.key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
-
             server = this.express;
-
         } else {
             // start https server
             server = https.createServer({
@@ -73,9 +73,13 @@ class Server {
             }, this.express);
         }
 
-        server.listen(this.config.port);
+        this.server = server.listen(this.config.port);
 
         app.logger.notice(`server started with port ${this.config.port}`);
+    }
+
+    async stop() {
+        this.server.close();
     }
 
     addRoutes(routes) {

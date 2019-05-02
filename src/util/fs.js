@@ -5,22 +5,6 @@ const fs = require('fs').promises;
 fs.path = require('path');
 fs.constants = require('fs').constants;
 
-// TODO: optimize
-fs.fileNameToClassName = (fileName) => {
-
-    let key = fileName.split('.')[0];
-    let parts = key.split('-');
-
-    for (let p in parts) {
-        if (0 == p) {
-            continue;
-        }
-        parts[p] = parts[p].charAt(0).toUpperCase() + parts[p].slice(1)
-    }
-
-    return parts.join('');
-};
-
 fs.remove = async (path) => {
 
     if(await fs.isFile(path)) {

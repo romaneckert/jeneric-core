@@ -23,9 +23,11 @@ class App {
             return;
         }
 
+        this.nodeLoopTimeCheckTimer = null;
+
     }
 
-    async boot() {
+    async start() {
 
 // placeholder for install script
 
@@ -33,7 +35,7 @@ class App {
         for(let m in this.module) {
             let module = this.module[m];
 
-            if ('function' === typeof module.init) await module.init();
+            //if ('function' === typeof module.init) await module.init();
 
         }
 
@@ -50,7 +52,7 @@ class App {
         let start = process.hrtime();
         let threshold = 10;
 
-        setInterval(function () {
+        this.nodeLoopTimeCheckTimer = setInterval(function () {
             let delta = process.hrtime(start);
             let nanosec = delta[0] * 1e9 + delta[1];
             let ms = nanosec / 1e6;
@@ -60,6 +62,19 @@ class App {
             }
             start = process.hrtime();
         }, interval);
+    }
+
+    async stop() {
+
+        clearInterval(this.nodeLoopTimeCheckTimer);
+
+        // stop modules
+        for(let m in this.module) {
+            let module = this.module[m];
+
+            //if ('function' === typeof module.stop) await module.stop();
+
+        }
     }
 
 }

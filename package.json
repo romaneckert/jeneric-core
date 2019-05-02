@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "start": "node bin/install.js && node .",
-        "test": "nyc --reporter=text mocha",
+        "test": "node bin/install.js && nyc --all --reporter=text mocha",
         "docs:build": "./node_modules/documentation/bin/documentation.js build src/** -f html -o docs"
     },
     "author": "Roman Eckert",
@@ -35,6 +35,14 @@
         ],
         "ext": "js,json,pug,css,js",
         "exec": "npm run start"
+    },
+    "nyc": {
+        "all": true,
+        "include": [
+            "node_modules/@jeneric/app"
+        ],
+        "excludeNodeModules": false,
+        "temp-directory": "var/nyc"
     },
     "devDependencies": {
         "documentation": "10.0.0",

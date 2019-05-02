@@ -1,5 +1,12 @@
 module.exports = {
 
+    camelize(text) {
+        return text.split('.')[0].replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1, p2) => {
+            if (p2) return p2.toUpperCase();
+            return p1.toLowerCase();
+        });
+    },
+
     toSingle(string) {
         if (string.indexOf('ies') === string.length - 3) return string.slice(0, -3) + 'y';
         if (string.indexOf('s') === string.length - 1) return string.slice(0, -1);

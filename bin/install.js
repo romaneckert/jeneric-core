@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require('../src/util/fs');
+const string = require('../src/util/string');
 const object = require('../src/util/object');
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -132,9 +133,9 @@ class Install {
             for (let fileName of await fs.readdir(pathToNs)) {
 
                 if('util' === ns) {
-                    fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: require('./${fs.path.join(`src/${ns}`, fileName)}'),\n`;
+                    fileContent += `${tab}${tab}${tab}${string.camelize(fileName)}: require('./${fs.path.join(`src/${ns}`, fileName)}'),\n`;
                 } else {
-                    fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${fs.path.join(`src/${ns}`, fileName)}'))(),\n`;
+                    fileContent += `${tab}${tab}${tab}${string.camelize(fileName)}: new (require('./${fs.path.join(`src/${ns}`, fileName)}'))(),\n`;
                 }
 
             }
@@ -158,7 +159,7 @@ class Install {
 
                 if('module' === ns && ('app.js' === fileName || 'logger.js' === fileName)) continue;
 
-                fileContent += `${tab}${tab}${tab}${fs.fileNameToClassName(fileName)}: new (require('./${fs.path.join(`src/${ns}`, fileName)}'))(),\n`;
+                fileContent += `${tab}${tab}${tab}${string.camelize(fileName)}: new (require('./${fs.path.join(`src/${ns}`, fileName)}'))(),\n`;
 
             }
 

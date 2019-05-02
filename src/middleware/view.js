@@ -18,7 +18,7 @@ class View {
 
             for(let fileName of app.util.fs.readdirSync(dir)) {
 
-                let ns = app.util.fs.fileNameToClassName(fileName);
+                let ns = app.util.string.camelize(fileName);
 
                 view[ns] = this._instantiate(req, path.join(dir, fileName));
             }
