@@ -13,13 +13,13 @@
     "repository": "https://github.com/romaneckert/jeneric-core",
     "dependencies": {
         "@jeneric/app": "2.0.1",
-        "body-parser": "1.18.3",
+        "body-parser": "1.19.0",
         "compression": "1.7.4",
         "cookie-parser": "1.4.4",
         "express": "4.16.4",
-        "helmet": "3.16.0",
+        "helmet": "3.17.0",
         "jsonwebtoken": "8.5.1",
-        "mongoose": "5.5.3",
+        "mongoose": "5.5.5",
         "nodemailer": "6.1.1",
         "pug": "2.0.3",
         "stack-trace": "0.0.10"
@@ -45,7 +45,7 @@
         "temp-directory": "var/nyc"
     },
     "devDependencies": {
-        "documentation": "10.0.0",
+        "documentation": "10.1.0",
         "eslint": "5.16.0",
         "eslint-plugin-jsdoc": "4.8.3",
         "mocha": "6.1.4",
