@@ -33,10 +33,7 @@ class App {
 
         // init modules
         for(let m in this.module) {
-            let module = this.module[m];
-
-            //if ('function' === typeof module.init) await module.init();
-
+            if ('function' === typeof this.module[m].start) await this.module[m].start();
         }
 
         // handle uncaught exceptions
@@ -70,10 +67,7 @@ class App {
 
         // stop modules
         for(let m in this.module) {
-            let module = this.module[m];
-
-            //if ('function' === typeof module.stop) await module.stop();
-
+            if ('function' === typeof this.module[m].stop) await this.module[m].stop();
         }
     }
 

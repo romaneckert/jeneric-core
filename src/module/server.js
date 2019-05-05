@@ -1,6 +1,5 @@
 const path = require('path');
 const helmet = require('helmet');
-const http = require('http');
 const https = require('https');
 const compression = require('compression');
 const express = require('express');
@@ -21,7 +20,7 @@ class Server {
 
     }
 
-    async init() {
+    async start() {
 
         this.express = express();
 

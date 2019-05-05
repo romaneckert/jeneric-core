@@ -36,7 +36,7 @@ class Install {
         await fs.remove(this.pathToApp);
 
         // create app folder @jeneric/app
-        fs.ensureDirExists(this.pathToApp);
+        await fs.ensureDirExists(this.pathToApp);
 
         // add config
         this.config = {};
@@ -172,6 +172,8 @@ class Install {
 
         await fs.ensureFileExists(filePath);
         await fs.appendFile(filePath, appFileContent);
+
+        await fs.remove(fs.path.join(this.pathToApp, 'src/module/app.js'));
     }
 
     async addLocale(pathToLocale, locale) {

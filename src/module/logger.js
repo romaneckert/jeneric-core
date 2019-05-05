@@ -1,4 +1,3 @@
-const path = require('path');
 const stackTrace = require('stack-trace');
 const app = require('@jeneric/app');
 
@@ -45,41 +44,39 @@ class Logger {
         this._history = [];
     }
 
-    emergency(message, meta) {
-        this.log(message, meta, 0);
+    async emergency(message, meta) {
+        await this.log(message, meta, 0);
     }
 
-    alert(message, meta) {
-        this.log(message, meta, 1);
+    async alert(message, meta) {
+        await this.log(message, meta, 1);
     }
 
-    critical(message, meta) {
-        this.log(message, meta, 2);
+    async critical(message, meta) {
+        await this.log(message, meta, 2);
     }
 
-    error(message, meta) {
-        this.log(message, meta, 3);
+    async error(message, meta) {
+        await this.log(message, meta, 3);
     }
 
-    warning(message, meta) {
-        this.log(message, meta, 4);
+    async warning(message, meta) {
+        await this.log(message, meta, 4);
     }
 
-    notice(message, meta) {
-        this.log(message, meta, 5);
+    async notice(message, meta) {
+        await this.log(message, meta, 5);
     }
 
-    info(message, meta) {
-        this.log(message, meta, 6);
+    async info(message, meta) {
+        await this.log(message, meta, 6);
     }
 
-    debug(message, meta) {
-        this.log(message, meta, 7);
+    async debug(message, meta) {
+        await this.log(message, meta, 7);
     }
 
-    log(message, meta, code, type, name) {
-
-        return;
+    async log(message, meta, code, type, name) {
 
         // create stack
         let stack = stackTrace.parse(new Error());
@@ -142,7 +139,7 @@ class Logger {
         this._addToHistory(log);
 
         // write log to log files
-        this._writeToLogFiles(log);
+        await this._writeToLogFiles(log);
 
         // write log to console
         this._writeToConsole(log);
@@ -169,7 +166,7 @@ class Logger {
         return false;
     }
 
-    _writeToLogFiles(log) {
+    async _writeToLogFiles(log) {
 
         // write log entry in specific log file by type and by class type/name
         let logFiles = [
@@ -187,13 +184,15 @@ class Logger {
         for (let logFile of logFiles) {
 
             // check if log file exists and create if not
-            app.util.fs.ensureFileExists(logFile);
+            await app.util.fs.ensureFileExists(logFile);
+
+            process.exit();
 
             // check if log rotation is necessary
-            this._rotateLogFile(logFile);
+            await this._rotateLogFile(logFile);
 
             // write line to log file
-            app.util.fs.appendFileSync(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
+            await app.util.fs.appendFile(logFile, output.replace(/\r?\n?/g, '').trim() + '\n');
 
         }
 
@@ -210,24 +209,24 @@ class Logger {
             let pathToArchivedLogFile = pathToLogFile + '.' + i;
 
             // check if archived file exists
-            if (!app.util.fs.existsSync(pathToArchivedLogFile)) continue;
+            if (!await app.util.fs.isFile(pathToArchivedLogFile)) continue;
 
             // unlink last log file
             if (this.config.maxLogRotationsPerType - 1 === i) {
-                app.util.fs.unlinkSync(pathToArchivedLogFile);
+                await app.util.fs.remove(pathToArchivedLogFile);
                 continue;
             }
 
-            app.util.fs.renameSync(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
+            await app.util.fs.rename(pathToArchivedLogFile, pathToLogFile + '.' + (i + 1));
         }
 
-        app.util.fs.renameSync(pathToLogFile, pathToLogFile + '.' + 0);
-        app.util.fs.ensureFileExists(pathToLogFile);
+        await app.util.fs.rename(pathToLogFile, pathToLogFile + '.' + 0);
+        await app.util.fs.ensureFileExists(pathToLogFile);
     }
 
     _getPathToLogFile(code, namespaces) {
 
-        return path.join(
+        return app.util.fs.path.join(
             process.cwd(),
             this.config.directory,
             namespaces.join('/'),
@@ -299,7 +298,7 @@ class Logger {
 
         for (let entry of stack) {
 
-            let processParentDir = path.dirname(process.cwd());
+            let processParentDir = app.util.fs.path.dirname(process.cwd());
 
             if (null !== entry.fileName && entry.fileName.includes(processParentDir)) {
 
