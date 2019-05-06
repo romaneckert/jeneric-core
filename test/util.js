@@ -9,12 +9,14 @@ describe('util', () => {
         let testFilePath = null;
         let testDirSymlinkPath = null;
         let testFileSymlinkPath = null;
+        let testFileNotExists = null;
 
         it('defineConst', async () => {
             testDirPath = './var/test';
             testFilePath = app.util.fs.path.join(testDirPath, 'test-file.txt');
             testDirSymlinkPath = './var/test-symlink';
             testFileSymlinkPath = app.util.fs.path.join(testDirPath, 'test-file-symlink.txt');
+            testFileNotExists = app.util.fs.path.join(testDirPath, 'test-file-not-exists.txt');
         });
 
         it('remove', async () => {
@@ -24,9 +26,13 @@ describe('util', () => {
 
         it('ensureDirExists', async () => {
             await app.util.fs.ensureDirExists(testDirPath);
+            await app.util.fs.ensureDirExists(testDirPath);
+            await app.util.fs.ensureDirExists(testDirPath);
         });
 
         it('ensureFileExists', async () => {
+            await app.util.fs.ensureFileExists(testFilePath);
+            await app.util.fs.ensureFileExists(testFilePath);
             await app.util.fs.ensureFileExists(testFilePath);
         });
 
@@ -40,6 +46,7 @@ describe('util', () => {
             assert.strictEqual(await app.util.fs.isDirectory(testFilePath), false);
             assert.strictEqual(await app.util.fs.isDirectory(testDirSymlinkPath), false);
             assert.strictEqual(await app.util.fs.isDirectory(testFileSymlinkPath), false);
+            assert.strictEqual(await app.util.fs.isDirectory(testFileNotExists), false);
         });
 
         it('isFile', async () => {
@@ -47,13 +54,15 @@ describe('util', () => {
             assert.strictEqual(await app.util.fs.isFile(testFilePath), true);
             assert.strictEqual(await app.util.fs.isFile(testDirSymlinkPath), false);
             assert.strictEqual(await app.util.fs.isFile(testFileSymlinkPath), false);
+            assert.strictEqual(await app.util.fs.isFile(testFileNotExists), false);
         });
 
         it('isSymlink', async () => {
-            assert.strictEqual(await app.util.fs.isFile(testDirPath), false);
-            assert.strictEqual(await app.util.fs.isFile(testFilePath), false);
-            assert.strictEqual(await app.util.fs.isFile(testDirSymlinkPath), true);
-            assert.strictEqual(await app.util.fs.isFile(testFileSymlinkPath), true);
+            assert.strictEqual(await app.util.fs.isSymbolicLink(testDirPath), false);
+            assert.strictEqual(await app.util.fs.isSymbolicLink(testFilePath), false);
+            assert.strictEqual(await app.util.fs.isSymbolicLink(testDirSymlinkPath), true);
+            assert.strictEqual(await app.util.fs.isSymbolicLink(testFileSymlinkPath), true);
+            assert.strictEqual(await app.util.fs.isSymbolicLink(testFileNotExists), false);
         });
 
         it('isWritable', async () => {
@@ -61,6 +70,7 @@ describe('util', () => {
             assert.strictEqual(await app.util.fs.isWritable(testFilePath), true);
             assert.strictEqual(await app.util.fs.isWritable(testDirSymlinkPath), true);
             assert.strictEqual(await app.util.fs.isWritable(testFileSymlinkPath), true);
+            assert.strictEqual(await app.util.fs.isWritable(testFileNotExists), false);
         });
 
         it('appendFile', async () => {
@@ -120,6 +130,32 @@ describe('util', () => {
                 '{"test":{"test":{"test":123}}}'
             );
         });
+    });
+
+    describe('object', () => {
+
+        it('merge', () => {
+            let obj1 = {
+                test: {
+                    test: 2
+                },
+                test2: {
+                    test: 4
+                }
+            };
+
+            let obj2 = {
+                test: {
+                    test: 3
+                }
+            };
+
+            app.util.object.merge(obj1, obj2);
+
+            assert.strictEqual(JSON.stringify(obj1), '{"test":{"test":3},"test2":{"test":4}}');
+
+        });
+
     });
 });
 

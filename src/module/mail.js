@@ -13,7 +13,7 @@ class Mail {
     async start() {
 
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
-            app.logger.warning('missing config.mail.url');
+            await app.logger.warning('missing config.mail.url');
             return;
         }
 

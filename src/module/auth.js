@@ -11,10 +11,12 @@ class Auth {
     constructor() {
         // load config
         this.config = app.config.auth;
+    }
 
+    async start() {
         // validate config.secret
         if ('string' !== typeof this.config.secret || 10 > this.config.secret.length) {
-            app.logger.warning('config.auth.secret not set or not valid - have to be string, minimum length 10 - generate temporary secret');
+            await app.logger.warning('config.auth.secret not set or not valid - have to be string, minimum length 10 - generate temporary secret');
             this.config.secret = crypto.randomBytes(32).toString('hex');
         }
 
@@ -123,7 +125,7 @@ class Auth {
         let user = null;
 
         try {
-            user = await app.model.user.findOne({ email: data.user.email });
+            user = await app.model.user.findOne({email: data.user.email});
         } catch (e) {
             user = null;
         }

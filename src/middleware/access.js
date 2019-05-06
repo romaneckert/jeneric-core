@@ -2,8 +2,8 @@ const app = require('@jeneric/app');
 
 class Access {
 
-    handle(req, res, next) {
-        app.logger.info(req.url);
+    async handle(req, res, next) {
+        await app.logger.info(req.url);
         app.module.report.addRequest(req.url)
         return next();
     }

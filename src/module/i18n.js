@@ -38,14 +38,14 @@ class I18n {
      * @example Translation
      * @returns {string} The translated key or key if translation not exist.
      */
-    translate(locale, key, data) {
+    async translate(locale, key, data) {
 
         // check if locale is in the list of predefined locales, if not fall back to default locale
         if (-1 === this.config.locales.indexOf(locale)) locale = this.config.defaultLocale;
 
         // check if the key is valid
         if (0 < key.replace(/[a-zA-Z0-9._]/g, '').length) {
-            app.logger.warning(`the translation key '${key}' does not seem to be valid`);
+            await app.logger.warning(`the translation key '${key}' does not seem to be valid`);
             return key;
         }
 
@@ -59,7 +59,7 @@ class I18n {
         }
 
         if ('string' === typeof translation) {
-            return this._addData(locale, key, translation, data);
+            return await this._addData(locale, key, translation, data);
         }
 
         // if translation not found, try to get from fallback
@@ -73,26 +73,26 @@ class I18n {
         }
 
         if ('string' === typeof translation) {
-            app.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);
+            await app.logger.debug(`the translation key '${key}' could not be found for the locale ${locale}, fallback to ${this.config.defaultLocale}`);
 
-            return this._addData(this.config.defaultLocale, key, translation, data);
+            return await this._addData(this.config.defaultLocale, key, translation, data);
         }
 
-        app.logger.warning(`the translation key '${key}' could not be found for the default locale ${this.config.defaultLocale}`);
+        await app.logger.warning(`the translation key '${key}' could not be found for the default locale ${this.config.defaultLocale}`);
 
         return key;
 
     }
 
-    _addData(locale, key, value, data) {
+    async _addData(locale, key, value, data) {
 
-        return value.replace(/{{(.+?)}}/g, (match) => {
+        return value.replace(/{{(.+?)}}/g, async (match) => {
 
             let property = match.replace('{{', '').replace('}}', '').trim();
 
             if ('string' === typeof data[property]) return data[property];
 
-            app.logger.warning(`the translation key '${key}' in locale ${locale} has no data for ${match}`);
+            await app.logger.warning(`the translation key '${key}' in locale ${locale} has no data for ${match}`);
 
             return match;
 

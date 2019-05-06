@@ -8,19 +8,19 @@ class Mongoose {
 
     async start() {
 
-        this.instance.connection.on('error', (err) => app.logger.error(err));
-        this.instance.connection.on('disconnected', () => app.logger.notice('disconnect from mongodb'));
-        this.instance.connection.on('connected', () => app.logger.notice('connected to mongodb'));
-
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
-            app.logger.warning('missing config.mongoose.url');
+            await app.logger.warning('missing config.mongoose.url');
             return;
         }
 
         if ('object' !== typeof this.config.connection || null === this.config.connection) {
-            app.logger.warning('missing config.mongoose.connection');
+            await app.logger.warning('missing config.mongoose.connection');
             return;
         }
+
+        this.instance.connection.on('error', async (err) => await app.logger.error(err));
+        this.instance.connection.on('disconnected', async () => await app.logger.notice('disconnect from mongodb'));
+        this.instance.connection.on('connected', async () => await app.logger.notice('connected to mongodb'));
 
         this.instance.connect(this.config.url, this.config.connection);
     }

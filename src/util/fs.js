@@ -14,7 +14,11 @@ fs.constants = require('fs').constants;
  */
 fs.remove = async (path) => {
 
-    if(await fs.isFile(path)) {
+    if (await fs.isFile(path)) {
+
+        await fs.unlink(path);
+
+    } else if (await fs.isSymbolicLink(path)) {
 
         await fs.unlink(path);
 
@@ -29,38 +33,38 @@ fs.remove = async (path) => {
 
 };
 
-fs.isFile = async(path) => {
+fs.isFile = async (path) => {
 
     let stats = null;
 
     try {
-        stats = await fs.stat(path);
-    } catch(err) {
+        stats = await fs.lstat(path);
+    } catch (err) {
         return false;
     }
 
     return stats.isFile();
 };
 
-fs.isSymbolicLink = async(path) => {
+fs.isSymbolicLink = async (path) => {
     let stats = null;
 
     try {
-        stats = await fs.stat(path);
-    } catch(err) {
+        stats = await fs.lstat(path);
+    } catch (err) {
         return false;
     }
 
     return stats.isSymbolicLink();
 };
 
-fs.isDirectory = async(path) => {
+fs.isDirectory = async (path) => {
 
     let stats = null;
 
     try {
-        stats = await fs.stat(path);
-    } catch(err) {
+        stats = await fs.lstat(path);
+    } catch (err) {
         return false;
     }
 
@@ -68,20 +72,8 @@ fs.isDirectory = async(path) => {
 };
 
 fs.ensureDirExists = async (path) => {
-    try {
-        await fs.access(path, fs.constants.R_OK);
-        return true;
-    } catch(err) {
-        await fs.ensureDirExists(fs.path.dirname(path))
-    }
 
-    try {
-        await fs.mkdir(path);
-    } catch(err) {
-        if(err.code !== 'EEXIST') {
-            throw err;
-        }
-    }
+    await fs.mkdir(path, {recursive: true});
 
     return true;
 };
@@ -91,7 +83,7 @@ fs.ensureFileExists = async (path) => {
     try {
         await fs.access(path, fs.constants.R_OK);
         return true;
-    } catch(err) {
+    } catch (err) {
         await fs.ensureDirExists(fs.path.dirname(path))
     }
 
@@ -104,7 +96,7 @@ fs.isWritable = async (path) => {
     try {
         await fs.access(path, fs.constants.R_OK | fs.constants.W_OK);
         return true;
-    } catch(err) {
+    } catch (err) {
         return false;
     }
 };

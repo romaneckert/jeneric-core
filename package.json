@@ -42,8 +42,9 @@
         "include": [
             "node_modules/@jeneric/app"
         ],
+        "skip-full": true,
         "excludeNodeModules": false,
-        "temp-directory": "var/nyc"
+        "temp-directory": ".nyc"
     },
     "devDependencies": {
         "documentation": "10.1.0",

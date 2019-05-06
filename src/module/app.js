@@ -32,7 +32,7 @@ class App {
 // placeholder for install script
 
         // init modules
-        for(let m in this.module) {
+        for (let m in this.module) {
             if ('function' === typeof this.module[m].start) await this.module[m].start();
         }
 
@@ -41,7 +41,7 @@ class App {
 
         // log information about start process of core
         if (!this.config.app.cluster || (cluster.worker && 1 === cluster.worker.id)) {
-            this.logger.log('application startet in context: "' + this.config.app.context + '"', null, 5, 'core', 'core');
+            await this.logger.log('application startet in context: "' + this.config.app.context + '"', null, 5, 'app', 'app');
         }
 
         // register set interval function to monitor blocking
@@ -66,7 +66,7 @@ class App {
         clearInterval(this.nodeLoopTimeCheckTimer);
 
         // stop modules
-        for(let m in this.module) {
+        for (let m in this.module) {
             if ('function' === typeof this.module[m].stop) await this.module[m].stop();
         }
     }
