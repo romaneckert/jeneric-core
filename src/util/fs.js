@@ -16,11 +16,7 @@ fs.remove = async (path) => {
 
     if(await fs.isFile(path)) {
 
-        try {
-            await fs.unlink(path);
-        } catch(err) {
-            console.log(err);
-        }
+        await fs.unlink(path);
 
     } else if (await fs.isDirectory(path)) {
 
@@ -31,7 +27,6 @@ fs.remove = async (path) => {
         await fs.rmdir(path);
     }
 
-    return false;
 };
 
 fs.isFile = async(path) => {
@@ -44,13 +39,19 @@ fs.isFile = async(path) => {
         return false;
     }
 
-    if(stats.isFile()) return true;
+    return stats.isFile();
+};
 
-    if(stats.isSymbolicLink()) {
-        return await fs.isFile(await fs.readlink(path));
+fs.isSymbolicLink = async(path) => {
+    let stats = null;
+
+    try {
+        stats = await fs.stat(path);
+    } catch(err) {
+        return false;
     }
 
-    return false;
+    return stats.isSymbolicLink();
 };
 
 fs.isDirectory = async(path) => {
@@ -63,13 +64,7 @@ fs.isDirectory = async(path) => {
         return false;
     }
 
-    if(stats.isDirectory()) return true;
-
-    if(stats.isSymbolicLink()) {
-        return await fs.isDirectory(await fs.readlink(path));
-    }
-
-    return false;
+    return stats.isDirectory();
 };
 
 fs.ensureDirExists = async (path) => {
@@ -80,7 +75,13 @@ fs.ensureDirExists = async (path) => {
         await fs.ensureDirExists(fs.path.dirname(path))
     }
 
-    await fs.mkdir(path);
+    try {
+        await fs.mkdir(path);
+    } catch(err) {
+        if(err.code !== 'EEXIST') {
+            throw err;
+        }
+    }
 
     return true;
 };

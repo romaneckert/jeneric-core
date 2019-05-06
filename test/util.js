@@ -5,25 +5,60 @@ describe('util', () => {
 
     describe('fs', () => {
 
+        let testDirPath = null;
+        let testFilePath = null;
+        let testDirSymlinkPath = null;
+        let testFileSymlinkPath = null;
+
+        it('defineConst', async () => {
+            testDirPath = './var/test';
+            testFilePath = app.util.fs.path.join(testDirPath, 'test-file.txt');
+            testDirSymlinkPath = './var/test-symlink';
+            testFileSymlinkPath = app.util.fs.path.join(testDirPath, 'test-file-symlink.txt');
+        });
+
         it('ensureDirExists', async () => {
-            await app.util.fs.ensureDirExists('./var/test');
-        });
-
-        it('symlink', async () => {
-            await app.util.fs.symlink('./test', './var/test-symlink');
-        });
-
-        it('isDirectory', async () => {
-            assert.strictEqual(await app.util.fs.isDirectory('./var/test'), true);
-            assert.strictEqual(await app.util.fs.isDirectory('./var/test-symlink'), true);
+            await app.util.fs.ensureDirExists(testDirPath);
         });
 
         it('ensureFileExists', async () => {
-            await app.util.fs.ensureFileExists('./var/test/test-file.txt');
+            await app.util.fs.ensureFileExists(testFilePath);
+        });
+
+        it('symlink', async () => {
+            await app.util.fs.symlink('./test', testDirSymlinkPath);
+            await app.util.fs.symlink('./test-file.txt', testFileSymlinkPath);
+        });
+
+        it('isDirectory', async () => {
+            assert.strictEqual(await app.util.fs.isDirectory(testDirPath), true);
+            assert.strictEqual(await app.util.fs.isDirectory(testFilePath), false);
+
+            console.log(await app.util.fs.isDirectory(testDirSymlinkPath));
+
+            assert.strictEqual(await app.util.fs.isDirectory(testDirSymlinkPath), false);
+            assert.strictEqual(await app.util.fs.isDirectory(testFileSymlinkPath), false);
+        });
+
+        it('isFile', async () => {
+            assert.strictEqual(await app.util.fs.isFile(testDirPath), false);
+            assert.strictEqual(await app.util.fs.isFile(testFilePath), true);
+            assert.strictEqual(await app.util.fs.isFile(testDirSymlinkPath), false);
+            assert.strictEqual(await app.util.fs.isFile(testFileSymlinkPath), false);
+        });
+
+        it('isSymlink', async () => {
+            assert.strictEqual(await app.util.fs.isFile(testDirPath), false);
+            assert.strictEqual(await app.util.fs.isFile(testFilePath), false);
+            assert.strictEqual(await app.util.fs.isFile(testDirSymlinkPath), true);
+            assert.strictEqual(await app.util.fs.isFile(testFileSymlinkPath), true);
         });
 
         it('isWritable', async () => {
-            await app.util.fs.isWritable('./var/test/test-file.txt');
+            assert.strictEqual(await app.util.fs.isWritable(testDirPath), true);
+            assert.strictEqual(await app.util.fs.isWritable(testFilePath), true);
+            assert.strictEqual(await app.util.fs.isWritable(testDirSymlinkPath), true);
+            assert.strictEqual(await app.util.fs.isWritable(testFileSymlinkPath), true);
         });
 
         it('appendFile', async () => {
@@ -36,8 +71,8 @@ describe('util', () => {
         });
 
         it('remove', async () => {
-            assert.strictEqual(await app.util.fs.remove('./var/test-symlink'), true);
-            assert.strictEqual(await app.util.fs.remove('./var/test'), true);
+            await app.util.fs.remove('./var/test-symlink');
+            await app.util.fs.remove('./var/test');
         });
 
         it('isDirectory after remove', async () => {

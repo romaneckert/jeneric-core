@@ -186,8 +186,6 @@ class Logger {
             // check if log file exists and create if not
             await app.util.fs.ensureFileExists(logFile);
 
-            process.exit();
-
             // check if log rotation is necessary
             await this._rotateLogFile(logFile);
 
@@ -200,7 +198,7 @@ class Logger {
 
     async _rotateLogFile(pathToLogFile) {
 
-        let fileSize = await app.util.fs.stat(pathToLogFile).size;
+        let fileSize = (await app.util.fs.stat(pathToLogFile)).size;
 
         if (fileSize < this.config.maxSizePerLogFile) return false;
 
