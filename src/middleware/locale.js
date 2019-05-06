@@ -18,7 +18,7 @@ class Locale {
             if ('string' === typeof browserLanguage) locale = browserLanguage;
         }
 
-        req.locale = locale;
+        req.locale = res.locals.locale = locale;
 
         return next();
     }

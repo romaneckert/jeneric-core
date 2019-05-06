@@ -13,8 +13,7 @@ class Mail {
     async start() {
 
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
-            await app.logger.warning('missing config.mail.url');
-            return;
+            throw new Error('missing config.mail.url');
         }
 
         let mailUrl = url.parse(this.config.url);
@@ -39,6 +38,8 @@ class Mail {
     }
 
     async render(path, options, res) {
+
+        if ('object' !== typeof options) options = {};
 
         // set base url
         if ('string' !== typeof options.baseUrl || options.baseUrl.length === 0) options.baseUrl = this.config.baseUrl;

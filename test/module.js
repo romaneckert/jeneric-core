@@ -6,10 +6,7 @@ describe('module', () => {
     describe('server', () => {
 
         it('index', async () => {
-
-            console.log(app.config);
-
-            assert.strictEqual((await app.util.request('http://localhost:3000')).includes('200'), true);
+            assert.strictEqual((await app.util.request(app.config.app.url)).includes('200'), true);
         });
 
         it('404', async () => {
@@ -23,6 +20,17 @@ describe('module', () => {
         });
 
 
+    });
+
+    describe('mail', () => {
+        it('send', async () => {
+
+            let content = await app.module.renderer.render('index');
+
+            console.log(content);
+
+            assert.strictEqual((await app.util.request(app.config.app.url)).includes('200'), true);
+        });
     });
 
 });

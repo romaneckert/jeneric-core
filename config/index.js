@@ -1,6 +1,7 @@
 module.exports = {
     app: {
-        cluster: false
+        cluster: false,
+        url: process.env.APP_URL
     },
     auth: {
         tokenExpiresIn: 600,
@@ -62,7 +63,8 @@ module.exports = {
     },
     mail: {
         defaultFrom: 'default@jeneric',
-        connectionTimeout: 2000
+        connectionTimeout: 2000,
+        url: process.env.MAIL_URL
     },
     mongoose: {
         connection: {
@@ -70,7 +72,7 @@ module.exports = {
             reconnectTries: Number.MAX_VALUE,
             reconnectInterval: 1000
         },
-        url: process.env.DB
+        url: process.env.DB_URL
     },
     server: {
         port: 3000,
@@ -84,7 +86,6 @@ module.exports = {
             100: 'auth',
             200: 'roles',
             300: 'locale',
-            400: 'view',
             1000: 'handler'
         }
     }

@@ -12,13 +12,8 @@ class App {
             throw new Error(`context "${process.env.NODE_ENV}" not allowed -> ${allowedContexts.join(',')}`);
         }
 
-        if ('string' === typeof process.env.NODE_ENV) {
-            config.app.context = process.env.NODE_ENV;
-        } else {
-            config.app.context = 'production';
-        }
-
         this.config = config;
+        this.config.app.context = process.env.NODE_ENV;
 
         this.module = {};
         this.logger = null;

@@ -54,7 +54,7 @@ class Server {
         // add notFound middleware
         this.express.use(middleware.notFound.handle);
 
-        //this.express.engine('pug', app.module.renderer.render);
+        this.express.engine('pug', app.module.renderer.render.bind(app.module.renderer));
         this.express.set('views', path.join(app.config.app.path, 'view'));
         this.express.set('view engine', 'pug');
 

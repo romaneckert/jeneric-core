@@ -4,19 +4,65 @@ const pug = require('pug');
 
 class Renderer {
 
-    async render(filePath, options) {
+    async render(filePath, options, callback) {
 
         let content = await app.util.fs.readFile(filePath, 'utf8');
 
         let pathToMixinDir = path.join(app.config.app.path, 'view/mixins');
 
         for (let fileName of await app.util.fs.readdir(pathToMixinDir)) {
-            //content += `include mixins/${fileName}\n` + content;
+            content = `include mixins/${fileName}\n` + content;
         }
 
-        console.log(pug.compile(content, options));
+        let fn = pug.compile(
+            content,
+            {
+                filename: filePath,
+                cache: true,
+            }
+        );
 
-        return pug.compile(content, options);
+        let locals = options._locals;
+
+        locals.view = this._instantiate(
+            {
+                locale: locals.locale,
+                baseUrl: app.config.app.url
+            },
+            path.join(app.config.app.path, 'src/view')
+        );
+
+        callback(null, fn(locals));
+    }
+
+    async _instantiate(options, dir) {
+
+        let view = {};
+
+        if (await app.util.fs.isDirectory(dir)) {
+
+            for (let fileName of await app.util.fs.readdir(dir)) {
+
+                let ns = app.util.string.camelize(fileName);
+
+                view[ns] = await this._instantiate(options, path.join(dir, fileName));
+            }
+
+
+        } else if (await app.util.fs.isFile(dir)) {
+
+            let viewHelper = new (require(dir))(options);
+
+            if ('function' !== typeof viewHelper.render) {
+                throw new Error(`${dir} has no render method`);
+            }
+
+            view = viewHelper.render.bind(viewHelper);
+
+        }
+
+        return view;
+
     }
 
 }
