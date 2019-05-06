@@ -5,3 +5,5 @@ test/var
 docs
 /var
 /.nyc
+config/.env.*
+!config/.env.template

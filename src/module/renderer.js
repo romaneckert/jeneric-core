@@ -4,20 +4,19 @@ const pug = require('pug');
 
 class Renderer {
 
-    render(filePath, options, callback) {
+    async render(filePath, options) {
 
+        let content = await app.util.fs.readFile(filePath, 'utf8');
 
-        app.util.fs.readFile(filePath, (err, content) => {
-            if (err) return callback(err);
+        let pathToMixinDir = path.join(app.config.app.path, 'view/mixins');
 
-            let pathToMixinDir = path.join(app.config.app.path, 'view/mixins');
+        for (let fileName of await app.util.fs.readdir(pathToMixinDir)) {
+            //content += `include mixins/${fileName}\n` + content;
+        }
 
-            for (let fileName of app.util.fs.readdirSync(pathToMixinDir)) {
-                content += `include mixins/${fileName}\n` + content;
-            }
+        console.log(pug.compile(content, options));
 
-            return callback(null, pug.compile(content, options));
-        });
+        return pug.compile(content, options);
     }
 
 }

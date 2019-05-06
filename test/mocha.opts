@@ -1,1 +1,1 @@
---recursive --timeout 10000
+--recursive --timeout 100000

@@ -3,32 +3,32 @@ const path = require('path');
 
 class View {
 
-    handle(req, res, next) {
+    async handle(req, res, next) {
 
-        res.locals.view = this._instantiate(req, path.join(app.config.app.path, 'src/view'));
+        res.locals.view = await this._instantiate(req, path.join(app.config.app.path, 'src/view'));
 
         return next();
     }
 
-    _instantiate(req, dir) {
+    async _instantiate(req, dir) {
 
         let view = {};
 
-        if(app.util.fs.isDirectorySync(dir)) {
+        if (await app.util.fs.isDirectory(dir)) {
 
-            for(let fileName of app.util.fs.readdirSync(dir)) {
+            for (let fileName of await app.util.fs.readdir(dir)) {
 
                 let ns = app.util.string.camelize(fileName);
 
-                view[ns] = this._instantiate(req, path.join(dir, fileName));
+                view[ns] = await this._instantiate(req, path.join(dir, fileName));
             }
 
 
-        } else if(app.util.fs.isFileSync(dir)) {
+        } else if (await app.util.fs.isFile(dir)) {
 
             let viewHelper = new (require(dir))(req);
 
-            if('function' !== typeof viewHelper.render) {
+            if ('function' !== typeof viewHelper.render) {
                 throw new Error(`${dir} has no render method`);
             }
 

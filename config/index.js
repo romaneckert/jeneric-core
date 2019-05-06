@@ -4,7 +4,8 @@ module.exports = {
     },
     auth: {
         tokenExpiresIn: 600,
-        tokenCookieName: '_t'
+        tokenCookieName: '_t',
+        secret: process.env.SECRET
     },
     i18n: {
         locales: ['en'],
@@ -68,10 +69,17 @@ module.exports = {
             useNewUrlParser: true,
             reconnectTries: Number.MAX_VALUE,
             reconnectInterval: 1000
-        }
+        },
+        url: process.env.DB
     },
     server: {
         port: 3000,
+        routes: {
+            'index': {
+                methods: ['get'],
+                path: '/'
+            },
+        },
         middleware: {
             100: 'auth',
             200: 'roles',

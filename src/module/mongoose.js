@@ -9,13 +9,11 @@ class Mongoose {
     async start() {
 
         if ('string' !== typeof this.config.url || 0 === this.config.url.length) {
-            await app.logger.warning('missing config.mongoose.url');
-            return;
+            throw new Error('missing config.mongoose.url');
         }
 
         if ('object' !== typeof this.config.connection || null === this.config.connection) {
-            await app.logger.warning('missing config.mongoose.connection');
-            return;
+            throw new Error('missing config.mongoose.connection');
         }
 
         this.instance.connection.on('error', async (err) => await app.logger.error(err));

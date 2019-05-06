@@ -6,6 +6,12 @@ class App {
 
     constructor() {
 
+        const allowedContexts = ['production', 'acceptance', 'staging', 'test', 'development'];
+
+        if (-1 === allowedContexts.indexOf(process.env.NODE_ENV)) {
+            throw new Error(`context "${process.env.NODE_ENV}" not allowed -> ${allowedContexts.join(',')}`);
+        }
+
         if ('string' === typeof process.env.NODE_ENV) {
             config.app.context = process.env.NODE_ENV;
         } else {
@@ -33,7 +39,9 @@ class App {
 
         // init modules
         for (let m in this.module) {
-            if ('function' === typeof this.module[m].start) await this.module[m].start();
+            if ('function' === typeof this.module[m].start) {
+                await this.module[m].start();
+            }
         }
 
         // handle uncaught exceptions
@@ -67,7 +75,9 @@ class App {
 
         // stop modules
         for (let m in this.module) {
-            if ('function' === typeof this.module[m].stop) await this.module[m].stop();
+            if ('function' === typeof this.module[m].stop) {
+                await this.module[m].stop();
+            }
         }
     }
 

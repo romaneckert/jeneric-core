@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const fs = require('../src/util/fs');
 const string = require('../src/util/string');
 const object = require('../src/util/object');
@@ -15,6 +16,16 @@ class Install {
     }
 
     async install() {
+
+        // load config from .env
+        const pathToDotEnv = fs.path.join('config', '.env.' + process.env.NODE_ENV);
+
+        if (!await fs.isFile(pathToDotEnv)) {
+            throw new Error(`${pathToDotEnv} does not exists`);
+        }
+
+        require('dotenv').config({path: pathToDotEnv});
+
         // get args
         this.args = process.argv.slice(2);
 
@@ -25,7 +36,7 @@ class Install {
         this.pathToNodeModules = fs.path.join(this.pathToRoot, 'node_modules');
 
         // check if node_modules writable
-        if(!await fs.isWritable(this.pathToNodeModules)) {
+        if (!await fs.isWritable(this.pathToNodeModules)) {
             throw new Error(`${this.pathToNodeModules} is not writable`);
         }
 
@@ -53,15 +64,15 @@ class Install {
 
         this.modulePaths.push(this.pathToRoot);
 
-        for(let modulePath of this.modulePaths) {
+        for (let modulePath of this.modulePaths) {
 
             // check if module path exists
-            if(!await fs.isDirectory(modulePath)) {
+            if (!await fs.isDirectory(modulePath)) {
                 throw new Error(`${modulePath} is not a directory`);
             }
 
             // symlink all files in src and view
-            for(let pathToDir of ['public', 'src', 'view']) {
+            for (let pathToDir of ['public', 'src', 'view']) {
 
                 let src = fs.path.join(modulePath, pathToDir);
                 let dest = fs.path.join(this.pathToApp, pathToDir);
@@ -73,7 +84,7 @@ class Install {
             // merge config files
             let pathToConfig = fs.path.join(modulePath, 'config/index.js');
 
-            if(await fs.isFile(pathToConfig)) {
+            if (await fs.isFile(pathToConfig)) {
                 let config = require(pathToConfig);
                 object.merge(this.config, config);
             }
@@ -120,7 +131,7 @@ class Install {
 
         let fileContent = '';
 
-        for(let ns of ['util', 'model']) {
+        for (let ns of ['util', 'model']) {
 
             let pathToNs = fs.path.join(this.pathToApp, './src/', ns);
 
@@ -132,7 +143,7 @@ class Install {
 
             for (let fileName of await fs.readdir(pathToNs)) {
 
-                if('util' === ns) {
+                if ('util' === ns) {
                     fileContent += `${tab}${tab}${tab}${string.camelize(fileName)}: require('./${fs.path.join(`src/${ns}`, fileName)}'),\n`;
                 } else {
                     fileContent += `${tab}${tab}${tab}${string.camelize(fileName)}: new (require('./${fs.path.join(`src/${ns}`, fileName)}'))(),\n`;
@@ -145,7 +156,7 @@ class Install {
 
         fileContent += `${tab}${tab}this.logger = new (require('./src/module/logger.js'))();\n`;
 
-        for(let ns of ['module']) {
+        for (let ns of ['module']) {
 
             let pathToNs = fs.path.join(this.pathToApp, './src/', ns);
 
@@ -157,7 +168,7 @@ class Install {
 
             for (let fileName of await fs.readdir(pathToNs)) {
 
-                if('module' === ns && ('app.js' === fileName || 'logger.js' === fileName)) continue;
+                if ('module' === ns && ('app.js' === fileName || 'logger.js' === fileName)) continue;
 
                 fileContent += `${tab}${tab}${tab}${string.camelize(fileName)}: new (require('./${fs.path.join(`src/${ns}`, fileName)}'))(),\n`;
 
@@ -178,17 +189,17 @@ class Install {
 
     async addLocale(pathToLocale, locale) {
 
-        for(let fileName of await fs.readdir(pathToLocale)) {
+        for (let fileName of await fs.readdir(pathToLocale)) {
 
             let filePath = fs.path.join(pathToLocale, fileName);
 
-            if(await fs.isDirectory(filePath)) {
+            if (await fs.isDirectory(filePath)) {
 
-                if('object' !== typeof locale[fileName]) locale[fileName] = {};
+                if ('object' !== typeof locale[fileName]) locale[fileName] = {};
 
                 await this.addLocale(filePath, locale[fileName]);
 
-            } else if(await fs.isFile(filePath)) {
+            } else if (await fs.isFile(filePath)) {
 
                 let fileDetails = fs.path.parse(fileName);
 
@@ -206,9 +217,9 @@ class Install {
     async copyOnlyFilesSync(src, dest) {
 
         // check if source exists
-        if(!await fs.isWritable(src)) return false;
+        if (!await fs.isWritable(src)) return false;
 
-        if(await fs.isDirectory(src)) {
+        if (await fs.isDirectory(src)) {
 
             try {
                 await fs.mkdir(dest);
@@ -221,7 +232,7 @@ class Install {
             }
         } else {
 
-            if(await fs.isWritable(dest)) {
+            if (await fs.isWritable(dest)) {
                 await fs.remove(dest);
                 console.log(`overwrite: ${dest}`);
             }

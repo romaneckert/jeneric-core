@@ -16,8 +16,7 @@ class Auth {
     async start() {
         // validate config.secret
         if ('string' !== typeof this.config.secret || 10 > this.config.secret.length) {
-            await app.logger.warning('config.auth.secret not set or not valid - have to be string, minimum length 10 - generate temporary secret');
-            this.config.secret = crypto.randomBytes(32).toString('hex');
+            throw new Error(`config.auth.secret not set or not valid - have to be string, minimum length 10 - example: ${crypto.randomBytes(32).toString('hex')}`);
         }
 
         // validate config.tokenExpiresIn

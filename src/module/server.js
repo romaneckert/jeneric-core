@@ -28,12 +28,12 @@ class Server {
         this.express.use(helmet());
         this.express.use(compression());
         this.express.use(cookieParser());
-        this.express.use(bodyParser.urlencoded({ extended: false }));
+        this.express.use(bodyParser.urlencoded({extended: false}));
 
         let publicPath = path.join(app.config.app.path, 'public');
 
         if (await app.util.fs.isDirectory(publicPath)) {
-            this.express.use(express.static(publicPath, { maxAge: '30 days' }));
+            this.express.use(express.static(publicPath, {maxAge: '30 days'}));
         }
 
         // add access middleware
@@ -54,7 +54,7 @@ class Server {
         // add notFound middleware
         this.express.use(middleware.notFound.handle);
 
-        this.express.engine('pug', app.module.renderer.render);
+        //this.express.engine('pug', app.module.renderer.render);
         this.express.set('views', path.join(app.config.app.path, 'view'));
         this.express.set('view engine', 'pug');
 
@@ -62,7 +62,7 @@ class Server {
 
         // check certificates
         if (!await app.util.fs.isFile(this.pathToKeyPem) || !await app.util.fs.isFile(this.pathToCertPem)) {
-            app.logger.warning(`.key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
+            await app.logger.warning(`.key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
             server = this.express;
         } else {
             // start https server
@@ -74,7 +74,7 @@ class Server {
 
         this.server = server.listen(this.config.port);
 
-        app.logger.notice(`server started with port ${this.config.port}`);
+        await app.logger.notice(`server started with port ${this.config.port}`);
     }
 
     async stop() {
@@ -89,17 +89,17 @@ class Server {
             let handler = null;
 
             // sanitize routeConfig
-            if('string' !== typeof route.path) route.path = '/' + routeName;
-            if('object' !== typeof route.methods) route.methods = ['get'];
+            if ('string' !== typeof route.path) route.path = '/' + routeName;
+            if ('object' !== typeof route.methods) route.methods = ['get'];
 
-            if('object' !== typeof route.handler) {
+            if ('object' !== typeof route.handler) {
                 let pathToHandler = path.join(app.config.app.path, 'src/handler', routeName);
                 handler = new (require(pathToHandler))();
-            } else{
+            } else {
                 handler = route.handler;
             }
 
-            if('function' !== typeof handler.handle) {
+            if ('function' !== typeof handler.handle) {
                 throw new Error(`${routeName} has no valid handler`);
             }
 
