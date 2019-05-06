@@ -235,6 +235,8 @@ class Logger {
     // write log entry to console
     _writeToConsole(log) {
 
+        if(app.config.app.context === 'test') return;
+
         // disabled, if config console disabled
         if (!this.config.levels[log.code].console) return;
 

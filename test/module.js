@@ -3,7 +3,7 @@ const https = require('https');
 describe('module', () => {
 
     describe('server', () => {
-
+        /*
         https.request({
             hostname: 'localhost',
             port: 3000,
@@ -16,7 +16,7 @@ describe('module', () => {
             res.on('data', (d) => {
                 process.stdout.write(d);
             });
-        });
+        });*/
 
     });
 

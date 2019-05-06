@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "start": "node bin/install.js && node .",
-        "test": "node bin/install.js && nyc --all --reporter=text mocha",
+        "test": "export NODE_ENV=test && node bin/install.js && nyc --all --reporter=text mocha",
         "docs:build": "./node_modules/documentation/bin/documentation.js build src/** -f html -o docs"
     },
     "author": "Roman Eckert",

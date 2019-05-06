@@ -17,6 +17,11 @@ describe('util', () => {
             testFileSymlinkPath = app.util.fs.path.join(testDirPath, 'test-file-symlink.txt');
         });
 
+        it('remove', async () => {
+            await app.util.fs.remove(testDirSymlinkPath);
+            await app.util.fs.remove(testDirPath);
+        });
+
         it('ensureDirExists', async () => {
             await app.util.fs.ensureDirExists(testDirPath);
         });
@@ -33,9 +38,6 @@ describe('util', () => {
         it('isDirectory', async () => {
             assert.strictEqual(await app.util.fs.isDirectory(testDirPath), true);
             assert.strictEqual(await app.util.fs.isDirectory(testFilePath), false);
-
-            console.log(await app.util.fs.isDirectory(testDirSymlinkPath));
-
             assert.strictEqual(await app.util.fs.isDirectory(testDirSymlinkPath), false);
             assert.strictEqual(await app.util.fs.isDirectory(testFileSymlinkPath), false);
         });
