@@ -27,8 +27,6 @@ describe('module', () => {
 
             let content = await app.module.renderer.render('index');
 
-            console.log(content);
-
             assert.strictEqual((await app.util.request(app.config.app.url)).includes('200'), true);
         });
     });

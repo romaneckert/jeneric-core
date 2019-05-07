@@ -17,14 +17,12 @@ class Install {
 
     async install() {
 
-        // load config from .env
-        const pathToDotEnv = fs.path.join('config', '.env.' + process.env.NODE_ENV);
+        // load context specific config
+        const pathToContextConfig = fs.path.join('config', 'config.' + process.env.NODE_ENV + '.js');
 
-        if (!await fs.isFile(pathToDotEnv)) {
-            throw new Error(`${pathToDotEnv} does not exists`);
+        if (!await fs.isFile(pathToContextConfig)) {
+            throw new Error(`${pathToContextConfig} does not exists`);
         }
-
-        require('dotenv').config({path: pathToDotEnv});
 
         // get args
         this.args = process.argv.slice(2);
@@ -82,11 +80,16 @@ class Install {
             }
 
             // merge config files
-            let pathToConfig = fs.path.join(modulePath, 'config/index.js');
+            let pathToConfig = fs.path.join(modulePath, 'config/config.js');
 
             if (await fs.isFile(pathToConfig)) {
-                let config = require(pathToConfig);
-                object.merge(this.config, config);
+                object.merge(this.config, require(pathToConfig));
+            }
+
+            let pathToContextSpecificConfig = fs.path.join(modulePath, 'config/config.' + process.env.NODE_ENV + '.js');
+
+            if (await fs.isFile(pathToContextSpecificConfig)) {
+                object.merge(this.config, require(pathToContextSpecificConfig));
             }
 
             // merge locales

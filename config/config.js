@@ -1,12 +1,10 @@
 module.exports = {
     app: {
-        cluster: false,
-        url: process.env.APP_URL
+        cluster: false
     },
     auth: {
         tokenExpiresIn: 600,
-        tokenCookieName: '_t',
-        secret: process.env.SECRET
+        tokenCookieName: '_t'
     },
     i18n: {
         locales: ['en'],
@@ -64,15 +62,13 @@ module.exports = {
     mail: {
         defaultFrom: 'default@jeneric',
         connectionTimeout: 2000,
-        url: process.env.MAIL_URL
     },
     mongoose: {
         connection: {
             useNewUrlParser: true,
             reconnectTries: Number.MAX_VALUE,
             reconnectInterval: 1000
-        },
-        url: process.env.DB_URL
+        }
     },
     server: {
         port: 3000,

@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "start": "export NODE_ENV=production && node bin/install.js && node .",
+        "dev": "export NODE_ENV=development && node bin/install.js && node .",
         "test": "export NODE_ENV=test && node bin/install.js && nyc --all --reporter=text mocha",
         "docs:build": "export NODE_ENV=production ./node_modules/documentation/bin/documentation.js build src/** -f html -o docs"
     },
@@ -16,7 +17,6 @@
         "body-parser": "1.19.0",
         "compression": "1.7.4",
         "cookie-parser": "1.4.4",
-        "dotenv": "8.0.0",
         "express": "4.16.4",
         "helmet": "3.17.0",
         "jsonwebtoken": "8.5.1",
@@ -38,7 +38,7 @@
             ".git"
         ],
         "ext": "js,json,pug,css",
-        "exec": "npm run start"
+        "exec": "npm run dev"
     },
     "nyc": {
         "all": true,
