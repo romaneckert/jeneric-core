@@ -18,16 +18,18 @@ describe('module', () => {
             }
 
         });
-
-
     });
 
     describe('mail', () => {
+
         it('send', async () => {
 
-            let content = await app.module.renderer.render('index');
+            await app.module.mail.send({
+                to: 'test@jeneric',
+                subject: 'Test Mail module',
+                html: await app.module.server.render('index')
+            });
 
-            assert.strictEqual((await app.util.request(app.config.app.url)).includes('200'), true);
         });
     });
 

@@ -2,13 +2,8 @@ const app = require('@jeneric/app');
 
 class Translate {
 
-    constructor(options) {
-
-        if ('object' !== typeof options || null === options || 'string' !== typeof options.locale) {
-            throw new Error('missing locale option');
-        }
-
-        this.locale = options.locale;
+    constructor(locals) {
+        this.locale = locals.locale;
     }
 
     render(message, data) {

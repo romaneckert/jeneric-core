@@ -37,22 +37,6 @@ class Mail {
 
     }
 
-    async render(path, options, res) {
-
-        if ('object' !== typeof options) options = {};
-
-        // set base url
-        if ('string' !== typeof options.baseUrl || options.baseUrl.length === 0) options.baseUrl = this.config.baseUrl;
-
-        return new Promise(resolve => {
-            res.render(path, options, (err, html) => {
-                if (err) throw err;
-                resolve(html);
-            });
-        });
-
-    }
-
 }
 
 module.exports = Mail;

@@ -17,25 +17,31 @@ class Renderer {
         let fn = pug.compile(
             content,
             {
-                filename: filePath,
-                cache: true,
+                filename: filePath
             }
         );
 
-        let locals = options._locals;
+        let locals = {};
+
+        if ('object' === typeof options && null !== options && 'object' === typeof options._locals) {
+            locals = options._locals;
+        }
+
+        if ('string' !== typeof locals.locale || 0 === locals.locale.length) {
+            locals.locale = null;
+        }
 
         locals.view = this._instantiate(
             {
-                locale: locals.locale,
-                baseUrl: app.config.app.url
+                locale: locals.locale
             },
             path.join(app.config.app.path, 'src/view')
         );
 
-        callback(null, fn(locals));
+        callback(null, fn(locals, {cache: true}));
     }
 
-    async _instantiate(options, dir) {
+    async _instantiate(locals, dir) {
 
         let view = {};
 
@@ -45,13 +51,13 @@ class Renderer {
 
                 let ns = app.util.string.camelize(fileName);
 
-                view[ns] = await this._instantiate(options, path.join(dir, fileName));
+                view[ns] = await this._instantiate(locals, path.join(dir, fileName));
             }
 
 
         } else if (await app.util.fs.isFile(dir)) {
 
-            let viewHelper = new (require(dir))(options);
+            let viewHelper = new (require(dir))(locals);
 
             if ('function' !== typeof viewHelper.render) {
                 throw new Error(`${dir} has no render method`);

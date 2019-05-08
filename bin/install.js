@@ -94,8 +94,6 @@ class Install {
 
             // merge locales
             await this.addLocale(fs.path.join(modulePath, 'locale'), this.locale);
-
-            console.log(`install -> merge ${modulePath}`);
         }
 
         await this.writeCustomConfig();

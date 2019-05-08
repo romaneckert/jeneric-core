@@ -77,6 +77,24 @@ class Server {
         await app.logger.notice(`server started with port ${this.config.port}`);
     }
 
+    render(path, locals) {
+
+        return new Promise((resolve, reject) => {
+
+            if ('object' !== typeof locals || null === locals) {
+                locals = {};
+            }
+
+            this.express.render(path, locals, (err, html) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(html);
+                }
+            });
+        });
+    }
+
     async stop() {
         this.server.close();
     }
