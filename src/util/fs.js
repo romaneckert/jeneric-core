@@ -101,4 +101,19 @@ fs.isWritable = async (path) => {
     }
 };
 
+fs.pathToObject = async (path) => {
+
+    let obj = {};
+
+    if (await fs.isDirectory(path)) {
+        for (let file of await fs.readdir(path)) {
+            obj[file] = await fs.pathToObject(fs.path.join(path, file));
+        }
+    } else if (await fs.isFile(path)) {
+        return path;
+    }
+
+    return obj;
+};
+
 module.exports = fs;
