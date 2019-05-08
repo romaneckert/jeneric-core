@@ -1,6 +1,6 @@
 {
     "name": "@jeneric/core",
-    "version": "2.0.7",
+    "version": "2.0.8",
     "description": "jeneric core",
     "main": "index.js",
     "scripts": {
@@ -18,11 +18,11 @@
         "compression": "1.7.4",
         "cookie-parser": "1.4.4",
         "express": "4.16.4",
-        "helmet": "3.17.0",
+        "helmet": "3.18.0",
         "jsonwebtoken": "8.5.1",
-        "mongoose": "5.5.5",
+        "mongoose": "5.5.6",
         "nodemailer": "6.1.1",
-        "nodemon": "^1.19.0",
+        "nodemon": "1.19.0",
         "pug": "2.0.3",
         "request": "2.88.0",
         "request-promise-native": "1.0.7",
@@ -50,7 +50,7 @@
         "temp-directory": ".nyc"
     },
     "devDependencies": {
-        "documentation": "10.1.0",
+        "documentation": "11.0.0",
         "eslint": "5.16.0",
         "eslint-plugin-jsdoc": "4.8.3",
         "mocha": "6.1.4",
