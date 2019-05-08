@@ -16,6 +16,10 @@ class Mail {
             throw new Error('missing config.mail.url');
         }
 
+        if ('string' !== typeof this.config.defaultFrom || 0 === this.config.defaultFrom.length) {
+            throw new Error('missing config.mail.defaultFrom');
+        }
+
         let mailUrl = url.parse(this.config.url);
 
         mailUrl.search = querystring.stringify({
@@ -28,13 +32,7 @@ class Mail {
     }
 
     async send(options) {
-
-        return this.transporter.sendMail(options).then(info => {
-            return info;
-        }).catch(err => {
-            throw err;
-        });
-
+        return this.transporter.sendMail(options);
     }
 
 }

@@ -235,13 +235,14 @@ class Logger {
     // write log entry to console
     _writeToConsole(log) {
 
-        if(app.config.app.context === 'test') return;
-
         // disabled, if config console disabled
         if (!this.config.levels[log.code].console) return;
 
         // disabled, if log level less then notice and in mode production
         if (log.code > 5 && app.config.app.context === 'production') return;
+
+        // disabled, if context in mode test
+        if (app.config.app.context === 'test') return;
 
         let consoleOutput = '';
 
@@ -258,7 +259,6 @@ class Logger {
         }
 
         console.log(this.config.levels[log.code].color, consoleOutput.replace(/\r?\n?/g, '').trim(), "\x1b[0m");
-
     }
 
     _addToHistory(log) {

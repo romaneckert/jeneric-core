@@ -17,13 +17,6 @@ class Install {
 
     async install() {
 
-        // load context specific config
-        const pathToContextConfig = fs.path.join('config', 'config.' + process.env.NODE_ENV + '.js');
-
-        if (!await fs.isFile(pathToContextConfig)) {
-            throw new Error(`${pathToContextConfig} does not exists`);
-        }
-
         // get args
         this.args = process.argv.slice(2);
 
@@ -65,7 +58,7 @@ class Install {
         for (let modulePath of this.modulePaths) {
 
             // check if module path exists
-            if (!await fs.isDirectory(modulePath)) {
+            if (!await fs.isDirectory(modulePath) && !await fs.isSymbolicLinkToDirectory(modulePath)) {
                 throw new Error(`${modulePath} is not a directory`);
             }
 

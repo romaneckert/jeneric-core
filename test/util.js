@@ -49,6 +49,14 @@ describe('util', () => {
             assert.strictEqual(await app.util.fs.isDirectory(testFileNotExists), false);
         });
 
+        it('isSymbolicLinkToDirectory', async () => {
+            assert.strictEqual(await app.util.fs.isSymbolicLinkToDirectory(testDirPath), false);
+            assert.strictEqual(await app.util.fs.isSymbolicLinkToDirectory(testFilePath), false);
+            assert.strictEqual(await app.util.fs.isSymbolicLinkToDirectory(testDirSymlinkPath), true);
+            assert.strictEqual(await app.util.fs.isSymbolicLinkToDirectory(testFileSymlinkPath), false);
+            assert.strictEqual(await app.util.fs.isSymbolicLinkToDirectory(testFileNotExists), false);
+        });
+
         it('isFile', async () => {
             assert.strictEqual(await app.util.fs.isFile(testDirPath), false);
             assert.strictEqual(await app.util.fs.isFile(testFilePath), true);

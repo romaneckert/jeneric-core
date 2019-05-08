@@ -71,6 +71,23 @@ fs.isDirectory = async (path) => {
     return stats.isDirectory();
 };
 
+fs.isSymbolicLinkToDirectory = async (path) => {
+
+    let stats = null;
+
+    try {
+        stats = await fs.stat(path);
+    } catch (err) {
+        return false;
+    }
+
+    if (stats.isDirectory() && await fs.isSymbolicLink(path)) {
+        return true;
+    }
+
+    return false;
+};
+
 fs.ensureDirExists = async (path) => {
 
     await fs.mkdir(path, {recursive: true});
