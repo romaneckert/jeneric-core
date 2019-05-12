@@ -17,23 +17,24 @@ class Server {
         this.pathToCertPem = path.join(app.config.app.path, 'config/cert.pem');
 
         this.server = null;
+        this.router = null;
 
     }
 
     async start() {
 
-        this.express = express();
+        this.router = express();
 
-        this.express.enable('strict routing');
-        this.express.use(helmet());
-        this.express.use(compression());
-        this.express.use(cookieParser());
-        this.express.use(bodyParser.urlencoded({extended: false}));
+        this.router.enable('strict routing');
+        this.router.use(helmet());
+        this.router.use(compression());
+        this.router.use(cookieParser());
+        this.router.use(bodyParser.urlencoded({extended: false}));
 
         let publicPath = path.join(app.config.app.path, 'public');
 
         if (await app.util.fs.isDirectory(publicPath)) {
-            this.express.use(express.static(publicPath, {maxAge: '30 days'}));
+            this.router.use(express.static(publicPath, {maxAge: '30 days'}));
         }
 
         // add access middleware
@@ -43,33 +44,33 @@ class Server {
             notFound: new (require('@jeneric/app/src/middleware/not-found'))()
         };
 
-        this.express.use(middleware.access.handle);
+        this.router.use(middleware.access.handle);
 
         // add custom middleware and routes
         this.addRoutes(this.config.routes, []);
 
         // add error middleware
-        this.express.use(middleware.error.handle);
+        this.router.use(middleware.error.handle);
 
         // add notFound middleware
-        this.express.use(middleware.notFound.handle);
+        this.router.use(middleware.notFound.handle);
 
-        this.express.engine('pug', app.module.renderer.render.bind(app.module.renderer));
-        this.express.set('views', path.join(app.config.app.path, 'view'));
-        this.express.set('view engine', 'pug');
+        this.router.engine('pug', app.module.renderer.render.bind(app.module.renderer));
+        this.router.set('views', path.join(app.config.app.path, 'view'));
+        this.router.set('view engine', 'pug');
 
         let server = null;
 
         // check certificates
         if (!await app.util.fs.isFile(this.pathToKeyPem) || !await app.util.fs.isFile(this.pathToCertPem)) {
             await app.logger.warning(`.key and .pem files missing`, [this.pathToKeyPem, this.pathToCertPem]);
-            server = this.express;
+            server = this.router;
         } else {
             // start https server
             server = https.createServer({
                 key: await app.util.fs.readFile(this.pathToKeyPem),
                 cert: await app.util.fs.readFile(this.pathToCertPem)
-            }, this.express);
+            }, this.router);
         }
 
         this.server = server.listen(this.config.port);
@@ -85,7 +86,7 @@ class Server {
                 locals = {};
             }
 
-            this.express.render(path, locals, (err, html) => {
+            this.router.render(path, locals, (err, html) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -129,22 +130,24 @@ class Server {
 
                 switch (middlewareName) {
                     case 'roles':
-                        middleware = new (require(path.join(app.config.app.path, 'src/middleware', middlewareName)))();
-
                         if ('object' === typeof route.roles) {
+
+                            console.log(route.roles);
+
+                            middleware = new (require(path.join(app.config.app.path, 'src/middleware', middlewareName)))();
                             for (let method of route.methods) {
-                                this.express[method](route.path, middleware.handle.bind(middleware));
+                                this.router[method](route.path, middleware.handle.bind(middleware));
                             }
                         }
                         break;
                     case 'handler':
                         for (let method of route.methods) {
-                            this.express[method](route.path, handler.handle.bind(handler));
+                            this.router[method](route.path, handler.handle.bind(handler));
                         }
                         break;
                     default:
                         middleware = new (require(path.join(app.config.app.path, 'src/middleware', middlewareName)))();
-                        this.express.use(route.path, middleware.handle.bind(middleware));
+                        this.router.use(route.path, middleware.handle.bind(middleware));
                         break;
                 }
             }

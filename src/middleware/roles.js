@@ -13,10 +13,8 @@ class Roles {
         app.util.object.merge(this.config, config);
 
         this._roles = {};
-    }
 
-    init() {
-        this._initRoles(jeneric.module.server.routes);
+        this._initRoles(app.config.server.routes);
     }
 
     _initRoles(routes) {
@@ -48,8 +46,10 @@ class Roles {
         // check if route has roles
         if ('object' !== typeof routeRoles) throw new Error('route has no roles');
 
-        // check if user has authentificated
-        if ('object' !== typeof req.user || null === req.user || 'object' !== typeof req.user.roles) return res.redirect(this.config.redirectPath);
+        // check if user has authenticated
+        if ('object' !== typeof req.user || null === req.user || 'object' !== typeof req.user.roles) {
+            return res.redirect(this.config.redirectPath);
+        }
 
         // check if one role in user roles match route roles
         for (let role of req.user.roles) {
