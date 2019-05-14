@@ -5,29 +5,19 @@ const pug = require('pug');
 class Renderer {
 
     constructor() {
-        this.view = {};
+        this.mixins = {};
+        this.pathToMixinDir = null;
     }
 
+
     async start() {
+        this.pathToMixinDir = path.join(app.config.app.path, 'view/mixins');
         await this.instantiateMixins();
     }
 
     async render(filePath, options, callback) {
 
         let content = await app.util.fs.readFile(filePath, 'utf8');
-
-        let pathToMixinDir = path.join(app.config.app.path, 'view/mixins');
-
-        let view = {};
-
-        for (let fileName of await app.util.fs.readdir(pathToMixinDir)) {
-
-            let fileContent =
-
-            view[app.util.fs.string.camelize(fileName)] = pug.compile(mixinCode);
-
-            content = `include ${app.util.fs.path.join(pathToMixinDir, fileName)}\n` + content;
-        }
 
         let fn = pug.compile(
             content,
@@ -54,11 +44,18 @@ class Renderer {
             path.join(app.config.app.path, 'src/view')
         );
 
-        callback(null, fn(locals, {cache: true}));
+        app.util.object.merge(locals.view, this.mixins);
+
+        callback(null, fn(locals, { cache: true }));
     }
 
     async instantiateMixins() {
+        for (let fileName of await app.util.fs.readdir(this.pathToMixinDir)) {
 
+            let fileContent = await app.util.fs.readFile(app.util.fs.path.join(this.pathToMixinDir, fileName));
+
+            this.mixins[app.util.string.camelize(fileName)] = pug.compile(fileContent);
+        }
     }
 
     async _instantiate(locals, dir) {
