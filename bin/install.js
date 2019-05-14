@@ -92,6 +92,29 @@ class Install {
         await this.writeCustomConfig();
         await this.writeCustomLocale();
         await this.writeAppFile();
+        await this.writeMixinsToDefaultLayout();
+    }
+
+    async writeMixinsToDefaultLayout() {
+
+        let pathToMixins = fs.path.join(this.pathToApp, 'view/mixin');
+        let pathToDefaulLayout = fs.path.join(this.pathToApp, 'view/layout/default.pug');
+
+        let layoutContent = await fs.readFile(pathToDefaulLayout);
+
+        for (let fileName of await fs.readdir(pathToMixins)) {
+
+            let fileContent = await fs.readFile(fs.path.join(pathToMixins, fileName));
+
+            layoutContent = fileContent + "\n" + layoutContent;
+
+        }
+
+        await fs.remove(pathToDefaulLayout);
+        await fs.ensureFileExists(pathToDefaulLayout);
+        await fs.appendFile(pathToDefaulLayout, layoutContent);
+
+        await fs.remove(pathToMixins);
     }
 
     async writeCustomConfig() {
@@ -119,7 +142,7 @@ class Install {
 
         let pathToAppModule = fs.path.join(this.pathToApp, './src/module/app.js');
 
-        let appFileContent = await fs.readFile(pathToAppModule, 'utf8');
+        let appFileContent = await fs.readFile(pathToAppModule);
 
         let tab = '    ';
 
@@ -199,7 +222,7 @@ class Install {
 
                 if ('.txt' !== fileDetails.ext) continue;
 
-                let content = await fs.readFile(filePath, 'utf8');
+                let content = await fs.readFile(filePath);
 
                 locale[fileDetails.name] = content.trim();
 

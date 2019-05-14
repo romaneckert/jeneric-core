@@ -1,19 +1,7 @@
 const app = require('@jeneric/app');
-const path = require('path');
 const pug = require('pug');
 
 class Renderer {
-
-    constructor() {
-        this.mixins = {};
-        this.pathToMixinDir = null;
-    }
-
-
-    async start() {
-        this.pathToMixinDir = path.join(app.config.app.path, 'view/mixins');
-        await this.instantiateMixins();
-    }
 
     async render(filePath, options, callback) {
 
@@ -37,25 +25,16 @@ class Renderer {
             locals.locale = null;
         }
 
-        locals.view = this._instantiate(
+        locals.view = await this._instantiate(
             {
                 locale: locals.locale
             },
-            path.join(app.config.app.path, 'src/view')
+            app.util.fs.path.join(app.config.app.path, 'src/view')
         );
 
         app.util.object.merge(locals.view, this.mixins);
 
         callback(null, fn(locals, { cache: true }));
-    }
-
-    async instantiateMixins() {
-        for (let fileName of await app.util.fs.readdir(this.pathToMixinDir)) {
-
-            let fileContent = await app.util.fs.readFile(app.util.fs.path.join(this.pathToMixinDir, fileName));
-
-            this.mixins[app.util.string.camelize(fileName)] = pug.compile(fileContent);
-        }
     }
 
     async _instantiate(locals, dir) {
@@ -68,7 +47,7 @@ class Renderer {
 
                 let ns = app.util.string.camelize(fileName);
 
-                view[ns] = await this._instantiate(locals, path.join(dir, fileName));
+                view[ns] = await this._instantiate(locals, app.util.fs.path.join(dir, fileName));
             }
 
 

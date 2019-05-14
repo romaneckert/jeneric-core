@@ -29,12 +29,12 @@ class Server {
         this.router.use(helmet());
         this.router.use(compression());
         this.router.use(cookieParser());
-        this.router.use(bodyParser.urlencoded({extended: false}));
+        this.router.use(bodyParser.urlencoded({ extended: false }));
 
         let publicPath = path.join(app.config.app.path, 'public');
 
         if (await app.util.fs.isDirectory(publicPath)) {
-            this.router.use(express.static(publicPath, {maxAge: '30 days'}));
+            this.router.use(express.static(publicPath, { maxAge: '30 days' }));
         }
 
         // add access middleware
@@ -56,7 +56,7 @@ class Server {
         this.router.use(middleware.notFound.handle);
 
         this.router.engine('pug', app.module.renderer.render.bind(app.module.renderer));
-        this.router.set('views', path.join(app.config.app.path, 'view'));
+        this.router.set('views', path.join(app.config.app.path, 'view/template'));
         this.router.set('view engine', 'pug');
 
         let server = null;
