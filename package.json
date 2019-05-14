@@ -4,29 +4,32 @@
     "description": "jeneric core",
     "main": "index.js",
     "scripts": {
-        "start": "export NODE_ENV=production && node bin/install.js && node .",
+        "start": "export NODE_ENV=production && node dist/server.js",
+        "prestart": "npm run build",
         "dev": "export NODE_ENV=development && node bin/install.js && node .",
         "test": "export NODE_ENV=test && node bin/install.js && nyc --all --reporter=text mocha",
-        "docs:build": "export NODE_ENV=production ./node_modules/documentation/bin/documentation.js build src/** -f html -o docs"
+        "docs:build": "export NODE_ENV=production ./node_modules/documentation/bin/documentation.js build src/** -f html -o docs",
+        "build": "tsc"
     },
     "author": "Roman Eckert",
     "license": "MIT",
     "repository": "https://github.com/romaneckert/jeneric-core",
     "dependencies": {
-        "@jeneric/app": "2.0.1",
-        "body-parser": "1.19.0",
-        "compression": "1.7.4",
-        "cookie-parser": "1.4.4",
-        "express": "4.16.4",
-        "helmet": "3.18.0",
-        "jsonwebtoken": "8.5.1",
-        "mongoose": "5.5.6",
-        "nodemailer": "6.1.1",
-        "nodemon": "1.19.0",
-        "pug": "2.0.3",
-        "request": "2.88.0",
-        "request-promise-native": "1.0.7",
-        "stack-trace": "0.0.10"
+        "@jeneric/app": "^2.0.1",
+        "body-parser": "^1.19.0",
+        "compression": "^1.7.4",
+        "cookie-parser": "^1.4.4",
+        "express": "^4.16.4",
+        "helmet": "^3.18.0",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^5.5.7",
+        "nodemailer": "^6.1.1",
+        "nodemon": "^1.19.0",
+        "pug": "^2.0.3",
+        "request": "^2.88.0",
+        "request-promise-native": "^1.0.7",
+        "stack-trace": "^0.0.10",
+        "typeorm": "^0.2.17"
     },
     "nodemonConfig": {
         "ignore": [
@@ -50,10 +53,11 @@
         "temp-directory": ".nyc"
     },
     "devDependencies": {
-        "documentation": "11.0.0",
-        "eslint": "5.16.0",
-        "eslint-plugin-jsdoc": "4.8.3",
-        "mocha": "6.1.4",
-        "nyc": "14.1.0"
+        "documentation": "^11.0.0",
+        "eslint": "^5.16.0",
+        "eslint-plugin-jsdoc": "^4.8.4",
+        "mocha": "^6.1.4",
+        "nyc": "^14.1.1",
+        "typescript": "^3.4.5"
     }
 }
