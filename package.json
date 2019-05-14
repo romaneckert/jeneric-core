@@ -6,7 +6,7 @@
     "scripts": {
         "start": "export NODE_ENV=production && node bin/install.js && node .",
         "dev": "export NODE_ENV=development && node bin/install.js && node .",
-        "test": "export NODE_ENV=test && node bin/install.js && nyc --all --reporter=text mocha",
+        "test": "export NODE_ENV=test && node bin/install.js && nyc mocha",
         "docs:build": "export NODE_ENV=production ./node_modules/documentation/bin/documentation.js build src/** -f html -o docs"
     },
     "author": "Roman Eckert",
@@ -20,7 +20,7 @@
         "express": "4.16.4",
         "helmet": "3.18.0",
         "jsonwebtoken": "8.5.1",
-        "mongoose": "5.5.6",
+        "mongoose": "5.5.8",
         "nodemailer": "6.1.1",
         "nodemon": "1.19.0",
         "pug": "2.0.3",
@@ -47,13 +47,14 @@
         ],
         "skip-full": true,
         "excludeNodeModules": false,
-        "temp-directory": ".nyc"
+        "temp-directory": ".nyc",
+        "reporter": "text"
     },
     "devDependencies": {
         "documentation": "11.0.0",
         "eslint": "5.16.0",
-        "eslint-plugin-jsdoc": "4.8.3",
+        "eslint-plugin-jsdoc": "5.0.0",
         "mocha": "6.1.4",
-        "nyc": "14.1.0"
+        "nyc": "14.1.1"
     }
 }
