@@ -29,12 +29,12 @@ class Server {
         this.router.use(helmet());
         this.router.use(compression());
         this.router.use(cookieParser());
-        this.router.use(bodyParser.urlencoded({ extended: false }));
+        this.router.use(bodyParser.urlencoded({extended: false}));
 
         let publicPath = path.join(app.config.app.path, 'public');
 
         if (await app.util.fs.isDirectory(publicPath)) {
-            this.router.use(express.static(publicPath, { maxAge: '30 days' }));
+            this.router.use(express.static(publicPath, {maxAge: '30 days'}));
         }
 
         // add access middleware
@@ -131,9 +131,6 @@ class Server {
                 switch (middlewareName) {
                     case 'roles':
                         if ('object' === typeof route.roles) {
-
-                            console.log(route.roles);
-
                             middleware = new (require(path.join(app.config.app.path, 'src/middleware', middlewareName)))();
                             for (let method of route.methods) {
                                 this.router[method](route.path, middleware.handle.bind(middleware));
