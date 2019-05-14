@@ -6,8 +6,8 @@ class Translate {
         this.locale = locals.locale;
     }
 
-    async render(message, data) {
-        return await app.module.i18n.translate(this.locale, message, data);
+    render(key, data) {
+        return app.module.i18n.translate(this.locale, key, data);
     }
 }
 

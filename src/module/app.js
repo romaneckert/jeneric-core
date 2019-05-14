@@ -61,7 +61,7 @@ class App {
                 this.logger.error('block error');
             }
             start = process.hrtime();
-        }, interval);
+        }.bind(this), interval);
     }
 
     async stop() {

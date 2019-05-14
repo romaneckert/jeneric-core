@@ -73,10 +73,10 @@ module.exports = {
     server: {
         port: 3000,
         routes: {
-            'index': {
+            index: {
                 methods: ['get'],
                 path: '/'
-            },
+            }
         },
         middleware: {
             100: 'auth',

@@ -1,8 +1,15 @@
 extends ../layout/default.pug
 
 block head
-    meta(name="description" content="200")
-    title 200
+    meta(name="description" content="Jeneric")
+    title Jeneric
 
 block body
-    | 200
+    h1 Welcome to Jeneric
+
+    h2 Mixins
+    h3 Error
+
+    +error(errors=errors)
+
+    h2 View helper

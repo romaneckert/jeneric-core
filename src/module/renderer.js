@@ -6,6 +6,7 @@ class Renderer {
     async render(filePath, options, callback) {
 
         let content = await app.util.fs.readFile(filePath, 'utf8');
+        let locals = options;
 
         let fn = pug.compile(
             content,
@@ -14,12 +15,6 @@ class Renderer {
                 basedir: '/'
             }
         );
-
-        let locals = {};
-
-        if ('object' === typeof options && null !== options && 'object' === typeof options._locals) {
-            locals = options._locals;
-        }
 
         if ('string' !== typeof locals.locale || 0 === locals.locale.length) {
             locals.locale = null;
@@ -32,9 +27,7 @@ class Renderer {
             app.util.fs.path.join(app.config.app.path, 'src/view')
         );
 
-        app.util.object.merge(locals.view, this.mixins);
-
-        callback(null, fn(locals, { cache: true }));
+        callback(null, fn(locals, {cache: true}));
     }
 
     async _instantiate(locals, dir) {

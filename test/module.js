@@ -18,7 +18,7 @@ describe('module', () => {
             await app.module.mail.send({
                 to: 'test@jeneric',
                 subject: 'Test Mail module',
-                html: await app.module.server.render('index')
+                html: await app.module.server.render('mail')
             });
 
         });
@@ -51,7 +51,7 @@ describe('module', () => {
     describe('server', () => {
 
         it('index', async () => {
-            assert.strictEqual((await app.util.request(app.config.app.url)).includes('200'), true);
+            assert.strictEqual((await app.util.request(app.config.app.url)).includes('Jeneric'), true);
         });
 
         it('404', async () => {
