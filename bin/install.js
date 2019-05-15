@@ -98,21 +98,25 @@ class Install {
     async writeMixinsToDefaultLayout() {
 
         let pathToMixins = fs.path.join(this.pathToApp, 'view/mixin');
-        let pathToDefaulLayout = fs.path.join(this.pathToApp, 'view/layout/default.pug');
-
-        let layoutContent = await fs.readFile(pathToDefaulLayout);
+        let pathToLayouts = fs.path.join(this.pathToApp, 'view/layout');
+        let mixins = '';
 
         for (let fileName of await fs.readdir(pathToMixins)) {
-
-            let fileContent = await fs.readFile(fs.path.join(pathToMixins, fileName));
-
-            layoutContent = fileContent + "\n" + layoutContent;
-
+            mixins += await fs.readFile(fs.path.join(pathToMixins, fileName)) + "\n";
         }
 
-        await fs.remove(pathToDefaulLayout);
-        await fs.ensureFileExists(pathToDefaulLayout);
-        await fs.appendFile(pathToDefaulLayout, layoutContent);
+        for (let fileName of await fs.readdir(pathToLayouts)) {
+            let pathToLayout = fs.path.join(pathToLayouts, fileName);
+            let layoutContent = await fs.readFile(pathToLayout);
+
+            if (0 !== layoutContent.indexOf('extends')) {
+                layoutContent = mixins + layoutContent;
+
+                await fs.remove(pathToLayout);
+                await fs.ensureFileExists(pathToLayout);
+                await fs.appendFile(pathToLayout, layoutContent);
+            }
+        }
 
         await fs.remove(pathToMixins);
     }

@@ -43,6 +43,11 @@ class I18n {
         // check if locale is in the list of predefined locales, if not fall back to default locale
         if (-1 === this.config.locales.indexOf(locale)) locale = this.config.defaultLocale;
 
+        if ('string' !== typeof key || 0 === key.length) {
+            app.logger.warning(`an empty key is not allowed`);
+            return '';
+        }
+
         // check if the key is valid
         if (0 < key.replace(/[a-zA-Z0-9._]/g, '').length) {
             app.logger.warning(`the translation key '${key}' does not seem to be valid`);

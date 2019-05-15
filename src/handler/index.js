@@ -1,3 +1,5 @@
+const app = require('@jeneric/app');
+
 module.exports = class Index {
 
     async handle(req, res) {
@@ -9,10 +11,13 @@ module.exports = class Index {
             }
         };
 
-        return res.render(
+        let logs = await app.model.log.find().sort({date: -1}).limit(10);
+
+        res.render(
             'index',
             {
-                errors: errors
+                errors: errors,
+                logs: logs
             }
         );
     }

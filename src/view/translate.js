@@ -1,13 +1,8 @@
 const app = require('@jeneric/app');
 
 class Translate {
-
-    constructor(locals) {
-        this.locale = locals.locale;
-    }
-
-    render(key, data) {
-        return app.module.i18n.translate(this.locale, key, data);
+    render(locale, key, data) {
+        return app.module.i18n.translate(locale, key, data);
     }
 }
 
