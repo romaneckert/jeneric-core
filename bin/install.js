@@ -99,22 +99,23 @@ class Install {
 
         let pathToMixins = fs.path.join(this.pathToApp, 'view/mixin');
         let pathToLayouts = fs.path.join(this.pathToApp, 'view/layout');
-        let mixins = '';
 
-        for (let fileName of await fs.readdir(pathToMixins)) {
-            mixins += await fs.readFile(fs.path.join(pathToMixins, fileName)) + "\n";
-        }
+        let mixins = await fs.readDirectoryFileContent(pathToMixins);
+        let layouts = await fs.readDirectoryFileContent(pathToLayouts);
 
-        for (let fileName of await fs.readdir(pathToLayouts)) {
-            let pathToLayout = fs.path.join(pathToLayouts, fileName);
-            let layoutContent = await fs.readFile(pathToLayout);
+        for (let layoutPath in layouts) {
 
-            if (0 !== layoutContent.indexOf('extends')) {
-                layoutContent = mixins + layoutContent;
+            let content = layouts[layoutPath];
 
-                await fs.remove(pathToLayout);
-                await fs.ensureFileExists(pathToLayout);
-                await fs.appendFile(pathToLayout, layoutContent);
+            if (0 !== content.indexOf('extends')) {
+
+                for (let filePath in mixins) {
+                    content = mixins[filePath] + content;
+                }
+
+                await fs.remove(layoutPath);
+                await fs.ensureFileExists(layoutPath);
+                await fs.appendFile(layoutPath, content);
             }
         }
 

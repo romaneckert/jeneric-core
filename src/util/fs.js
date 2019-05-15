@@ -90,7 +90,7 @@ fs.isSymbolicLinkToDirectory = async (path) => {
 
 fs.ensureDirExists = async (path) => {
 
-    await fs.mkdir(path, { recursive: true });
+    await fs.mkdir(path, {recursive: true});
 
     return true;
 };
@@ -142,6 +142,24 @@ fs.readFile = async (path, options) => {
     }
 
     return defaultReadFile(path, options);
+};
+
+fs.readDirectoryFileContent = async (path, obj) => {
+
+    if ('object' !== typeof obj || null === obj) {
+        obj = {};
+    }
+
+    if (await fs.isDirectory(path)) {
+
+        for (let file of await fs.readdir(path)) {
+            await fs.readDirectoryFileContent(fs.path.join(path, file), obj);
+        }
+    } else if (await fs.isFile(path)) {
+        obj[path] = await fs.readFile(path);
+    }
+
+    return obj;
 };
 
 module.exports = fs;
